@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tag_insets" type="id" />
+    <item name="row_title" type="id" />
+    <item name="row_value" type="id" />
+    <item name="row_switch" type="id" />
+</resources>

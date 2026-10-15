@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/ic_splash_clock">
+    <target android:name="t0">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="0" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="0" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t1">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="45" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="45" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t2">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="90" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="90" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t3">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="135" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="135" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t4">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="180" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="180" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t5">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="225" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="225" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t6">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="270" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="270" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t7">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="315" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="315" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t8">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="360" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="360" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t9">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="405" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="405" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t10">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="450" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="450" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="t11">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:duration="360" android:startOffset="495" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+                <objectAnimator android:duration="360" android:startOffset="495" android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="hourHand">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="900" android:startOffset="120" android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="rotation" android:valueFrom="-300" android:valueTo="0" android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="minHand">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="1000" android:startOffset="120" android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="rotation" android:valueFrom="-720" android:valueTo="0" android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="secHand">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="1000" android:startOffset="120" android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="rotation" android:valueFrom="-1080" android:valueTo="0" android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+</animated-vector>

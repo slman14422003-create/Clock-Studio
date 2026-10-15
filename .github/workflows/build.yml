@@ -1,0 +1,83 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore: ['**/*.md']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        type: choice
+        options: [release, debug]
+        default: release
+
+permissions:
+  contents: read
+
+env:
+  BUILD_TYPE: ${{ inputs.build_type || 'release' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Guard (exported components)
+        run: |
+          M=app/src/main/AndroidManifest.xml
+          EXP="$(grep -B1 'android:exported="true"' $M | grep -o 'android:name="[^"]*"' | sort | tr '\n' ' ')"
+          [ "$EXP" = 'android:name=".MainActivity" ' ] || { echo "::error::only MainActivity may be exported (found: $EXP)"; exit 1; }
+          grep -q 'android:allowBackup="false"' $M || { echo "::error::backup must stay disabled"; exit 1; }
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK (API 36)
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-36 build-tools;36.0.0'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+
+      - name: Prepare release signing
+        if: env.BUILD_TYPE == 'release'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::warning::no permanent signing key, the APK gets a temporary debug key"
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d > "$RUNNER_TEMP/release.jks"
+          {
+            echo "SIGNING_STORE_FILE=$RUNNER_TEMP/release.jks"
+            echo "SIGNING_STORE_PASSWORD=$KEYSTORE_PASSWORD"
+            echo "SIGNING_KEY_ALIAS=${KEY_ALIAS:-clock}"
+            echo "SIGNING_KEY_PASSWORD=${KEY_PASSWORD:-$KEYSTORE_PASSWORD}"
+          } >> "$GITHUB_ENV"
+
+      - name: Build APK
+        run: |
+          if [ "$BUILD_TYPE" = "release" ]; then
+            gradle assembleRelease --stacktrace
+          else
+            gradle assembleDebug --stacktrace
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Clock-${{ env.BUILD_TYPE }}-apk
+          path: app/build/outputs/apk/${{ env.BUILD_TYPE }}/*.apk
+          if-no-files-found: error
+          retention-days: 30

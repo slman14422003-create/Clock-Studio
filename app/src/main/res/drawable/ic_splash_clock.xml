@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group android:name="mark" android:pivotX="54" android:pivotY="54" android:scaleX="0.86" android:scaleY="0.86">
+        <path android:fillColor="#140A84FF" android:pathData="M16,54a38,38 0 1,0 76,0a38,38 0 1,0 -76,0Z" />
+            <group android:name="t0" android:pivotX="54" android:pivotY="54" android:rotation="0">
+                <path android:fillColor="#FF9BD8FF" android:pathData="M50.8,26a3.2,7 0 1,0 6.4,0a3.2,7 0 1,0 -6.4,0Z" />
+            </group>
+            <group android:name="t1" android:pivotX="54" android:pivotY="54" android:rotation="30">
+                <path android:fillColor="#FF85C4FB" android:pathData="M51.7,26a2.3,4.6 0 1,0 4.6,0a2.3,4.6 0 1,0 -4.6,0Z" />
+            </group>
+            <group android:name="t2" android:pivotX="54" android:pivotY="54" android:rotation="60">
+                <path android:fillColor="#FF6EB0F7" android:pathData="M51.7,26a2.3,4.6 0 1,0 4.6,0a2.3,4.6 0 1,0 -4.6,0Z" />
+            </group>
+            <group android:name="t3" android:pivotX="54" android:pivotY="54" android:rotation="90">
+                <path android:fillColor="#FF589CF4" android:pathData="M50.8,26a3.2,7 0 1,0 6.4,0a3.2,7 0 1,0 -6.4,0Z" />
+            </group>
+            <group android:name="t4" android:pivotX="54" android:pivotY="54" android:rotation="120">
+                <path android:fillColor="#FF4288F0" android:pathData="M51.7,26a2.3,4.6 0 1,0 4.6,0a2.3,4.6 0 1,0 -4.6,0Z" />
+            </group>
+            <group android:name="t5" android:pivotX="54" android:pivotY="54" android:rotation="150">
+                <path android:fillColor="#FF2B74EC" android:pathData="M51.7,26a2.3,4.6 0 1,0 4.6,0a2.3,4.6 0 1,0 -4.6,0Z" />
+            </group>
+            <group android:name="t6" android:pivotX="54" android:pivotY="54" android:rotation="180">
+                <path android:fillColor="#FF1560E8" android:pathData="M50.8,26a3.2,7 0 1,0 6.4,0a3.2,7 0 1,0 -6.4,0Z" />
+            </group>
+            <group android:name="t7" android:pivotX="54" android:pivotY="54" android:rotation="210">
+                <path android:fillColor="#FF2B74EC" android:pathData="M51.7,26a2.3,4.6 0 1,0 4.6,0a2.3,4.6 0 1,0 -4.6,0Z" />
+            </group>
+            <group android:name="t8" android:pivotX="54" android:pivotY="54" android:rotation="240">
+                <path android:fillColor="#FF4288F0" android:pathData="M51.7,26a2.3,4.6 0 1,0 4.6,0a2.3,4.6 0 1,0 -4.6,0Z" />
+            </group>
+            <group android:name="t9" android:pivotX="54" android:pivotY="54" android:rotation="270">
+                <path android:fillColor="#FF589CF4" android:pathData="M50.8,26a3.2,7 0 1,0 6.4,0a3.2,7 0 1,0 -6.4,0Z" />
+            </group>
+            <group android:name="t10" android:pivotX="54" android:pivotY="54" android:rotation="300">
+                <path android:fillColor="#FF6EB0F7" android:pathData="M51.7,26a2.3,4.6 0 1,0 4.6,0a2.3,4.6 0 1,0 -4.6,0Z" />
+            </group>
+            <group android:name="t11" android:pivotX="54" android:pivotY="54" android:rotation="330">
+                <path android:fillColor="#FF85C4FB" android:pathData="M51.7,26a2.3,4.6 0 1,0 4.6,0a2.3,4.6 0 1,0 -4.6,0Z" />
+            </group>
+            <group android:name="hourHand" android:pivotX="54" android:pivotY="54" android:rotation="0">
+                <path android:pathData="M54,54L42.53,45.97" android:strokeColor="#FF1560E8" android:strokeWidth="5.4" android:strokeLineCap="round" />
+            </group>
+            <group android:name="minHand" android:pivotX="54" android:pivotY="54" android:rotation="0">
+                <path android:pathData="M54,54L72.19,43.5" android:strokeColor="#FF1560E8" android:strokeWidth="4" android:strokeLineCap="round" />
+            </group>
+            <group android:name="secHand" android:pivotX="54" android:pivotY="54" android:rotation="0">
+                <path android:pathData="M56.05,48.36L47.5,71.85" android:strokeColor="#FFFF9F0A" android:strokeWidth="1.8" android:strokeLineCap="round" />
+            </group>
+        <path android:fillColor="#FFFF9F0A" android:pathData="M50.6,54a3.4,3.4 0 1,0 6.8,0a3.4,3.4 0 1,0 -6.8,0Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M52.7,54a1.3,1.3 0 1,0 2.6,0a1.3,1.3 0 1,0 -2.6,0Z" />
+    </group>
+</vector>

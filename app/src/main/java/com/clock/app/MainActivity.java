@@ -1,0 +1,234 @@
+package com.clock.app;
+
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.splashscreen.SplashScreen;
+
+/** Clock, Alarms, Timers and Tasks live here as four tabs; Settings is its own screen. */
+public class MainActivity extends BaseActivity implements TabView.Host {
+    static final String A_NEW_ALARM = "app.clock.action.NEW_ALARM";
+    static final String A_NEW_TIMER = "app.clock.action.NEW_TIMER";
+    static final String A_NEW_TASK = "app.clock.action.NEW_TASK";
+
+    private final TabView[] tabs = new TabView[4];
+    private NavBar nav;
+    private int tab = NavBar.CLOCK;
+    private final Handler ui = new Handler(Looper.getMainLooper());
+    private OnBackPressedCallback backCb;
+    private LinearLayout pill;
+    private TextView pillMsg;
+    private Runnable undoAction;
+    private final Runnable hideUndo = this::hidePill;
+    private final Runnable onBus = this::refreshAll;
+    private final Runnable ticker = new Runnable() {
+        @Override
+        public void run() {
+            if (tabs[tab] != null) tabs[tab].tick();
+            ui.postDelayed(this, 1000 - System.currentTimeMillis() % 1000);
+        }
+    };
+
+    private final ActivityResultLauncher<String> notifPermission = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), granted -> { });
+
+    private final ActivityResultLauncher<Intent> cityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), r -> {
+                Intent d = r.getData();
+                if (r.getResultCode() == RESULT_OK && d != null && d.getStringExtra("zone") != null) {
+                    WorldClockView.addZone(this, d.getStringExtra("zone"));
+                }
+            });
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen splash = SplashScreen.installSplashScreen(this);
+        splash.setOnExitAnimationListener(provider -> {
+            try {
+                final View sv = provider.getView();
+                View ic = provider.getIconView();
+                if (ic != null) {
+                    ic.animate().scaleX(1.7f).scaleY(1.7f).alpha(0f).setDuration(360)
+                            .setInterpolator(new android.view.animation.AccelerateInterpolator(1.2f)).start();
+                }
+                if (sv != null) {
+                    sv.animate().alpha(0f).setStartDelay(140).setDuration(320).withEndAction(provider::remove).start();
+                } else {
+                    provider.remove();
+                }
+            } catch (Throwable t) {
+                try {
+                    provider.remove();
+                } catch (Throwable ignored) {
+                }
+            }
+        });
+        super.onCreate(savedInstanceState);
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackgroundColor(Ui.color(this, R.color.bg));
+        FrameLayout stage = new FrameLayout(this);
+        root.addView(stage, new LinearLayout.LayoutParams(-1, 0, 1f));
+        setContentView(root);
+        root.setAlpha(0f);
+        root.animate().alpha(1f).setStartDelay(160).setDuration(420).start();
+
+        tabs[0] = new WorldClockView(this, this);
+        tabs[1] = new AlarmsView(this, this);
+        tabs[2] = new TimersView(this, this);
+        tabs[3] = new TasksView(this, this);
+        for (TabView t : tabs) stage.addView(t, new FrameLayout.LayoutParams(-1, -1));
+
+        pill = new LinearLayout(this);
+        pill.setOrientation(LinearLayout.HORIZONTAL);
+        pill.setGravity(Gravity.CENTER_VERTICAL);
+        pill.setBackground(Ui.rect(0xF0262628, Ui.dpf(this, 100)));
+        pill.setPadding(Ui.dp(this, 18), Ui.dp(this, 11), Ui.dp(this, 18), Ui.dp(this, 11));
+        pill.setElevation(Ui.dp(this, 6));
+        pillMsg = Ui.text(this, "", 15, R.color.text_primary);
+        pillMsg.setTextColor(0xFFFFFFFF);
+        pill.addView(pillMsg);
+        TextView act = Ui.text(this, getString(R.string.undo), 15, R.color.text_primary);
+        act.setTextColor(0xFF5CC0FF);
+        act.setTypeface(Ui.medium());
+        act.setPadding(Ui.dp(this, 16), 0, 0, 0);
+        act.setOnClickListener(v -> {
+            Runnable r = undoAction;
+            hidePill();
+            if (r != null) r.run();
+        });
+        pill.addView(act);
+        pill.setVisibility(View.GONE);
+        FrameLayout.LayoutParams pl = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+        pl.bottomMargin = Ui.dp(this, 10);
+        stage.addView(pill, pl);
+
+        nav = NavBar.attach(this, root, NavBar.CLOCK, idx -> {
+            if (idx == NavBar.SETTINGS) startActivity(new Intent(this, SettingsActivity.class));
+            else showTab(idx);
+        });
+        nav.setOnReselect(idx -> {
+            if (idx < 4) tabs[idx].scrollToTop();
+        });
+
+        backCb = new OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+                showTab(NavBar.CLOCK);
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, backCb);
+
+        showTab(NavBar.CLOCK);
+        if (savedInstanceState == null) handle(getIntent());
+
+        if (Build.VERSION.SDK_INT >= 33 && !Store.askedNotifications(this)
+                && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            Store.setAskedNotifications(this);
+            notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handle(intent);
+    }
+
+    private void handle(Intent in) {
+        if (in == null) return;
+        String a = in.getAction();
+        if (A_NEW_ALARM.equals(a)) {
+            showTab(NavBar.ALARMS);
+            editAlarm(0);
+        } else if (A_NEW_TIMER.equals(a)) {
+            showTab(NavBar.TIMERS);
+        } else if (A_NEW_TASK.equals(a)) {
+            showTab(NavBar.TASKS);
+            editTask(0);
+        } else if (in.hasExtra("tab")) {
+            int t = in.getIntExtra("tab", NavBar.CLOCK);
+            if (t >= 0 && t <= NavBar.TASKS) showTab(t);
+        }
+        in.setAction(null);
+        in.removeExtra("tab");
+    }
+
+    private void showTab(int i) {
+        tab = i;
+        for (int k = 0; k < tabs.length; k++) tabs[k].setVisibility(k == i ? View.VISIBLE : View.GONE);
+        tabs[i].refresh();
+        tabs[i].setAlpha(0f);
+        tabs[i].animate().alpha(1f).setDuration(220).start();
+        nav.render(i);
+        backCb.setEnabled(i != NavBar.CLOCK);
+    }
+
+    private void refreshAll() {
+        for (TabView t : tabs) t.refresh();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Bus.listen(onBus);
+        refreshAll();
+        ui.removeCallbacks(ticker);
+        ui.post(ticker);
+    }
+
+    @Override
+    protected void onPause() {
+        Bus.unlisten(onBus);
+        ui.removeCallbacks(ticker);
+        super.onPause();
+    }
+
+    // ---- TabView.Host
+
+    @Override
+    public void undo(CharSequence message, Runnable undo) {
+        undoAction = undo;
+        pillMsg.setText(message);
+        pill.setVisibility(View.VISIBLE);
+        pill.setAlpha(0f);
+        pill.animate().alpha(1f).setDuration(180).start();
+        ui.removeCallbacks(hideUndo);
+        ui.postDelayed(hideUndo, 4500);
+    }
+
+    private void hidePill() {
+        undoAction = null;
+        ui.removeCallbacks(hideUndo);
+        pill.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void editAlarm(int id) {
+        startActivity(new Intent(this, AlarmEditActivity.class).putExtra("id", id));
+    }
+
+    @Override
+    public void editTask(int id) {
+        startActivity(new Intent(this, TaskEditActivity.class).putExtra("id", id));
+    }
+
+    @Override
+    public void pickCity() {
+        cityLauncher.launch(new Intent(this, CityPickerActivity.class));
+    }
+}
