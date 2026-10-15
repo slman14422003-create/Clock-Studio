@@ -7,3 +7,14 @@
 - ميزات جديدة: StandBy (رقمي/تناظري/ليلي)، محوّل التوقيت، وقت النوم Bedtime (منبّه استيقاظ + تذكير)، تخطّي المنبّه التالي (ضغطة مطولة)، عقرب ستوب‌واتش تناظري (اضغط الوقت)، إعادة ترتيب المدن بالسحب، اهتزاز لمسي (قابل للإيقاف من الإعدادات).
 - ملفات جديدة: Anim, Bedtime, BedtimeActivity, ConverterActivity, StandByActivity, StandByView, StopwatchDial.
 - حذف README.md من المشروع.
+
+## مهمة: مفتاح ريليس + workflow خاص بالريليس
+- مفتاح توقيع clock-release.jks (alias: clock) صالح حتى 2064، الأسرار المطلوبة: KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD.
+- .github/workflows/release.yml: يبني APK موقّع ويتحقق من التوقيع وينشر GitHub Release (عند دفع وسم v* أو تشغيل يدوي مع رقم الإصدار). يفشل إذا الأسرار ناقصة.
+- build.yml بقي للبناء العادي بدون تعديل.
+
+## مهمة: أوقات الصلاة
+- موقع الأوقات: Aladhan API (api.aladhan.com) بحسب موقع المستخدم؛ تنزيل شهر كامل وتخزينه ليعمل بدون إنترنت، ويتجدد عند تغيّر الشهر/الموقع/الطريقة.
+- الموقع: تلقائي (إذن ACCESS_COARSE_LOCATION، بدون خدمات Google) أو اختيار مدينة من PrayerCities (سوريا أولاً). الإحداثيات تُرسل بدقة منزلتين عشريتين فقط.
+- شاشة PrayerActivity (طريقة الحساب، العصر الحنفي، إشعارات الصلاة)، وبطاقة "الصلاة القادمة" بتبويب الساعة.
+- ملفات: PrayerTimes, PrayerLoc, PrayerCities, PrayerActivity, ic_prayer. أذونات جديدة: INTERNET, ACCESS_COARSE_LOCATION.

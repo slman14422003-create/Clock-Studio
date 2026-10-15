@@ -25,6 +25,9 @@ import java.util.TimeZone;
 /** World clock: analog local clock on top, then one big-time row per city, swipe to delete. */
 final class WorldClockView extends TabView {
     private final RecyclerView rv;
+    private LinearLayout prayerCard;
+    private TextView prayerTitle, prayerSub;
+    private long lastPrayerUi;
     private final List<String> zones = new ArrayList<>();
     private final Adapter adapter = new Adapter();
 
@@ -35,6 +38,33 @@ final class WorldClockView extends TabView {
         hd.addButton(R.drawable.ic_globe, R.string.converter, false, v -> openScreen(ConverterActivity.class, false));
         hd.addButton(R.drawable.ic_add, R.string.add_city, true, v -> host.pickCity());
         addView(hd);
+        prayerCard = new LinearLayout(c);
+        prayerCard.setOrientation(LinearLayout.HORIZONTAL);
+        prayerCard.setGravity(Gravity.CENTER_VERTICAL);
+        prayerCard.setBackground(Ui.rect(Ui.color(c, R.color.field), Ui.dpf(c, 16)));
+        prayerCard.setPaddingRelative(Ui.dp(c, 14), Ui.dp(c, 10), Ui.dp(c, 14), Ui.dp(c, 10));
+        LinearLayout.LayoutParams ptl = new LinearLayout.LayoutParams(Ui.dp(c, 34), Ui.dp(c, 34));
+        ptl.setMarginEnd(Ui.dp(c, 12));
+        prayerCard.addView(Ui.tile(c, R.drawable.ic_prayer, R.color.ok), ptl);
+        LinearLayout pcol = new LinearLayout(c);
+        pcol.setOrientation(LinearLayout.VERTICAL);
+        prayerTitle = Ui.text(c, "", 16, R.color.text_primary);
+        prayerTitle.setTypeface(Ui.medium());
+        prayerTitle.setSingleLine(true);
+        pcol.addView(prayerTitle);
+        prayerSub = Ui.text(c, "", 13, R.color.text_secondary);
+        prayerSub.setSingleLine(true);
+        pcol.addView(prayerSub);
+        prayerCard.addView(pcol, new LinearLayout.LayoutParams(0, -2, 1f));
+        ImageView pch = new ImageView(c);
+        pch.setImageResource(R.drawable.ic_chevron);
+        pch.setImageTintList(android.content.res.ColorStateList.valueOf(Ui.color(c, R.color.text_hint)));
+        prayerCard.addView(pch, new LinearLayout.LayoutParams(Ui.dp(c, 18), Ui.dp(c, 18)));
+        Ui.press(c, prayerCard);
+        prayerCard.setOnClickListener(v -> c.startActivity(new android.content.Intent(c, PrayerActivity.class)));
+        LinearLayout.LayoutParams pcl = new LinearLayout.LayoutParams(-1, -2);
+        pcl.setMargins(Ui.dp(c, 16), Ui.dp(c, 2), Ui.dp(c, 16), Ui.dp(c, 8));
+        addView(prayerCard, pcl);
         rv = new RecyclerView(c);
         rv.setLayoutManager(new LinearLayoutManager(c));
         rv.setAdapter(adapter);
@@ -90,6 +120,21 @@ final class WorldClockView extends TabView {
         return true;
     }
 
+    private void updatePrayerCard() {
+        Context c = getContext();
+        lastPrayerUi = System.currentTimeMillis();
+        PrayerTimes.Cfg g = PrayerTimes.cfg(c);
+        PrayerTimes.Next n = g.configured ? PrayerTimes.next(c) : null;
+        if (n == null) {
+            prayerTitle.setText(R.string.prayer_times);
+            prayerSub.setText(g.configured ? g.place : c.getString(R.string.prayer_setup_sub));
+            return;
+        }
+        String[] names = c.getResources().getStringArray(R.array.prayer_names);
+        prayerTitle.setText(c.getString(R.string.next_prayer) + c.getString(R.string.list_sep) + " " + names[n.idx]);
+        prayerSub.setText(PrayerTimes.label(c, n.at, g.zone) + " \u00B7 " + Fmt.untilText(c, n.at - lastPrayerUi));
+    }
+
     private void deleteAt(int pos) {
         final int idx = pos - 1;
         if (idx < 0 || idx >= zones.size()) {
@@ -109,6 +154,7 @@ final class WorldClockView extends TabView {
 
     @Override
     void refresh() {
+        updatePrayerCard();
         zones.clear();
         zones.addAll(loadZones(getContext()));
         adapter.notifyDataSetChanged();
@@ -116,6 +162,7 @@ final class WorldClockView extends TabView {
 
     @Override
     void tick() {
+        if (System.currentTimeMillis() - lastPrayerUi > 20000) updatePrayerCard();
         for (int i = 0; i < rv.getChildCount(); i++) {
             RecyclerView.ViewHolder vh = rv.getChildViewHolder(rv.getChildAt(i));
             if (vh instanceof Row) ((Row) vh).time();

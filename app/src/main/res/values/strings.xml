@@ -172,4 +172,43 @@
     <string name="skipping_next">سيتم تخطّي التالي</string>
     <string name="skip_done">سيتم تخطّي المنبّه التالي</string>
     <string name="haptics">الاهتزاز اللمسي</string>
+    <string name="prayer_times">أوقات الصلاة</string>
+    <string name="next_prayer">الصلاة القادمة</string>
+    <string name="prayer_setup_sub">حدّد موقعك لعرض أوقات الصلاة</string>
+    <string name="sec_location">الموقع</string>
+    <string name="location">الموقع</string>
+    <string name="loc_auto">تلقائي (حسب موقعي)</string>
+    <string name="loc_city">اختيار مدينة</string>
+    <string name="loc_locating">جارٍ تحديد موقعك…</string>
+    <string name="loc_failed">تعذّر تحديد موقعك، فعّل الموقع أو اختر مدينة</string>
+    <string name="prayer_method">طريقة الحساب</string>
+    <string name="prayer_hanafi">العصر على المذهب الحنفي</string>
+    <string name="prayer_notify">إشعارات الصلاة</string>
+    <string name="prayer_updated">آخر تحديث: %s</string>
+    <string name="prayer_source">الأوقات من موقع Aladhan (aladhan.com) وتُحدَّث عبر الإنترنت حسب منطقتك وتبقى محفوظة للعمل بدون إنترنت.</string>
+    <string name="prayer_refresh_fail">تعذّر التحديث، تحقّق من الاتصال بالإنترنت.</string>
+    <string name="prayer_updated_ok">تم تحديث الأوقات</string>
+    <string name="prayer_updating">جارٍ التحديث…</string>
+    <string name="prayer_refresh">تحديث</string>
+    <string name="prayer_no_data">لا توجد أوقات محفوظة بعد، اضغط تحديث مع الاتصال بالإنترنت.</string>
+    <string name="ch_prayer">أوقات الصلاة</string>
+    <string name="prayer_notif_text">حان الآن موعد %1$s · %2$s</string>
+    <string name="hijri_fmt">%1$s %2$s %3$s هـ</string>
+    <string-array name="prayer_names">
+        <item>الفجر</item>
+        <item>الشروق</item>
+        <item>الظهر</item>
+        <item>العصر</item>
+        <item>المغرب</item>
+        <item>العشاء</item>
+    </string-array>
+    <string-array name="prayer_methods">
+        <item>تلقائي حسب المنطقة</item>
+        <item>رابطة العالم الإسلامي</item>
+        <item>أم القرى (مكة)</item>
+        <item>الهيئة المصرية العامة للمساحة</item>
+        <item>أمريكا الشمالية (ISNA)</item>
+        <item>جامعة العلوم الإسلامية بكراتشي</item>
+        <item>رئاسة الشؤون الدينية التركية</item>
+    </string-array>
 </resources>

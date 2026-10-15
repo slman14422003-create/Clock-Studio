@@ -57,6 +57,9 @@ public class ClockReceiver extends BroadcastReceiver {
             Bedtime b = Bedtime.load(c);
             if (b.configured && b.enabled) Notif.bedtime(c);
             Bedtime.reschedule(c);
+        } else if (Sched.KIND_PRAYER.equals(kind)) {
+            Notif.prayer(c, id);
+            PrayerTimes.scheduleNext(c);
         }
     }
 }

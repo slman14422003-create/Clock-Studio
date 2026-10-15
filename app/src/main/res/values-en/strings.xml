@@ -172,4 +172,43 @@
     <string name="skipping_next">Skipping next</string>
     <string name="skip_done">Next alarm will be skipped</string>
     <string name="haptics">Haptic feedback</string>
+    <string name="prayer_times">Prayer times</string>
+    <string name="next_prayer">Next prayer</string>
+    <string name="prayer_setup_sub">Set your location to see prayer times</string>
+    <string name="sec_location">Location</string>
+    <string name="location">Location</string>
+    <string name="loc_auto">Automatic (my location)</string>
+    <string name="loc_city">Choose a city</string>
+    <string name="loc_locating">Finding your location…</string>
+    <string name="loc_failed">Couldn\'t get your location. Turn on location or choose a city</string>
+    <string name="prayer_method">Calculation method</string>
+    <string name="prayer_hanafi">Hanafi Asr</string>
+    <string name="prayer_notify">Prayer notifications</string>
+    <string name="prayer_updated">Last updated: %s</string>
+    <string name="prayer_source">Times come from Aladhan (aladhan.com), updated online for your region and kept for offline use.</string>
+    <string name="prayer_refresh_fail">Couldn\'t update. Check your internet connection.</string>
+    <string name="prayer_updated_ok">Times updated</string>
+    <string name="prayer_updating">Updating…</string>
+    <string name="prayer_refresh">Refresh</string>
+    <string name="prayer_no_data">No saved times yet. Tap refresh while online.</string>
+    <string name="ch_prayer">Prayer times</string>
+    <string name="prayer_notif_text">It\'s time for %1$s · %2$s</string>
+    <string name="hijri_fmt">%1$s %2$s %3$s AH</string>
+    <string-array name="prayer_names">
+        <item>Fajr</item>
+        <item>Sunrise</item>
+        <item>Dhuhr</item>
+        <item>Asr</item>
+        <item>Maghrib</item>
+        <item>Isha</item>
+    </string-array>
+    <string-array name="prayer_methods">
+        <item>Automatic by region</item>
+        <item>Muslim World League</item>
+        <item>Umm al-Qura (Makkah)</item>
+        <item>Egyptian General Authority</item>
+        <item>ISNA (North America)</item>
+        <item>Karachi (Univ. of Islamic Sciences)</item>
+        <item>Diyanet (Turkey)</item>
+    </string-array>
 </resources>

@@ -229,6 +229,7 @@ public class MainActivity extends BaseActivity implements TabView.Host {
         super.onResume();
         Bus.listen(onBus);
         refreshAll();
+        PrayerTimes.autoRefresh(this, null);
         ui.removeCallbacks(ticker);
         ui.post(ticker);
     }

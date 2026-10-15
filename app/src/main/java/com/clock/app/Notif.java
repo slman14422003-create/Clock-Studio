@@ -22,8 +22,8 @@ final class Notif {
     private Notif() {
     }
 
-    static final String CH_RING = "ring", CH_TIMER = "timer", CH_TASK = "task", CH_MISSED = "missed", CH_BEDTIME = "bedtime";
-    private static final String TAG_TIMER = "timer", TAG_TASK = "task", TAG_MISSED = "missed", TAG_BEDTIME = "bedtime";
+    static final String CH_RING = "ring", CH_TIMER = "timer", CH_TASK = "task", CH_MISSED = "missed", CH_BEDTIME = "bedtime", CH_PRAYER = "prayer";
+    private static final String TAG_TIMER = "timer", TAG_TASK = "task", TAG_MISSED = "missed", TAG_BEDTIME = "bedtime", TAG_PRAYER = "prayer";
 
     static void init(Context c) {
         if (Build.VERSION.SDK_INT < 26) return;
@@ -41,6 +41,7 @@ final class Notif {
         list.add(new NotificationChannel(CH_TASK, c.getString(R.string.ch_task), NotificationManager.IMPORTANCE_HIGH));
         list.add(new NotificationChannel(CH_MISSED, c.getString(R.string.ch_missed), NotificationManager.IMPORTANCE_DEFAULT));
         list.add(new NotificationChannel(CH_BEDTIME, c.getString(R.string.ch_bedtime), NotificationManager.IMPORTANCE_DEFAULT));
+        list.add(new NotificationChannel(CH_PRAYER, c.getString(R.string.ch_prayer), NotificationManager.IMPORTANCE_HIGH));
         nm.createNotificationChannels(list);
     }
 
@@ -130,6 +131,22 @@ final class Notif {
                 .setAutoCancel(true)
                 .setContentIntent(openTab(c, NavBar.ALARMS));
         post(c, TAG_BEDTIME, 1, nb.build());
+    }
+
+    /** "It is time for Asr" at the prayer time (the next one is booked right after). */
+    static void prayer(Context c, int idx) {
+        String[] names = c.getResources().getStringArray(R.array.prayer_names);
+        if (idx < 0 || idx >= names.length) return;
+        PrayerTimes.Cfg g = PrayerTimes.cfg(c);
+        NotificationCompat.Builder nb = new NotificationCompat.Builder(c, CH_PRAYER)
+                .setSmallIcon(R.drawable.ic_prayer)
+                .setContentTitle(names[idx])
+                .setContentText(c.getString(R.string.prayer_notif_text, names[idx], g.place))
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setContentIntent(openTab(c, NavBar.CLOCK));
+        post(c, TAG_PRAYER, idx, nb.build());
     }
 
     static void cancelBedtime(Context c) {
