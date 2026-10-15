@@ -144,4 +144,32 @@
         <item>F</item>
         <item>S</item>
     </string-array>
+    <string name="standby">StandBy</string>
+    <string name="standby_style">StandBy style</string>
+    <string name="standby_digital">Digital</string>
+    <string name="standby_analog">Analog</string>
+    <string name="standby_night">Night</string>
+    <string name="sec_standby">StandBy</string>
+    <string name="converter">Time converter</string>
+    <string name="conv_from">Convert from</string>
+    <string name="conv_same_day">Same day</string>
+    <string name="bedtime">Bedtime</string>
+    <string name="bedtime_setup_sub">Set a sleep schedule and wake-up alarm</string>
+    <string name="bedtime_line">Sleep %1$s · Wake up %2$s</string>
+    <string name="wake_up">Wake up</string>
+    <string name="go_to_bed">Go to bed</string>
+    <string name="sleep_goal">Sleep goal</string>
+    <string name="bedtime_reminder">Reminder</string>
+    <string name="remind_before">%s before</string>
+    <string name="bedtime_on">Bedtime schedule</string>
+    <string name="bedtime_saved">Bedtime schedule saved</string>
+    <string name="bedtime_remove">Remove Bedtime</string>
+    <string name="bedtime_notif_title">Time to wind down</string>
+    <string name="bedtime_notif_text">Bedtime at %1$s · Wake up at %2$s</string>
+    <string name="ch_bedtime">Bedtime reminders</string>
+    <string name="skip_next">Skip next alarm</string>
+    <string name="skip_cancel">Cancel skip</string>
+    <string name="skipping_next">Skipping next</string>
+    <string name="skip_done">Next alarm will be skipped</string>
+    <string name="haptics">Haptic feedback</string>
 </resources>

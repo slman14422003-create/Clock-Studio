@@ -44,10 +44,20 @@ final class TimersView extends TabView {
         show(0);
     }
 
+    private boolean shown;
+
     private void show(int i) {
+        View in = i == 0 ? timer : watch;
         timer.setVisibility(i == 0 ? VISIBLE : GONE);
         watch.setVisibility(i == 1 ? VISIBLE : GONE);
         if (i == 1) watch.resume();
+        if (shown) {
+            in.animate().cancel();
+            in.setAlpha(0f);
+            in.setTranslationX((i == 1 ? 1 : -1) * Ui.dp(getContext(), 22));
+            in.animate().alpha(1f).translationX(0f).setDuration(380).setInterpolator(Anim.OUT).start();
+        }
+        shown = true;
     }
 
     void showStopwatch(boolean on) {
@@ -274,6 +284,8 @@ final class TimersView extends TabView {
     private static final class StopwatchPane extends LinearLayout {
         private final Handler h = new Handler(Looper.getMainLooper());
         private final TextView big, lapBtn, startBtn;
+        private final StopwatchDial dial;
+        private boolean analog;
         private final LinearLayout lapBox;
         private TextView liveTime;
         private boolean running;
@@ -291,6 +303,11 @@ final class TimersView extends TabView {
         StopwatchPane(Context c) {
             super(c);
             setOrientation(VERTICAL);
+            dial = new StopwatchDial(c);
+            LayoutParams dl = new LayoutParams(Ui.dp(c, 210), Ui.dp(c, 210));
+            dl.gravity = Gravity.CENTER_HORIZONTAL;
+            dl.topMargin = Ui.dp(c, 12);
+            addView(dial, dl);
             big = Ui.tabular(Ui.text(c, "", 72, R.color.text_primary));
             big.setTypeface(Ui.thin());
             big.setGravity(Gravity.CENTER);
@@ -325,7 +342,28 @@ final class TimersView extends TabView {
                 if (running) stop();
                 else start();
             });
+            View.OnClickListener toggle = v -> {
+                analog = !analog;
+                Store.setStopwatchAnalog(getContext(), analog);
+                Ui.tick(v);
+                applyMode(true);
+                paint();
+            };
+            big.setOnClickListener(toggle);
+            dial.setOnClickListener(toggle);
+            analog = Store.stopwatchAnalog(c);
+            applyMode(false);
             load();
+        }
+
+        /** Tap the time to switch between the big digits and the analog dial. */
+        private void applyMode(boolean animate) {
+            Context c = getContext();
+            dial.setVisibility(analog ? VISIBLE : GONE);
+            big.setTextSize(analog ? 34 : 72);
+            ((LayoutParams) big.getLayoutParams()).topMargin = Ui.dp(c, analog ? 10 : 36);
+            big.requestLayout();
+            if (animate) Anim.popIn(analog ? dial : big);
         }
 
         private long elapsed() {
@@ -424,6 +462,7 @@ final class TimersView extends TabView {
         private void paint() {
             long e = elapsed();
             big.setText(Fmt.stopwatch(e));
+            dial.setElapsed(e);
             if (liveTime != null) liveTime.setText(Fmt.stopwatch(e - (laps.isEmpty() ? 0 : laps.get(laps.size() - 1))));
         }
 

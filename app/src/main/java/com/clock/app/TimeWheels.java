@@ -33,6 +33,14 @@ final class TimeWheels {
         }
     }
 
+    /** Called whenever any wheel settles on a new row. */
+    void setOnChange(Runnable r) {
+        WheelView.Listener l = i -> r.run();
+        hour.setListener(l);
+        min.setListener(l);
+        if (ap != null) ap.setListener(l);
+    }
+
     int hour() {
         if (is24) return hour.getIndex();
         int h12 = hour.getIndex() + 1;

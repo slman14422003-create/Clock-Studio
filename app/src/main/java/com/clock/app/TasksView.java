@@ -45,6 +45,7 @@ final class TasksView extends TabView {
         rv.setLayoutManager(new LinearLayoutManager(c));
         rv.setAdapter(adapter);
         rv.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        hd.bindScroll(rv);
         new ItemTouchHelper(new SwipeDelete(c, this::deleteAt).filter(p -> p >= 2 && !tasks.isEmpty())).attachToRecyclerView(rv);
         addView(rv, new LayoutParams(-1, 0, 1f));
         refresh();

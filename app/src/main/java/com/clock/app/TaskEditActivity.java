@@ -24,6 +24,11 @@ public class TaskEditActivity extends BaseActivity {
     private android.widget.CompoundButton swDate, swTime;
 
     @Override
+    protected int transition() {
+        return SHEET;
+    }
+
+    @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         useGroupedBackground();

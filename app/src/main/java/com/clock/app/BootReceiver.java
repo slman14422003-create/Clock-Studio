@@ -11,5 +11,6 @@ public class BootReceiver extends BroadcastReceiver {
         Alarms.rescheduleAll(c);
         Timers.rescheduleAll(c);
         Tasks.rescheduleAll(c);
+        Bedtime.reschedule(c);
     }
 }

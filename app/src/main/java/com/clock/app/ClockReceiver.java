@@ -53,6 +53,10 @@ public class ClockReceiver extends BroadcastReceiver {
             Task t = Tasks.get(c, id);
             if (t == null || t.done) return;
             Notif.taskDue(c, t);
+        } else if (Sched.KIND_BEDTIME.equals(kind)) {
+            Bedtime b = Bedtime.load(c);
+            if (b.configured && b.enabled) Notif.bedtime(c);
+            Bedtime.reschedule(c);
         }
     }
 }

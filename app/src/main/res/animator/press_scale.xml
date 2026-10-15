@@ -1,30 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- iOS touch feedback: quick dip on press, soft spring back on release -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true">
         <set android:ordering="together">
             <objectAnimator
-                android:duration="80"
+                android:duration="90"
+                android:interpolator="@interpolator/ios_out"
                 android:propertyName="scaleX"
-                android:valueTo="0.97"
+                android:valueTo="0.955"
                 android:valueType="floatType" />
             <objectAnimator
-                android:duration="80"
+                android:duration="90"
+                android:interpolator="@interpolator/ios_out"
                 android:propertyName="scaleY"
-                android:valueTo="0.97"
+                android:valueTo="0.955"
                 android:valueType="floatType" />
         </set>
     </item>
     <item>
         <set android:ordering="together">
             <objectAnimator
-                android:duration="180"
-                android:interpolator="@android:interpolator/decelerate_quint"
+                android:duration="320"
+                android:interpolator="@interpolator/ios_spring"
                 android:propertyName="scaleX"
                 android:valueTo="1"
                 android:valueType="floatType" />
             <objectAnimator
-                android:duration="180"
-                android:interpolator="@android:interpolator/decelerate_quint"
+                android:duration="320"
+                android:interpolator="@interpolator/ios_spring"
                 android:propertyName="scaleY"
                 android:valueTo="1"
                 android:valueType="floatType" />

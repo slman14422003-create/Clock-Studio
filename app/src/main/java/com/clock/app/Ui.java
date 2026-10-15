@@ -1,6 +1,8 @@
 package com.clock.app;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -11,6 +13,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -199,6 +202,7 @@ final class Ui {
             t.setGravity(Gravity.CENTER);
             t.setTypeface(medium());
             t.setOnClickListener(v -> {
+                tick(v);
                 setSegment(track, idx);
                 if (cb != null) cb.on(idx);
             });
@@ -366,7 +370,10 @@ final class Ui {
         r.addView(col, clp);
         final SwitchCompat sw = styledSwitch(c, checked);
         sw.setId(R.id.row_switch);
-        sw.setOnCheckedChangeListener(l);
+        sw.setOnCheckedChangeListener((btn, on) -> {
+            tick(btn);
+            if (l != null) l.onCheckedChanged(btn, on);
+        });
         r.addView(sw, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         r.setOnClickListener(v -> sw.toggle());
         ripple(c, r);
@@ -413,12 +420,30 @@ final class Ui {
         if (v == null) return;
         v.animate().cancel();
         v.setAlpha(0f);
-        v.setTranslationY(dp(v.getContext(), 14));
+        v.setTranslationY(dp(v.getContext(), 22));
         v.animate().alpha(1f).translationY(0f)
-                .setStartDelay(Math.min(Math.max(index, 0), 9) * 28L)
-                .setDuration(300)
-                .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f))
+                .setStartDelay(Math.min(Math.max(index, 0), 9) * 34L)
+                .setDuration(480)
+                .setInterpolator(Anim.OUT)
                 .start();
+    }
+
+    /** Soft haptic tick for switches, segments and pick-ups (can be turned off in Settings). */
+    static void tick(View v) {
+        if (v == null || !Store.haptics(v.getContext())) return;
+        v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+    }
+
+    /** Opens a screen as an iOS bottom sheet. */
+    static void openSheet(Activity a, Intent i) {
+        a.startActivity(i);
+        a.overridePendingTransition(R.anim.sheet_open_enter, R.anim.sheet_open_exit);
+    }
+
+    /** Opens a screen with the soft iOS zoom (full-screen viewers such as StandBy). */
+    static void openZoom(Activity a, Intent i) {
+        a.startActivity(i);
+        a.overridePendingTransition(R.anim.viewer_open_enter, R.anim.hold);
     }
 
     static void toast(Context c, CharSequence t) {

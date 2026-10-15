@@ -34,6 +34,7 @@ public class SettingsActivity extends BaseActivity {
         root.addView(hd);
         ScrollView sv = new ScrollView(this);
         sv.setVerticalScrollBarEnabled(false);
+        hd.bindScroll(sv);
         col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
         col.setPadding(0, 0, 0, Ui.dp(this, 30));
@@ -76,6 +77,8 @@ public class SettingsActivity extends BaseActivity {
                         Lang.apply(this);
                     });
                 }), true);
+        Ui.addRow(g, Ui.switchRow(this, R.drawable.ic_vibrate, R.color.ok, getString(R.string.haptics), null,
+                Store.haptics(this), (v, on) -> Store.setHaptics(this, on)), true);
         col.addView(g);
 
         col.addView(Ui.sectionTitle(this, getString(R.string.sec_time)));
@@ -126,6 +129,19 @@ public class SettingsActivity extends BaseActivity {
         Ui.addRow(g3, Ui.switchRow(this, R.drawable.ic_sound, R.color.accent, getString(R.string.ramp_default), null,
                 Store.defaultRamp(this), (v, on) -> Store.setDefaultRamp(this, on)), true);
         col.addView(g3);
+
+        col.addView(Ui.sectionTitle(this, getString(R.string.sec_standby)));
+        LinearLayout gsb = Ui.group(this);
+        final String[] sbNames = {getString(R.string.standby_digital), getString(R.string.standby_analog), getString(R.string.standby_night)};
+        Ui.addRow(gsb, Ui.row(this, R.drawable.ic_standby, R.color.indigo, getString(R.string.standby_style),
+                sbNames[Store.standbyStyle(this)], true, v -> Dlg.choose(this, R.string.standby_style, sbNames,
+                        Store.standbyStyle(this), i -> {
+                            Store.setStandbyStyle(this, i);
+                            build();
+                        })), true);
+        Ui.addRow(gsb, Ui.row(this, R.drawable.ic_clock, R.color.info, getString(R.string.standby), null, true,
+                v -> Ui.openZoom(this, new Intent(this, StandByActivity.class))), true);
+        col.addView(gsb);
 
         col.addView(Ui.sectionTitle(this, getString(R.string.sec_permissions)));
         LinearLayout g4 = Ui.group(this);

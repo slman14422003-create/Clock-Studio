@@ -22,7 +22,7 @@ import android.widget.TextView;
 final class NavBar {
     static final int CLOCK = 0, ALARMS = 1, TIMERS = 2, TASKS = 3, SETTINGS = 4;
     private static final int COUNT = 5;
-    private static final long DURATION = 220;
+    private static final long DURATION = 320;
     private static final ArgbEvaluator ARGB = new ArgbEvaluator();
 
     interface Callback {
@@ -43,6 +43,10 @@ final class NavBar {
     private int selected = -1;
     private ValueAnimator anim;
     private Reselect reselect;
+
+    View view() {
+        return bar;
+    }
 
     void setOnReselect(Reselect r) {
         reselect = r;
@@ -134,9 +138,10 @@ final class NavBar {
         }
         anim = ValueAnimator.ofFloat(0f, 1f);
         anim.setDuration(DURATION);
-        anim.setInterpolator(new PathInterpolator(0.4f, 0f, 0.2f, 1f));
+        anim.setInterpolator(Anim.OUT);
         anim.addUpdateListener(v -> paint(from, sel, (float) v.getAnimatedValue()));
         anim.start();
+        Anim.bounce(icons[sel]);
     }
 
     private void paint(int from, int to, float t) {

@@ -109,6 +109,39 @@ final class Store {
         p(c).edit().putString(key, a.toString()).apply();
     }
 
+    static String raw(Context c, String key) {
+        return p(c).getString(key, "");
+    }
+
+    static void putRaw(Context c, String key, String v) {
+        p(c).edit().putString(key, v).apply();
+    }
+
+    static boolean haptics(Context c) {
+        return p(c).getBoolean("haptics", true);
+    }
+
+    static void setHaptics(Context c, boolean v) {
+        p(c).edit().putBoolean("haptics", v).apply();
+    }
+
+    /** 0 = digital, 1 = analog, 2 = night. */
+    static int standbyStyle(Context c) {
+        return Math.max(0, Math.min(2, p(c).getInt("standby_style", 0)));
+    }
+
+    static void setStandbyStyle(Context c, int v) {
+        p(c).edit().putInt("standby_style", v).apply();
+    }
+
+    static boolean stopwatchAnalog(Context c) {
+        return p(c).getBoolean("sw_analog", false);
+    }
+
+    static void setStopwatchAnalog(Context c, boolean v) {
+        p(c).edit().putBoolean("sw_analog", v).apply();
+    }
+
     static synchronized int nextId(Context c) {
         SharedPreferences sp = p(c);
         int id = sp.getInt("next_id", 1);

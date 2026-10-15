@@ -13,7 +13,7 @@ final class Sched {
     }
 
     static final String ACTION_FIRE = "app.clock.action.FIRE";
-    static final String KIND_ALARM = "alarm", KIND_SNOOZE = "snooze", KIND_TIMER = "timer", KIND_TASK = "task";
+    static final String KIND_ALARM = "alarm", KIND_SNOOZE = "snooze", KIND_TIMER = "timer", KIND_TASK = "task", KIND_BEDTIME = "bedtime";
 
     private static AlarmManager am(Context c) {
         return (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);

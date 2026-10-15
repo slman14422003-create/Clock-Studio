@@ -6,6 +6,7 @@
     android:viewportHeight="108">
     <group android:name="mark" android:pivotX="54" android:pivotY="54" android:scaleX="0.86" android:scaleY="0.86">
         <path android:fillColor="#140A84FF" android:pathData="M16,54a38,38 0 1,0 76,0a38,38 0 1,0 -76,0Z" />
+        <path android:name="ring" android:pathData="M54,16a38,38 0 1,1 0,76a38,38 0 1,1 0,-76" android:strokeColor="#990A84FF" android:strokeWidth="1.6" android:strokeLineCap="round" android:trimPathStart="0" android:trimPathEnd="1" />
             <group android:name="t0" android:pivotX="54" android:pivotY="54" android:rotation="0">
                 <path android:fillColor="#FF9BD8FF" android:pathData="M50.8,26a3.2,7 0 1,0 6.4,0a3.2,7 0 1,0 -6.4,0Z" />
             </group>

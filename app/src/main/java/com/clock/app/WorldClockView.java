@@ -31,6 +31,8 @@ final class WorldClockView extends TabView {
     WorldClockView(Context c, Host h) {
         super(c, h);
         Header hd = new Header(c, c.getString(R.string.nav_clock));
+        hd.addButton(R.drawable.ic_standby, R.string.standby, false, v -> openScreen(StandByActivity.class, true));
+        hd.addButton(R.drawable.ic_globe, R.string.converter, false, v -> openScreen(ConverterActivity.class, false));
         hd.addButton(R.drawable.ic_add, R.string.add_city, true, v -> host.pickCity());
         addView(hd);
         rv = new RecyclerView(c);
@@ -38,7 +40,8 @@ final class WorldClockView extends TabView {
         rv.setAdapter(adapter);
         rv.setClipToPadding(false);
         rv.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        new ItemTouchHelper(new SwipeDelete(c, this::deleteAt).filter(p -> p > 0)).attachToRecyclerView(rv);
+        hd.bindScroll(rv);
+        new ItemTouchHelper(new SwipeDelete(c, this::deleteAt).filter(p -> p > 0).mover(this::move)).attachToRecyclerView(rv);
         addView(rv, new LayoutParams(-1, 0, 1f));
         refresh();
     }
@@ -67,6 +70,24 @@ final class WorldClockView extends TabView {
         if (!z.contains(zone)) z.add(zone);
         saveZones(c, z);
         Bus.changed();
+    }
+
+    private void openScreen(Class<?> cls, boolean zoom) {
+        Context c = getContext();
+        if (!(c instanceof android.app.Activity)) return;
+        android.content.Intent i = new android.content.Intent(c, cls);
+        if (zoom) Ui.openZoom((android.app.Activity) c, i);
+        else Ui.openSheet((android.app.Activity) c, i);
+    }
+
+    /** Long press and drag reorders the cities (the analog clock on top stays put). */
+    private boolean move(int from, int to) {
+        int a = from - 1, b = to - 1;
+        if (a < 0 || b < 0 || a >= zones.size() || b >= zones.size()) return false;
+        zones.add(b, zones.remove(a));
+        adapter.notifyItemMoved(from, to);
+        saveZones(getContext(), zones);
+        return true;
     }
 
     private void deleteAt(int pos) {

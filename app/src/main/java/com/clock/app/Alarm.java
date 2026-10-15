@@ -17,6 +17,8 @@ final class Alarm {
     boolean ramp = true;
     boolean challenge;
     String sound = "";
+    /** While in the future, occurrences up to this instant are skipped ("skip next alarm"). */
+    long skipUntil;
 
     static final int EVERY_DAY = 127;
     static final int SUN_THU = 1 | 2 | 4 | 8 | 16;
@@ -26,7 +28,7 @@ final class Alarm {
         JSONObject o = new JSONObject();
         try {
             o.put("id", id).put("h", hour).put("m", minute).put("d", days).put("l", label).put("on", enabled)
-                    .put("v", vibrate).put("sn", snooze).put("r", ramp).put("c", challenge).put("s", sound);
+                    .put("v", vibrate).put("sn", snooze).put("r", ramp).put("c", challenge).put("s", sound).put("sk", skipUntil);
         } catch (Exception ignored) {
         }
         return o;
@@ -45,6 +47,7 @@ final class Alarm {
         a.ramp = o.optBoolean("r", true);
         a.challenge = o.optBoolean("c", false);
         a.sound = o.optString("s", "");
+        a.skipUntil = o.optLong("sk", 0L);
         return a;
     }
 
@@ -57,7 +60,7 @@ final class Alarm {
         c.set(Calendar.HOUR_OF_DAY, hour);
         c.set(Calendar.MINUTE, minute);
         for (int i = 0; i < 9; i++) {
-            if (c.getTimeInMillis() > now) {
+            if (c.getTimeInMillis() > now && c.getTimeInMillis() > skipUntil) {
                 if (days == 0 || (days & (1 << (c.get(Calendar.DAY_OF_WEEK) - 1))) != 0) return c.getTimeInMillis();
             }
             c.add(Calendar.DAY_OF_YEAR, 1);

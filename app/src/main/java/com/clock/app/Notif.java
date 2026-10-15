@@ -22,8 +22,8 @@ final class Notif {
     private Notif() {
     }
 
-    static final String CH_RING = "ring", CH_TIMER = "timer", CH_TASK = "task", CH_MISSED = "missed";
-    private static final String TAG_TIMER = "timer", TAG_TASK = "task", TAG_MISSED = "missed";
+    static final String CH_RING = "ring", CH_TIMER = "timer", CH_TASK = "task", CH_MISSED = "missed", CH_BEDTIME = "bedtime";
+    private static final String TAG_TIMER = "timer", TAG_TASK = "task", TAG_MISSED = "missed", TAG_BEDTIME = "bedtime";
 
     static void init(Context c) {
         if (Build.VERSION.SDK_INT < 26) return;
@@ -40,6 +40,7 @@ final class Notif {
         list.add(timer);
         list.add(new NotificationChannel(CH_TASK, c.getString(R.string.ch_task), NotificationManager.IMPORTANCE_HIGH));
         list.add(new NotificationChannel(CH_MISSED, c.getString(R.string.ch_missed), NotificationManager.IMPORTANCE_DEFAULT));
+        list.add(new NotificationChannel(CH_BEDTIME, c.getString(R.string.ch_bedtime), NotificationManager.IMPORTANCE_DEFAULT));
         nm.createNotificationChannels(list);
     }
 
@@ -114,6 +115,25 @@ final class Notif {
 
     static void cancelTask(Context c, int id) {
         cancelTag(c, TAG_TASK, id);
+    }
+
+    /** Gentle "time to wind down" reminder before the Bedtime schedule's sleep time. */
+    static void bedtime(Context c) {
+        Bedtime b = Bedtime.load(c);
+        String bed = Bedtime.label(c, b.bedHour(), b.bedMinute());
+        String wake = Bedtime.label(c, b.wakeHour, b.wakeMinute);
+        NotificationCompat.Builder nb = new NotificationCompat.Builder(c, CH_BEDTIME)
+                .setSmallIcon(R.drawable.ic_moon)
+                .setContentTitle(c.getString(R.string.bedtime_notif_title))
+                .setContentText(c.getString(R.string.bedtime_notif_text, bed, wake))
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setAutoCancel(true)
+                .setContentIntent(openTab(c, NavBar.ALARMS));
+        post(c, TAG_BEDTIME, 1, nb.build());
+    }
+
+    static void cancelBedtime(Context c) {
+        cancelTag(c, TAG_BEDTIME, 1);
     }
 
     static void missedTimer(Context c, TimerItem t) {

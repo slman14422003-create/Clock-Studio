@@ -144,4 +144,32 @@
         <item>ج</item>
         <item>س</item>
     </string-array>
+    <string name="standby">وضع الاستعداد</string>
+    <string name="standby_style">نمط وضع الاستعداد</string>
+    <string name="standby_digital">رقمي</string>
+    <string name="standby_analog">تناظري</string>
+    <string name="standby_night">ليلي</string>
+    <string name="sec_standby">وضع الاستعداد</string>
+    <string name="converter">محوّل التوقيت</string>
+    <string name="conv_from">التحويل من</string>
+    <string name="conv_same_day">نفس اليوم</string>
+    <string name="bedtime">وقت النوم</string>
+    <string name="bedtime_setup_sub">حدّد جدول نومك ومنبّه الاستيقاظ</string>
+    <string name="bedtime_line">النوم %1$s · الاستيقاظ %2$s</string>
+    <string name="wake_up">الاستيقاظ</string>
+    <string name="go_to_bed">موعد النوم</string>
+    <string name="sleep_goal">هدف النوم</string>
+    <string name="bedtime_reminder">التذكير</string>
+    <string name="remind_before">قبل %s</string>
+    <string name="bedtime_on">جدول وقت النوم</string>
+    <string name="bedtime_saved">تم حفظ جدول النوم</string>
+    <string name="bedtime_remove">إزالة وقت النوم</string>
+    <string name="bedtime_notif_title">حان وقت الاسترخاء</string>
+    <string name="bedtime_notif_text">موعد النوم %1$s · الاستيقاظ %2$s</string>
+    <string name="ch_bedtime">تذكيرات وقت النوم</string>
+    <string name="skip_next">تخطّي المنبّه التالي</string>
+    <string name="skip_cancel">إلغاء التخطّي</string>
+    <string name="skipping_next">سيتم تخطّي التالي</string>
+    <string name="skip_done">سيتم تخطّي المنبّه التالي</string>
+    <string name="haptics">الاهتزاز اللمسي</string>
 </resources>

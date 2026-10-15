@@ -77,6 +77,24 @@ final class Alarms {
         save(c, a);
     }
 
+    /** Skips the next ring of a repeating alarm; the one after it rings as usual. */
+    static void skipNext(Context c, int id) {
+        Alarm a = get(c, id);
+        if (a == null || !a.enabled || a.days == 0) return;
+        a.skipUntil = 0;
+        long t = a.next(System.currentTimeMillis());
+        if (t <= 0) return;
+        a.skipUntil = t;
+        save(c, a);
+    }
+
+    static void clearSkip(Context c, int id) {
+        Alarm a = get(c, id);
+        if (a == null) return;
+        a.skipUntil = 0;
+        save(c, a);
+    }
+
     static void reschedule(Context c, Alarm a) {
         Sched.cancel(c, Sched.KIND_ALARM, a.id);
         Sched.cancel(c, Sched.KIND_SNOOZE, a.id);
@@ -121,6 +139,7 @@ final class Alarms {
 
     private static void changed(Context c) {
         ClockWidget.refresh(c);
+        Bedtime.reschedule(c);
         Bus.changed();
     }
 }

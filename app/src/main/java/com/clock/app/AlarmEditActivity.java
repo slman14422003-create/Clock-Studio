@@ -39,6 +39,11 @@ public class AlarmEditActivity extends BaseActivity {
             });
 
     @Override
+    protected int transition() {
+        return SHEET;
+    }
+
+    @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         useGroupedBackground();
@@ -220,6 +225,7 @@ public class AlarmEditActivity extends BaseActivity {
         alarm.minute = wheels.minute();
         alarm.label = labelEdit.getText().toString().trim();
         alarm.enabled = true;
+        alarm.skipUntil = 0;
         Alarms.save(this, alarm);
         long t = alarm.next(System.currentTimeMillis());
         if (t > 0) Ui.toast(this, getString(R.string.alarm_set_in, Fmt.untilText(this, t - System.currentTimeMillis())));

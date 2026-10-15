@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- iOS modal sheet rises from the bottom -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="false"
+    android:zAdjustment="top">
+    <translate
+        android:duration="500"
+        android:fromYDelta="100%p"
+        android:interpolator="@interpolator/ios_out"
+        android:toYDelta="0" />
+</set>

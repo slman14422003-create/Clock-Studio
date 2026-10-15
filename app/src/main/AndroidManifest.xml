@@ -62,6 +62,13 @@
         <activity android:name=".CityPickerActivity" android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".SettingsActivity" android:exported="false" />
+        <activity android:name=".BedtimeActivity" android:exported="false" />
+        <activity android:name=".ConverterActivity" android:exported="false" />
+        <activity
+            android:name=".StandByActivity"
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden" />
 
         <activity
             android:name=".RingActivity"
