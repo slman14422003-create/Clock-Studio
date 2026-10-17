@@ -34,6 +34,7 @@ final class WorldClockView extends TabView {
     WorldClockView(Context c, Host h) {
         super(c, h);
         Header hd = new Header(c, c.getString(R.string.nav_clock));
+        hd.addButton(R.drawable.ic_brain, R.string.assistant, false, v -> AssistantActivity.open(c, false));
         hd.addButton(R.drawable.ic_standby, R.string.standby, false, v -> openScreen(StandByActivity.class, true));
         hd.addButton(R.drawable.ic_globe, R.string.converter, false, v -> openScreen(ConverterActivity.class, false));
         hd.addButton(R.drawable.ic_add, R.string.add_city, true, v -> host.pickCity());

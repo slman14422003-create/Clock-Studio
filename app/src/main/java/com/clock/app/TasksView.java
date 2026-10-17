@@ -34,11 +34,13 @@ final class TasksView extends TabView {
     private final Adapter adapter = new Adapter();
     private final List<Task> tasks = new ArrayList<>();
     private final int[] counts = new int[4];
+    private final Header hd;
 
     TasksView(Context c, Host h) {
         super(c, h);
         setBackgroundColor(Ui.color(c, R.color.bg_group));
-        Header hd = new Header(c, c.getString(R.string.nav_tasks));
+        hd = new Header(c, c.getString(R.string.nav_tasks));
+        hd.addButton(R.drawable.ic_brain, R.string.assistant, false, v -> AssistantActivity.open(c, false));
         hd.addButton(R.drawable.ic_add, R.string.new_task, true, v -> host.editTask(0));
         addView(hd);
         rv = new RecyclerView(c);
@@ -65,6 +67,7 @@ final class TasksView extends TabView {
         tasks.clear();
         tasks.addAll(Tasks.filter(c, smart));
         for (int i = 0; i < 4; i++) counts[i] = Tasks.count(c, i);
+        hd.setSubtitle(Smart.insight(c));
         adapter.notifyDataSetChanged();
     }
 
@@ -123,7 +126,8 @@ final class TasksView extends TabView {
                     final int idx = r * 2 + k;
                     LinearLayout t = new LinearLayout(c);
                     t.setOrientation(LinearLayout.VERTICAL);
-                    t.setPadding(Ui.dp(c, 14), Ui.dp(c, 12), Ui.dp(c, 14), Ui.dp(c, 12));
+                    t.setPadding(Ui.dp(c, 14), Ui.dp(c, 14), Ui.dp(c, 14), Ui.dp(c, 14));
+                    t.setMinimumHeight(Ui.dp(c, 92));
                     LinearLayout top = new LinearLayout(c);
                     top.setGravity(Gravity.CENTER_VERTICAL);
                     ImageView ic = new ImageView(c);
@@ -150,20 +154,48 @@ final class TasksView extends TabView {
                     });
                     Ui.press(c, t);
                     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, -2, 1f);
-                    lp.setMargins(k == 0 ? 0 : Ui.dp(c, 5), 0, k == 0 ? Ui.dp(c, 5) : 0, Ui.dp(c, 10));
+                    lp.setMarginStart(k == 0 ? 0 : Ui.dp(c, 6));
+                    lp.setMarginEnd(k == 0 ? Ui.dp(c, 6) : 0);
+                    lp.bottomMargin = Ui.dp(c, 12);
                     row.addView(t, lp);
                     tile[idx] = t;
                     count[idx] = n;
                 }
                 col.addView(row, new LinearLayout.LayoutParams(-1, -2));
             }
+            LinearLayout cap = new LinearLayout(c);
+            cap.setGravity(Gravity.CENTER_VERTICAL);
+            cap.setPaddingRelative(Ui.dp(c, 14), Ui.dp(c, 12), Ui.dp(c, 14), Ui.dp(c, 12));
+            cap.setBackground(Ui.rect(Ui.color(c, R.color.surface), Ui.dpf(c, 18)));
+            ImageView spark = new ImageView(c);
+            spark.setImageResource(R.drawable.ic_brain);
+            spark.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+            int sp2 = Ui.dp(c, 6);
+            spark.setPadding(sp2, sp2, sp2, sp2);
+            spark.setBackground(Ui.rect(Ui.color(c, R.color.violet), Ui.dpf(c, 9)));
+            LinearLayout.LayoutParams sl = new LinearLayout.LayoutParams(Ui.dp(c, 32), Ui.dp(c, 32));
+            sl.setMarginEnd(Ui.dp(c, 12));
+            cap.addView(spark, sl);
+            TextView hint = Ui.text(c, c.getString(R.string.ai_capture_hint), 15, R.color.text_secondary);
+            hint.setSingleLine(true);
+            hint.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            cap.addView(hint, new LinearLayout.LayoutParams(0, -2, 1f));
+            ImageView mic = new ImageView(c);
+            mic.setImageResource(R.drawable.ic_mic);
+            mic.setImageTintList(ColorStateList.valueOf(Ui.color(c, R.color.accent)));
+            cap.addView(mic, new LinearLayout.LayoutParams(Ui.dp(c, 22), Ui.dp(c, 22)));
+            cap.setOnClickListener(v -> AssistantActivity.open(c, true));
+            Ui.press(c, cap);
+            LinearLayout.LayoutParams capLp = new LinearLayout.LayoutParams(-1, -2);
+            capLp.bottomMargin = Ui.dp(c, 4);
+            col.addView(cap, capLp);
         }
 
         void bind() {
             Context c = itemView.getContext();
             for (int i = 0; i < 4; i++) {
                 count[i].setText(String.valueOf(counts[i]));
-                GradientDrawable g = Ui.rect(Ui.color(c, R.color.surface), Ui.dpf(c, 14));
+                GradientDrawable g = Ui.rect(Ui.color(c, R.color.surface), Ui.dpf(c, 18));
                 if (i == smart) g.setStroke(Ui.dp(c, 2), Ui.color(c, TILE_COLOR[i]));
                 tile[i].setBackground(g);
             }

@@ -133,20 +133,31 @@ final class Notif {
         post(c, TAG_BEDTIME, 1, nb.build());
     }
 
-    /** "It is time for Asr" at the prayer time (the next one is booked right after). */
+    /** "It is time for Asr" at the prayer time (idx 0..5) or the early reminder (idx 10..15); the next one is booked right after. */
     static void prayer(Context c, int idx) {
         String[] names = c.getResources().getStringArray(R.array.prayer_names);
-        if (idx < 0 || idx >= names.length) return;
+        boolean early = idx >= 10;
+        int p = early ? idx - 10 : idx;
+        if (p < 0 || p >= names.length) return;
         PrayerTimes.Cfg g = PrayerTimes.cfg(c);
         NotificationCompat.Builder nb = new NotificationCompat.Builder(c, CH_PRAYER)
                 .setSmallIcon(R.drawable.ic_prayer)
-                .setContentTitle(names[idx])
-                .setContentText(c.getString(R.string.prayer_notif_text, names[idx], g.place))
+                .setContentTitle(names[p])
+                .setContentText(early ? c.getString(R.string.prayer_pre_text, g.pre, names[p])
+                        : c.getString(R.string.prayer_notif_text, names[p], g.place))
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(openTab(c, NavBar.CLOCK));
+        if (!early && PrayerLog.pos(p) >= 0) {
+            nb.addAction(0, c.getString(R.string.prayer_prayed), receiverAction(c, ClockReceiver.A_PRAYER_DONE, p));
+            cancelTag(c, TAG_PRAYER, 10 + p);
+        }
         post(c, TAG_PRAYER, idx, nb.build());
+    }
+
+    static void cancelPrayer(Context c, int idx) {
+        cancelTag(c, TAG_PRAYER, idx);
     }
 
     static void cancelBedtime(Context c) {

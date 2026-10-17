@@ -53,6 +53,10 @@ final class PrayerTimes {
         boolean hanafi;
         boolean notify;
         long locTs;
+        /** Minutes before the prayer for an early reminder (0 = off). */
+        int pre;
+        /** Bit per prayer in PRAYERS order (Fajr, Dhuhr, Asr, Maghrib, Isha) that gets a notification. */
+        int mask = 31;
     }
 
     static final class Day {
@@ -83,6 +87,8 @@ final class PrayerTimes {
             g.hanafi = o.optBoolean("h", false);
             g.notify = o.optBoolean("n", false);
             g.locTs = o.optLong("ts", 0);
+            g.pre = o.optInt("pre", 0);
+            g.mask = o.optInt("mk", 31);
         } catch (Exception ignored) {
         }
         return g;
@@ -92,7 +98,8 @@ final class PrayerTimes {
         try {
             JSONObject o = new JSONObject();
             o.put("cf", g.configured).put("au", g.auto).put("la", g.lat).put("lo", g.lon).put("pl", g.place)
-                    .put("tz", g.zone).put("m", g.method).put("h", g.hanafi).put("n", g.notify).put("ts", g.locTs);
+                    .put("tz", g.zone).put("m", g.method).put("h", g.hanafi).put("n", g.notify).put("ts", g.locTs)
+                    .put("pre", g.pre).put("mk", g.mask);
             Store.putRaw(c, CFG, o.toString());
         } catch (Exception ignored) {
         }
@@ -203,12 +210,62 @@ final class PrayerTimes {
 
     // ------------------------------------------------------------------ notifications
 
+    /** Ids 0..5 fire at the prayer time, ids 10..15 are the early reminder of the same prayer. */
     static void scheduleNext(Context c) {
-        for (int i = 0; i < 6; i++) Sched.cancel(c, Sched.KIND_PRAYER, i);
+        for (int i = 0; i < 16; i++) Sched.cancel(c, Sched.KIND_PRAYER, i);
         Cfg g = cfg(c);
         if (!g.configured || !g.notify) return;
-        Next n = next(c);
-        if (n != null) Sched.exact(c, n.at, Sched.KIND_PRAYER, n.idx);
+        long now = System.currentTimeMillis();
+        long best = 0;
+        int bestId = -1;
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(g.zone));
+        cal.setTimeInMillis(now);
+        for (int off = 0; off < 3 && best == 0; off++) {
+            String ymd = ymd(cal);
+            Day d = day(c, g, ymd);
+            if (d != null) {
+                for (int pos = 0; pos < PRAYERS.length; pos++) {
+                    if ((g.mask & (1 << pos)) == 0) continue;
+                    int i = PRAYERS[pos];
+                    try {
+                        long t = timeAt(g, ymd, d.hm[i]);
+                        if (t > now && (best == 0 || t < best)) {
+                            best = t;
+                            bestId = i;
+                        }
+                        if (g.pre > 0) {
+                            long p = t - g.pre * 60000L;
+                            if (p > now && (best == 0 || p < best)) {
+                                best = p;
+                                bestId = 10 + i;
+                            }
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        if (best > 0) Sched.exact(c, best, Sched.KIND_PRAYER, bestId);
+    }
+
+    /** Midnight of the Islamic night and the start of its last third (Maghrib to the next Fajr); {0, 0} when unknown. */
+    static long[] night(Context c, Cfg g) {
+        try {
+            String today = today(g);
+            Day d = day(c, g, today);
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(g.zone));
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+            String tom = ymd(cal);
+            Day n = day(c, g, tom);
+            if (d == null || n == null) return new long[]{0, 0};
+            long mag = timeAt(g, today, d.hm[MAGHRIB]);
+            long faj = timeAt(g, tom, n.hm[FAJR]);
+            if (faj <= mag) return new long[]{0, 0};
+            return new long[]{mag + (faj - mag) / 2, mag + (faj - mag) * 2 / 3};
+        } catch (Exception e) {
+            return new long[]{0, 0};
+        }
     }
 
     // ------------------------------------------------------------------ online updates

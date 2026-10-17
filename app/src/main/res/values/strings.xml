@@ -211,4 +211,97 @@
         <item>جامعة العلوم الإسلامية بكراتشي</item>
         <item>رئاسة الشؤون الدينية التركية</item>
     </string-array>
+
+    <!-- smart assistant, qibla, tasbih, prayer tracker -->
+    <string name="assistant">المساعد الذكي</string>
+    <string name="close">إغلاق</string>
+    <string name="ai_clear">مسح</string>
+    <string name="ai_offline_note">يعمل بالكامل على جهازك بدون إنترنت</string>
+    <string name="ai_hi">أهلًا! اكتب أو قل جملة عادية وأنا أنشئ لك مهمة أو منبهًا أو مؤقتًا، وأجيب عن يومك وأوقات الصلاة.</string>
+    <string name="ai_hi_task">ماذا تريد أن تضيف؟ اكتب مهمتك بشكل طبيعي وسأحدد الوقت والتكرار والأولوية تلقائيًا.</string>
+    <string name="ai_hint">اكتب أو قل ما تريد…</string>
+    <string name="ai_hint_task">مثال: ذكرني غدًا 5 مساءً بزيارة الطبيب</string>
+    <string name="ai_capture_hint">أضف مهمة بجملة عادية…</string>
+    <string name="ai_send">إرسال</string>
+    <string name="ai_voice">إدخال صوتي</string>
+    <string name="ai_listen">تحدّث الآن</string>
+    <string name="ai_voice_fail">الإدخال الصوتي غير متاح على هذا الجهاز</string>
+    <string name="ai_undone">تم التراجع</string>
+    <string name="ai_chip_plan">رتّب يومي</string>
+    <string name="ai_chip_today">مهامي اليوم</string>
+    <string name="ai_chip_late">المهام المتأخرة</string>
+    <string name="ai_chip_prayer">الصلاة القادمة</string>
+    <string name="ai_chip_alarm">المنبه القادم</string>
+    <string name="ai_ex_task">ذكرني غدًا الساعة 5 مساءً بزيارة الطبيب</string>
+    <string name="ai_ex_alarm">منبه 6:30 صباحًا كل يوم</string>
+    <string name="ai_ex_timer">مؤقت 15 دقيقة للمذاكرة</string>
+    <string name="ai_ex_prayer">ذكرني بعد صلاة العصر بقراءة الورد</string>
+    <string name="ai_task_added">أضفت المهمة «%1$s»%2$s</string>
+    <string name="ai_alarm_added">ضبطت منبهًا الساعة %1$s · %2$s%3$s</string>
+    <string name="ai_timer_added">بدأ المؤقت %1$s%2$s</string>
+    <string name="ai_need_time">في أي وقت تريد المنبه؟ مثال: منبه 6:30 صباحًا</string>
+    <string name="ai_need_duration">كم مدة المؤقت؟ مثال: مؤقت 10 دقائق</string>
+    <string name="ai_need_title">بماذا تريد أن أذكّرك؟</string>
+    <string name="ai_unknown">لم أفهم تمامًا. جرّب: «ذكرني غدًا الساعة 5 مساءً بالاتصال بأحمد» أو «منبه 6:30 صباحًا كل يوم» أو «مؤقت 15 دقيقة».</string>
+    <string name="ai_no_prayer_cfg">حدّد موقعك أولًا من شاشة أوقات الصلاة لأحسب الوقت.</string>
+    <string name="ai_open_prayer">فتح أوقات الصلاة</string>
+    <string name="ai_today_head">مهام اليوم (%d):</string>
+    <string name="ai_today_none">لا توجد مهام لليوم.</string>
+    <string name="ai_late_head">مهام متأخرة (%d):</string>
+    <string name="ai_late_none">لا توجد مهام متأخرة، أحسنت.</string>
+    <string name="ai_next_prayer">الصلاة القادمة: %1$s الساعة %2$s (%3$s)</string>
+    <string name="ai_next_alarm">المنبه القادم: %1$s (%2$s)</string>
+    <string name="ai_no_alarm">لا توجد منبهات مفعّلة.</string>
+    <string name="ai_cleared">حذفت %d مهمة مكتملة.</string>
+    <string name="ai_done_ok">أكملت المهمة «%s».</string>
+    <string name="ai_done_none">لم أجد مهمة تطابق ذلك.</string>
+    <string name="ai_help">يمكنني:\n• إنشاء مهمة: «ذكرني غدًا 5 مساءً بزيارة الطبيب» أو «اجتماع كل خميس الساعة 10 صباحًا مهم»\n• ضبط منبه: «منبه 6:30 صباحًا كل يوم»\n• بدء مؤقت: «مؤقت ساعة ونصف»\n• التذكير بالصلاة: «ذكرني بعد صلاة العصر بالورد»\n• الأسئلة: «رتّب يومي»، «مهامي اليوم»، «المهام المتأخرة»، «الصلاة القادمة»، «المنبه القادم»\n• الإنجاز: «خلصت زيارة الطبيب» أو «احذف المكتملة»</string>
+    <string name="ai_item_alarm">منبه</string>
+    <string name="ai_plan_head">خطة يومك:</string>
+    <string name="ai_plan_anytime">في أي وقت:</string>
+    <string name="ai_tip_late">نصيحة: ابدأ بالمهمة المتأخرة «%s» أولًا.</string>
+    <string name="ai_tip_top">نصيحة: أهم مهمة اليوم «%s».</string>
+    <string name="ai_tip_bed">تذكير: موعد نومك المقترح %s.</string>
+    <string name="ai_insight_late">المتأخرة: %1$d · لليوم: %2$d</string>
+    <string name="ai_insight_today">لليوم: %d</string>
+    <string name="qibla">القبلة</string>
+    <string name="qibla_deg">%1$d° من الشمال</string>
+    <string name="qibla_dist">المسافة إلى الكعبة: %1$s كم</string>
+    <string name="qibla_aligned">أنت باتجاه القبلة</string>
+    <string name="qibla_calibrate">حرّك الهاتف على شكل ٨ لمعايرة البوصلة</string>
+    <string name="qibla_hold_flat">امسك الهاتف أفقيًا وأدِره حتى يتجه السهم للأعلى</string>
+    <string name="qibla_no_sensor">لا يوجد حساس بوصلة في هذا الجهاز</string>
+    <string name="qibla_need_loc">حدّد موقعك أولًا لحساب اتجاه القبلة.</string>
+    <string name="tasbih">المسبحة</string>
+    <string name="tasbih_reset">تصفير</string>
+    <string name="tasbih_total">إجمالي اليوم: %d</string>
+    <string name="tasbih_free">حر</string>
+    <string name="prayer_tools">أدوات</string>
+    <string name="prayer_pre">تنبيه قبل الصلاة</string>
+    <string name="prayer_min">%d دقيقة</string>
+    <string name="prayer_each">الصلوات المنبَّهة</string>
+    <string name="prayer_pre_text">بعد %1$d دقيقة تدخل صلاة %2$s</string>
+    <string name="prayer_prayed">صليت</string>
+    <string name="prayer_check_hint">اضغط الدائرة لتسجيل أنك صليت.</string>
+    <string name="prayer_log">متابعة الصلوات</string>
+    <string name="prayer_log_today">صليت %d من 5 اليوم</string>
+    <string name="prayer_streak">%d يوم متتالٍ بكل الصلوات</string>
+    <string name="prayer_streak_none">ابدأ سلسلتك اليوم</string>
+    <string name="night_title">الليل</string>
+    <string name="night_mid">منتصف الليل</string>
+    <string name="night_third">الثلث الأخير من الليل</string>
+    <string-array name="compass_dirs">
+        <item>ش</item>
+        <item>ق</item>
+        <item>ج</item>
+        <item>غ</item>
+    </string-array>
+    <string-array name="tasbih_phrases">
+        <item>سبحان الله</item>
+        <item>الحمد لله</item>
+        <item>الله أكبر</item>
+        <item>لا إله إلا الله</item>
+        <item>أستغفر الله</item>
+        <item>اللهم صلِّ وسلِّم على نبينا محمد</item>
+    </string-array>
 </resources>

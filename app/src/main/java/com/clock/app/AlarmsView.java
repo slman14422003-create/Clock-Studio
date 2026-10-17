@@ -39,6 +39,7 @@ final class AlarmsView extends TabView {
     AlarmsView(Context c, Host h) {
         super(c, h);
         header = new Header(c, c.getString(R.string.nav_alarms));
+        header.addButton(R.drawable.ic_brain, R.string.assistant, false, v -> AssistantActivity.open(c, false));
         header.addButton(R.drawable.ic_add, R.string.new_alarm, true, v -> host.editAlarm(0));
         addView(header);
 

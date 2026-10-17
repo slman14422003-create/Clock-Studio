@@ -81,6 +81,13 @@ public class SettingsActivity extends BaseActivity {
                 Store.haptics(this), (v, on) -> Store.setHaptics(this, on)), true);
         col.addView(g);
 
+        LinearLayout gai = Ui.group(this);
+        Ui.addRow(gai, Ui.row(this, R.drawable.ic_brain, R.color.violet, getString(R.string.assistant),
+                getString(R.string.on), true, v -> AssistantActivity.open(this, false)), true);
+        Ui.addRow(gai, Ui.row(this, R.drawable.ic_prayer, R.color.ok, getString(R.string.prayer_times), null, true,
+                v -> startActivity(new Intent(this, PrayerActivity.class))), true);
+        col.addView(gai);
+
         col.addView(Ui.sectionTitle(this, getString(R.string.sec_time)));
         LinearLayout g2 = Ui.group(this);
         Ui.addRow(g2, Ui.row(this, R.drawable.ic_clock, R.color.info, getString(R.string.time_format), timeFormatName(), true, v -> {

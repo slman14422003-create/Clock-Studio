@@ -4,7 +4,14 @@ import android.Manifest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -144,6 +151,7 @@ public class PrayerActivity extends BaseActivity {
             cp.setMargins(Ui.dp(this, 16), Ui.dp(this, 4), Ui.dp(this, 16), Ui.dp(this, 10));
             col.addView(card, cp);
 
+            final String todayKey = PrayerTimes.today(g);
             LinearLayout times = Ui.group(this);
             for (int i = 0; i < 6; i++) {
                 LinearLayout row = Ui.row(this, 0, 0, names[i], PrayerTimes.hm(this, today.hm[i]), false, null);
@@ -155,14 +163,44 @@ public class PrayerActivity extends BaseActivity {
                     v.setTextColor(Ui.color(this, R.color.accent));
                     v.setTypeface(Ui.medium());
                 }
+                int pos = PrayerLog.pos(i);
+                if (pos >= 0) {
+                    FrameLayout ck = check(pos, todayKey);
+                    LinearLayout.LayoutParams cl = new LinearLayout.LayoutParams(Ui.dp(this, 28), Ui.dp(this, 28));
+                    cl.setMarginStart(Ui.dp(this, 14));
+                    row.addView(ck, cl);
+                }
                 Ui.addRow(times, row, false);
             }
             col.addView(times);
+            col.addView(Ui.footnote(this, getString(R.string.prayer_check_hint)));
+
+            col.addView(Ui.sectionTitle(this, getString(R.string.prayer_log)));
+            col.addView(logCard(todayKey));
+
+            long[] night = PrayerTimes.night(this, g);
+            if (night[0] > 0) {
+                LinearLayout gn = Ui.group(this);
+                Ui.addRow(gn, Ui.row(this, R.drawable.ic_moon, R.color.indigo, getString(R.string.night_mid),
+                        PrayerTimes.label(this, night[0], g.zone), false, null), true);
+                Ui.addRow(gn, Ui.row(this, R.drawable.ic_moon, R.color.violet, getString(R.string.night_third),
+                        PrayerTimes.label(this, night[1], g.zone), false, null), true);
+                col.addView(Ui.sectionTitle(this, getString(R.string.night_title)));
+                col.addView(gn);
+            }
         } else if (g.configured) {
             col.addView(Ui.footnote(this, getString(R.string.prayer_no_data)));
         } else {
             col.addView(Ui.footnote(this, getString(R.string.prayer_setup_sub)));
         }
+
+        col.addView(Ui.sectionTitle(this, getString(R.string.prayer_tools)));
+        LinearLayout gt = Ui.group(this);
+        Ui.addRow(gt, Ui.row(this, R.drawable.ic_compass, R.color.ok, getString(R.string.qibla), null, true,
+                v -> startActivity(new Intent(this, QiblaActivity.class))), true);
+        Ui.addRow(gt, Ui.row(this, R.drawable.ic_beads, R.color.indigo, getString(R.string.tasbih), null, true,
+                v -> startActivity(new Intent(this, TasbihActivity.class))), true);
+        col.addView(gt);
 
         col.addView(Ui.sectionTitle(this, getString(R.string.sec_location)));
         LinearLayout gl = Ui.group(this);
@@ -191,8 +229,28 @@ public class PrayerActivity extends BaseActivity {
                         k.notify = on;
                         PrayerTimes.save(this, k);
                         PrayerTimes.scheduleNext(this);
+                        build();
                     }), true);
+            if (g.notify) {
+                Ui.addRow(gm, Ui.row(this, R.drawable.ic_alarm, R.color.accent, getString(R.string.prayer_pre),
+                        g.pre == 0 ? getString(R.string.none) : getString(R.string.prayer_min, g.pre), true, v -> pickPre()), true);
+            }
             col.addView(gm);
+
+            if (g.notify) {
+                col.addView(Ui.sectionTitle(this, getString(R.string.prayer_each)));
+                LinearLayout ge = Ui.group(this);
+                for (int pos = 0; pos < PrayerTimes.PRAYERS.length; pos++) {
+                    final int bit = 1 << pos;
+                    Ui.addRow(ge, Ui.switchRow(this, 0, 0, names[PrayerTimes.PRAYERS[pos]], null, (g.mask & bit) != 0, (v, on) -> {
+                        PrayerTimes.Cfg k = PrayerTimes.cfg(this);
+                        k.mask = on ? (k.mask | bit) : (k.mask & ~bit);
+                        PrayerTimes.save(this, k);
+                        PrayerTimes.scheduleNext(this);
+                    }), false);
+                }
+                col.addView(ge);
+            }
         }
 
         String note = getString(R.string.prayer_source);
@@ -201,6 +259,107 @@ public class PrayerActivity extends BaseActivity {
             note += "\n" + getString(R.string.prayer_updated, Fmt.date(this, ts, "d MMM, HH:mm"));
         }
         col.addView(Ui.footnote(this, note));
+    }
+
+    private FrameLayout check(final int pos, final String ymd) {
+        final FrameLayout f = new FrameLayout(this);
+        ImageView tick = new ImageView(this);
+        tick.setImageResource(R.drawable.ic_check);
+        tick.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+        f.addView(tick, new FrameLayout.LayoutParams(Ui.dp(this, 16), Ui.dp(this, 16), Gravity.CENTER));
+        styleCheck(f, PrayerLog.done(this, ymd, pos));
+        f.setOnClickListener(v -> {
+            boolean on = !PrayerLog.done(this, ymd, pos);
+            PrayerLog.set(this, ymd, pos, on);
+            Ui.tick(f);
+            styleCheck(f, on);
+            fillLog(ymd);
+        });
+        return f;
+    }
+
+    private void styleCheck(FrameLayout f, boolean on) {
+        GradientDrawable ring = new GradientDrawable();
+        ring.setShape(GradientDrawable.OVAL);
+        if (on) {
+            ring.setColor(Ui.color(this, R.color.ok));
+        } else {
+            ring.setColor(0);
+            ring.setStroke(Ui.dp(this, 2), Ui.color(this, R.color.text_hint));
+        }
+        f.setBackground(ring);
+        f.getChildAt(0).setVisibility(on ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    private TextView logTitle, logSub;
+    private LinearLayout logBars;
+
+    private LinearLayout logCard(String ymd) {
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 14)));
+        card.setPadding(Ui.dp(this, 16), Ui.dp(this, 14), Ui.dp(this, 16), Ui.dp(this, 14));
+        logTitle = Ui.text(this, "", 18, R.color.text_primary);
+        logTitle.setTypeface(Ui.medium());
+        card.addView(logTitle);
+        logSub = Ui.text(this, "", 14, R.color.text_secondary);
+        card.addView(logSub);
+        logBars = new LinearLayout(this);
+        logBars.setGravity(Gravity.BOTTOM);
+        logBars.setLayoutDirection(View.LAYOUT_DIRECTION_LOCALE);
+        LinearLayout.LayoutParams bl = new LinearLayout.LayoutParams(-1, Ui.dp(this, 78));
+        bl.topMargin = Ui.dp(this, 12);
+        card.addView(logBars, bl);
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(-1, -2);
+        cp.setMargins(Ui.dp(this, 16), 0, Ui.dp(this, 16), Ui.dp(this, 6));
+        card.setLayoutParams(cp);
+        fillLog(ymd);
+        return card;
+    }
+
+    private void fillLog(String ymd) {
+        int today = PrayerLog.count(PrayerLog.mask(this, ymd));
+        logTitle.setText(getString(R.string.prayer_log_today, today));
+        int streak = PrayerLog.streak(this, ymd);
+        logSub.setText(streak > 0 ? getString(R.string.prayer_streak, streak) : getString(R.string.prayer_streak_none));
+        logBars.removeAllViews();
+        String[] ini = getResources().getStringArray(R.array.day_initials);
+        for (int i = 6; i >= 0; i--) {
+            String d = PrayerLog.shift(ymd, -i);
+            int n = PrayerLog.count(PrayerLog.mask(this, d));
+            LinearLayout cell = new LinearLayout(this);
+            cell.setOrientation(LinearLayout.VERTICAL);
+            cell.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+            View bar = new View(this);
+            int color = n >= 5 ? Ui.color(this, R.color.ok) : n > 0 ? Ui.color(this, R.color.accent) : Ui.color(this, R.color.neutral_soft);
+            bar.setBackground(Ui.rect(color, Ui.dpf(this, 5)));
+            int h = Math.max(Ui.dp(this, 6), Ui.dp(this, 44) * n / 5);
+            cell.addView(bar, new LinearLayout.LayoutParams(Ui.dp(this, 14), h));
+            TextView lbl = Ui.text(this, ini[PrayerLog.weekday(d) - 1], 12, i == 0 ? R.color.text_primary : R.color.text_secondary);
+            lbl.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams ll = new LinearLayout.LayoutParams(-2, -2);
+            ll.topMargin = Ui.dp(this, 4);
+            cell.addView(lbl, ll);
+            logBars.addView(cell, new LinearLayout.LayoutParams(0, -1, 1f));
+        }
+    }
+
+    private void pickPre() {
+        final int[] vals = {0, 5, 10, 15, 20, 30};
+        PrayerTimes.Cfg g = PrayerTimes.cfg(this);
+        String[] labels = new String[vals.length];
+        int cur = 0;
+        for (int i = 0; i < vals.length; i++) {
+            labels[i] = vals[i] == 0 ? getString(R.string.none) : getString(R.string.prayer_min, vals[i]);
+            if (vals[i] == g.pre) cur = i;
+        }
+        Dlg.choose(this, R.string.prayer_pre, labels, cur, i -> {
+            PrayerTimes.Cfg k = PrayerTimes.cfg(this);
+            k.pre = vals[i];
+            PrayerTimes.save(this, k);
+            PrayerTimes.scheduleNext(this);
+            build();
+        });
     }
 
     private void pickLocation() {

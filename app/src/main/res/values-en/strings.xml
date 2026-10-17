@@ -211,4 +211,97 @@
         <item>Karachi (Univ. of Islamic Sciences)</item>
         <item>Diyanet (Turkey)</item>
     </string-array>
+
+    <!-- smart assistant, qibla, tasbih, prayer tracker -->
+    <string name="assistant">Smart assistant</string>
+    <string name="close">Close</string>
+    <string name="ai_clear">Clear</string>
+    <string name="ai_offline_note">Runs entirely on your device, no internet needed</string>
+    <string name="ai_hi">Hi! Type or say a normal sentence and I will create a task, alarm or timer, and answer about your day and prayer times.</string>
+    <string name="ai_hi_task">What would you like to add? Write your task naturally and I will pick the time, repeat and priority.</string>
+    <string name="ai_hint">Type or say what you need…</string>
+    <string name="ai_hint_task">e.g. Remind me tomorrow 5pm to call Sam</string>
+    <string name="ai_capture_hint">Add a task in plain words…</string>
+    <string name="ai_send">Send</string>
+    <string name="ai_voice">Voice input</string>
+    <string name="ai_listen">Speak now</string>
+    <string name="ai_voice_fail">Voice input is not available on this device</string>
+    <string name="ai_undone">Undone</string>
+    <string name="ai_chip_plan">Plan my day</string>
+    <string name="ai_chip_today">My tasks today</string>
+    <string name="ai_chip_late">Overdue tasks</string>
+    <string name="ai_chip_prayer">Next prayer</string>
+    <string name="ai_chip_alarm">Next alarm</string>
+    <string name="ai_ex_task">Remind me tomorrow at 5pm to call Sam</string>
+    <string name="ai_ex_alarm">Alarm 6:30am every day</string>
+    <string name="ai_ex_timer">Timer 15 minutes for studying</string>
+    <string name="ai_ex_prayer">Remind me after Asr to read my daily page</string>
+    <string name="ai_task_added">Added task “%1$s”%2$s</string>
+    <string name="ai_alarm_added">Alarm set for %1$s · %2$s%3$s</string>
+    <string name="ai_timer_added">Timer started: %1$s%2$s</string>
+    <string name="ai_need_time">What time should the alarm ring? e.g. Alarm 6:30am</string>
+    <string name="ai_need_duration">How long should the timer run? e.g. Timer 10 minutes</string>
+    <string name="ai_need_title">What should I remind you about?</string>
+    <string name="ai_unknown">I did not quite get that. Try: “Remind me tomorrow at 5pm to call Sam”, “Alarm 6:30am every day” or “Timer 15 minutes”.</string>
+    <string name="ai_no_prayer_cfg">Set your location in Prayer times first so I can work out the time.</string>
+    <string name="ai_open_prayer">Open prayer times</string>
+    <string name="ai_today_head">Today’s tasks (%d):</string>
+    <string name="ai_today_none">No tasks for today.</string>
+    <string name="ai_late_head">Overdue tasks (%d):</string>
+    <string name="ai_late_none">Nothing overdue, well done.</string>
+    <string name="ai_next_prayer">Next prayer: %1$s at %2$s (%3$s)</string>
+    <string name="ai_next_alarm">Next alarm: %1$s (%2$s)</string>
+    <string name="ai_no_alarm">No alarms are on.</string>
+    <string name="ai_cleared">Removed %d completed tasks.</string>
+    <string name="ai_done_ok">Completed “%s”.</string>
+    <string name="ai_done_none">I could not find a matching task.</string>
+    <string name="ai_help">I can:\n• Create a task: “Remind me tomorrow 5pm to call Sam” or “Meeting every Thursday at 10am important”\n• Set an alarm: “Alarm 6:30am every day”\n• Start a timer: “Timer 1 hour 30 minutes”\n• Remind around prayers: “Remind me after Asr to read”\n• Answer: “Plan my day”, “My tasks today”, “Overdue tasks”, “Next prayer”, “Next alarm”\n• Finish things: “Finished call Sam” or “Clear completed”</string>
+    <string name="ai_item_alarm">Alarm</string>
+    <string name="ai_plan_head">Your day:</string>
+    <string name="ai_plan_anytime">Any time:</string>
+    <string name="ai_tip_late">Tip: start with the overdue task “%s”.</string>
+    <string name="ai_tip_top">Tip: your top task today is “%s”.</string>
+    <string name="ai_tip_bed">Reminder: your suggested bedtime is %s.</string>
+    <string name="ai_insight_late">Overdue: %1$d · Today: %2$d</string>
+    <string name="ai_insight_today">Today: %d</string>
+    <string name="qibla">Qibla</string>
+    <string name="qibla_deg">%1$d° from north</string>
+    <string name="qibla_dist">Distance to the Kaaba: %1$s km</string>
+    <string name="qibla_aligned">You are facing the Qibla</string>
+    <string name="qibla_calibrate">Move the phone in a figure 8 to calibrate the compass</string>
+    <string name="qibla_hold_flat">Hold the phone flat and turn until the arrow points up</string>
+    <string name="qibla_no_sensor">This device has no compass sensor</string>
+    <string name="qibla_need_loc">Set your location first to find the Qibla direction.</string>
+    <string name="tasbih">Tasbih</string>
+    <string name="tasbih_reset">Reset</string>
+    <string name="tasbih_total">Today’s total: %d</string>
+    <string name="tasbih_free">Free</string>
+    <string name="prayer_tools">Tools</string>
+    <string name="prayer_pre">Reminder before prayer</string>
+    <string name="prayer_min">%d min</string>
+    <string name="prayer_each">Prayers to notify</string>
+    <string name="prayer_pre_text">%1$d min until %2$s prayer</string>
+    <string name="prayer_prayed">Prayed</string>
+    <string name="prayer_check_hint">Tap the circle to mark a prayer as prayed.</string>
+    <string name="prayer_log">Prayer tracker</string>
+    <string name="prayer_log_today">Prayed %d of 5 today</string>
+    <string name="prayer_streak">%d days in a row with all prayers</string>
+    <string name="prayer_streak_none">Start your streak today</string>
+    <string name="night_title">Night</string>
+    <string name="night_mid">Islamic midnight</string>
+    <string name="night_third">Last third of the night</string>
+    <string-array name="compass_dirs">
+        <item>N</item>
+        <item>E</item>
+        <item>S</item>
+        <item>W</item>
+    </string-array>
+    <string-array name="tasbih_phrases">
+        <item>سبحان الله</item>
+        <item>الحمد لله</item>
+        <item>الله أكبر</item>
+        <item>لا إله إلا الله</item>
+        <item>أستغفر الله</item>
+        <item>اللهم صلِّ وسلِّم على نبينا محمد</item>
+    </string-array>
 </resources>

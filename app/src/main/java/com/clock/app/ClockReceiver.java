@@ -11,6 +11,7 @@ public class ClockReceiver extends BroadcastReceiver {
     static final String A_TIMER_CANCEL = "app.clock.action.TIMER_CANCEL";
     static final String A_TASK_DONE = "app.clock.action.TASK_DONE";
     static final String A_TASK_LATER = "app.clock.action.TASK_LATER";
+    static final String A_PRAYER_DONE = "app.clock.action.PRAYER_DONE";
 
     @Override
     public void onReceive(Context c, Intent i) {
@@ -29,6 +30,9 @@ public class ClockReceiver extends BroadcastReceiver {
             Tasks.toggle(c, id);
         } else if (A_TASK_LATER.equals(a)) {
             Tasks.postpone(c, id, 10 * 60000L);
+        } else if (A_PRAYER_DONE.equals(a)) {
+            PrayerLog.markToday(c, id, true);
+            Notif.cancelPrayer(c, id);
         }
         Bus.changed();
     }

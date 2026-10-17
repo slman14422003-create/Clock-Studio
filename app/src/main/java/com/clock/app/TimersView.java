@@ -30,7 +30,9 @@ final class TimersView extends TabView {
 
     TimersView(Context c, Host h) {
         super(c, h);
-        addView(new Header(c, c.getString(R.string.nav_timers)));
+        Header timersHeader = new Header(c, c.getString(R.string.nav_timers));
+        timersHeader.addButton(R.drawable.ic_brain, R.string.assistant, false, v -> AssistantActivity.open(c, false));
+        addView(timersHeader);
         seg = Ui.segmented(c, new CharSequence[]{c.getString(R.string.timer), c.getString(R.string.stopwatch)}, 0, this::show);
         LayoutParams sl = new LayoutParams(-1, -2);
         sl.setMargins(Ui.dp(c, 16), 0, Ui.dp(c, 16), Ui.dp(c, 8));

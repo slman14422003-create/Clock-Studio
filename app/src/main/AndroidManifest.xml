@@ -17,6 +17,7 @@
 
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
 
     <queries>
         <intent>
@@ -67,6 +68,12 @@
         <activity android:name=".SettingsActivity" android:exported="false" />
         <activity android:name=".BedtimeActivity" android:exported="false" />
         <activity android:name=".PrayerActivity" android:exported="false" />
+        <activity android:name=".QiblaActivity" android:exported="false" />
+        <activity android:name=".TasbihActivity" android:exported="false" />
+        <activity
+            android:name=".AssistantActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ConverterActivity" android:exported="false" />
         <activity
             android:name=".StandByActivity"
