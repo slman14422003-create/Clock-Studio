@@ -105,7 +105,7 @@ final class Alarms {
 
     static void rescheduleAll(Context c) {
         for (Alarm a : all(c)) reschedule(c, a);
-        ClockWidget.refresh(c);
+        WBase.refreshAll(c);
     }
 
     /** Called when an alarm rings: a one-time alarm switches itself off, a repeating one books its next day. */
@@ -122,7 +122,7 @@ final class Alarms {
 
     static void snooze(Context c, int id, int minutes) {
         Sched.alarmClock(c, System.currentTimeMillis() + minutes * 60000L, Sched.KIND_SNOOZE, id);
-        ClockWidget.refresh(c);
+        WBase.refreshAll(c);
     }
 
     /** Earliest trigger of any enabled alarm, 0 if none. */
@@ -138,7 +138,7 @@ final class Alarms {
     }
 
     private static void changed(Context c) {
-        ClockWidget.refresh(c);
+        WBase.refreshAll(c);
         Bedtime.reschedule(c);
         Bus.changed();
     }

@@ -324,4 +324,19 @@
         <item>غرب</item>
         <item>شمال غرب</item>
     </string-array>
+    <string name="widget_digital">رقمية أفقية</string>
+    <string name="widget_digital_desc">الوقت والتاريخ بشكل أفقي أنيق</string>
+    <string name="widget_stack">أرقام كبيرة</string>
+    <string name="widget_stack_desc">الساعة والدقيقة بأرقام كبيرة متدرجة</string>
+    <string name="widget_analog">ساعة عقارب</string>
+    <string name="widget_analog_desc">ساعة تناظرية بتصميم مبسط</string>
+    <string name="widget_date">تقويم اليوم</string>
+    <string name="widget_date_desc">اليوم والشهر بتصميم تقويم</string>
+    <string name="widget_prayer">الصلاة القادمة</string>
+    <string name="widget_prayer_desc">الصلاة القادمة مع عدّ تنازلي</string>
+    <string name="widget_alarm">المنبه القادم</string>
+    <string name="widget_alarm_desc">وقت المنبه القادم</string>
+    <string name="widget_next_prayer">الصلاة القادمة</string>
+    <string name="widget_next_alarm">المنبه القادم</string>
+    <string name="widget_prayer_setup">حدد موقع الصلاة من التطبيق</string>
 </resources>

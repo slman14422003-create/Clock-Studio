@@ -324,4 +324,19 @@
         <item>West</item>
         <item>North-west</item>
     </string-array>
+    <string name="widget_digital">Wide digital</string>
+    <string name="widget_digital_desc">Time and date in a slim wide bar</string>
+    <string name="widget_stack">Big digits</string>
+    <string name="widget_stack_desc">Hours and minutes stacked in big digits</string>
+    <string name="widget_analog">Analog clock</string>
+    <string name="widget_analog_desc">A clean analog clock face</string>
+    <string name="widget_date">Today calendar</string>
+    <string name="widget_date_desc">Day and month in a calendar style</string>
+    <string name="widget_prayer">Next prayer</string>
+    <string name="widget_prayer_desc">Next prayer with a live countdown</string>
+    <string name="widget_alarm">Next alarm</string>
+    <string name="widget_alarm_desc">Time of your next alarm</string>
+    <string name="widget_next_prayer">Next prayer</string>
+    <string name="widget_next_alarm">Next alarm</string>
+    <string name="widget_prayer_setup">Set the prayer location in the app</string>
 </resources>
