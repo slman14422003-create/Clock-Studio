@@ -428,8 +428,7 @@ public class QuranReaderActivity extends BaseActivity {
 
     private void share() {
         if (selected < 0) return;
-        Intent i = new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, ayahShare(selected));
-        startActivity(Intent.createChooser(i, getString(R.string.quran_share)));
+        ShareCard.show(this, d.surahShort(d.surahOf[selected]), QuranData.num(d.num[selected]), d.text[selected], ayahShare(selected));
     }
 
     // ------------------------------------------------------------------ pages
@@ -598,7 +597,7 @@ public class QuranReaderActivity extends BaseActivity {
         for (int q = 0; q < hl.size(); q++) {
             rr[q * 2] = hl.get(q)[0];
             rr[q * 2 + 1] = hl.get(q)[1];
-            cc[q] = Ui.alpha(accent, 0x30);
+            cc[q] = Ui.alpha(accent, 0xFF);
         }
         t.setHighlights(rr, cc);
         t.setTypeface(face);

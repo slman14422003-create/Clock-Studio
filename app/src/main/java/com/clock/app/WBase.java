@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +20,8 @@ abstract class WBase extends AppWidgetProvider {
     static final String REFRESH = "com.clock.app.WIDGET_REFRESH";
     static final int TEXT = 1, ACCENT = 2, SIZE = 4, FMT = 8, DATE = 16, FACE = 32, HIJRI = 64;
     static final Class<?>[] ALL = {ClockWidget.class, WidgetDigital.class, WidgetStack.class, WidgetAnalog.class,
-            WidgetDate.class, WidgetPrayer.class, WidgetPrayers.class, WidgetAlarm.class, WidgetQuran.class};
+            WidgetDate.class, WidgetPrayer.class, WidgetPrayers.class, WidgetAlarm.class, WidgetQuran.class,
+            ClockWidgetL.class, WidgetAnalogL.class, WidgetDigitalL.class, WidgetDateL.class, WidgetQuranL.class, WidgetPrayerL.class, WidgetStackL.class, WidgetPrayersL.class, WidgetAlarmL.class};
 
     abstract int layout(boolean rtl, WCfg cfg);
 
@@ -129,8 +131,43 @@ abstract class WBase extends AppWidgetProvider {
                 || Intent.ACTION_LOCALE_CHANGED.equals(a)) refreshAll(c);
     }
 
+    private float sizeFactor = 1f;
+
     RemoteViews build(Context app, int id) {
+        sizeFactor = measure(app, id);
         return build(app, WCfg.load(app, id, defaultBg()));
+    }
+
+    /** How much larger or smaller than its design size the widget currently is (launcher resize), so text grows and shrinks with it. */
+    private float measure(Context app, int id) {
+        try {
+            AppWidgetManager m = AppWidgetManager.getInstance(app);
+            AppWidgetProviderInfo info = m.getAppWidgetInfo(id);
+            Bundle o = m.getAppWidgetOptions(id);
+            if (info == null || o == null) return 1f;
+            float d = app.getResources().getDisplayMetrics().density;
+            boolean land = app.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+            float w = o.getInt(land ? AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH : AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0);
+            float h = o.getInt(land ? AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT : AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0);
+            float bw = Math.max(1f, info.minWidth / d);
+            float bh = Math.max(1f, info.minHeight / d);
+            String cn = info.provider.getClassName();
+            if (cn.endsWith("L")) {
+                String base = cn.substring(0, cn.length() - 1);
+                for (AppWidgetProviderInfo p : m.getInstalledProviders()) {
+                    if (p.provider.getPackageName().equals(app.getPackageName()) && p.provider.getClassName().equals(base)) {
+                        bw = Math.max(1f, p.minWidth / d);
+                        bh = Math.max(1f, p.minHeight / d);
+                        break;
+                    }
+                }
+            }
+            if (w <= 0 || h <= 0) return 1f;
+            float f = Math.min(w / bw, h / bh);
+            return Math.max(0.55f, Math.min(2.6f, f));
+        } catch (Throwable e) {
+            return 1f;
+        }
     }
 
     /** Builds the widget for an explicit configuration; the settings screen uses it for its live preview. */
@@ -179,8 +216,8 @@ abstract class WBase extends AppWidgetProvider {
         if (ac != 0) for (int id : accents()) rv.setTextColor(id, ac);
         if (setMain) tint(rv, sec);
         if (ac != 0) tintAccent(rv, ac);
-        float s = cfg.scale();
-        if ((caps() & SIZE) != 0 && s != 1f) {
+        float s = ((caps() & SIZE) != 0 ? cfg.scale() : 1f) * sizeFactor;
+        if (s != 1f) {
             for (int[] t : sizes()) rv.setTextViewTextSize(t[0], TypedValue.COMPLEX_UNIT_SP, t[1] * s);
         }
     }

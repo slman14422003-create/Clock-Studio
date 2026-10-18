@@ -126,8 +126,56 @@ final class Store {
     }
 
     /** 0 = digital, 1 = analog, 2 = night. */
+    static int shareTheme(Context c) {
+        return Math.max(0, p(c).getInt("share_theme", 0));
+    }
+
+    static void setShareTheme(Context c, int v) {
+        p(c).edit().putInt("share_theme", v).apply();
+    }
+
+    static boolean standbyAuto(Context c) {
+        return p(c).getBoolean("standby_auto", false);
+    }
+
+    static void setStandbyAuto(Context c, boolean v) {
+        p(c).edit().putBoolean("standby_auto", v).apply();
+    }
+
+    static boolean standbyLock(Context c) {
+        return p(c).getBoolean("standby_lock", true);
+    }
+
+    static void setStandbyLock(Context c, boolean v) {
+        p(c).edit().putBoolean("standby_lock", v).apply();
+    }
+
+    static boolean standbyLandscape(Context c) {
+        return p(c).getBoolean("standby_land", true);
+    }
+
+    static void setStandbyLandscape(Context c, boolean v) {
+        p(c).edit().putBoolean("standby_land", v).apply();
+    }
+
+    static boolean standbyAutoNight(Context c) {
+        return p(c).getBoolean("standby_autonight", true);
+    }
+
+    static void setStandbyAutoNight(Context c, boolean v) {
+        p(c).edit().putBoolean("standby_autonight", v).apply();
+    }
+
+    static int standbyColor(Context c) {
+        return Math.max(0, p(c).getInt("standby_color", 0));
+    }
+
+    static void setStandbyColor(Context c, int v) {
+        p(c).edit().putInt("standby_color", v).apply();
+    }
+
     static int standbyStyle(Context c) {
-        return Math.max(0, Math.min(2, p(c).getInt("standby_style", 0)));
+        return Math.max(0, Math.min(StandByView.COUNT - 1, p(c).getInt("standby_style", 0)));
     }
 
     static void setStandbyStyle(Context c, int v) {

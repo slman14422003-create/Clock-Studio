@@ -10,6 +10,11 @@ public class WidgetDate extends WBase {
     }
 
     @Override
+    int[][] sizes() {
+        return new int[][]{{R.id.wA1, 15}, {R.id.wP1, 72}, {R.id.wS1, 13}};
+    }
+
+    @Override
     int caps() {
         return TEXT | ACCENT;
     }

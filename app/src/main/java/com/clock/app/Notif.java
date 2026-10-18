@@ -22,7 +22,7 @@ final class Notif {
     private Notif() {
     }
 
-    static final String CH_RING = "ring", CH_TIMER = "timer", CH_TASK = "task", CH_MISSED = "missed", CH_BEDTIME = "bedtime", CH_PRAYER = "prayer";
+    static final String CH_RING = "ring", CH_TIMER = "timer", CH_TASK = "task", CH_MISSED = "missed", CH_BEDTIME = "bedtime", CH_PRAYER = "prayer", CH_STANDBY = "standby", CH_STANDBY_LAUNCH = "standby_launch";
     private static final String TAG_TIMER = "timer", TAG_TASK = "task", TAG_MISSED = "missed", TAG_BEDTIME = "bedtime", TAG_PRAYER = "prayer";
 
     static void init(Context c) {
@@ -42,6 +42,15 @@ final class Notif {
         list.add(new NotificationChannel(CH_MISSED, c.getString(R.string.ch_missed), NotificationManager.IMPORTANCE_DEFAULT));
         list.add(new NotificationChannel(CH_BEDTIME, c.getString(R.string.ch_bedtime), NotificationManager.IMPORTANCE_DEFAULT));
         list.add(new NotificationChannel(CH_PRAYER, c.getString(R.string.ch_prayer), NotificationManager.IMPORTANCE_HIGH));
+        NotificationChannel sb = new NotificationChannel(CH_STANDBY, c.getString(R.string.ch_standby), NotificationManager.IMPORTANCE_MIN);
+        sb.setShowBadge(false);
+        list.add(sb);
+        NotificationChannel sbl = new NotificationChannel(CH_STANDBY_LAUNCH, c.getString(R.string.ch_standby), NotificationManager.IMPORTANCE_HIGH);
+        sbl.setSound(null, null);
+        sbl.enableVibration(false);
+        sbl.setShowBadge(false);
+        sbl.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
+        list.add(sbl);
         nm.createNotificationChannels(list);
     }
 

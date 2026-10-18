@@ -13,5 +13,7 @@ public class BootReceiver extends BroadcastReceiver {
         Tasks.rescheduleAll(c);
         Bedtime.reschedule(c);
         PrayerTimes.scheduleNext(c);
+        String a = i.getAction();
+        if (Intent.ACTION_BOOT_COMPLETED.equals(a) || Intent.ACTION_MY_PACKAGE_REPLACED.equals(a)) StandByService.sync(c);
     }
 }

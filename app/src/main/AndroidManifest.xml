@@ -14,12 +14,16 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.hardware.location" android:required="false" />
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
 
     <queries>
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
         <intent>
             <action android:name="app.semo.ECOSYSTEM" />
         </intent>
@@ -37,6 +41,16 @@
         android:theme="@style/AppTheme">
 
         <meta-data android:name="app.semo.ROLE" android:value="clock" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <activity
             android:name=".MainActivity"
@@ -85,6 +99,7 @@
         <activity
             android:name=".StandByActivity"
             android:exported="false"
+            android:launchMode="singleTask"
             android:screenOrientation="fullSensor"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden" />
 
@@ -102,6 +117,15 @@
             android:name=".RingService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
+
+        <service
+            android:name=".StandByService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Watches charger and screen state to show the desk clock (StandBy) over the lock screen" />
+        </service>
 
         <receiver android:name=".ClockReceiver" android:exported="false" />
 
@@ -199,6 +223,88 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_quran_info" />
+        </receiver>
+
+
+        <receiver android:name=".ClockWidgetL" android:exported="false" android:label="@string/widget_classic_l">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_classic_l_info" />
+        </receiver>
+
+        <receiver android:name=".WidgetAnalogL" android:exported="false" android:label="@string/widget_analog_l">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_analog_l_info" />
+        </receiver>
+
+        <receiver android:name=".WidgetDigitalL" android:exported="false" android:label="@string/widget_digital_l">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_digital_l_info" />
+        </receiver>
+
+        <receiver android:name=".WidgetDateL" android:exported="false" android:label="@string/widget_date_l">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_date_l_info" />
+        </receiver>
+
+        <receiver android:name=".WidgetQuranL" android:exported="false" android:label="@string/widget_quran_l">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quran_l_info" />
+        </receiver>
+
+        <receiver android:name=".WidgetPrayerL" android:exported="false" android:label="@string/widget_prayer_l">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_prayer_l_info" />
+        </receiver>
+
+        <receiver android:name=".WidgetStackL" android:exported="false" android:label="@string/widget_stack_l">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_stack_l_info" />
+        </receiver>
+
+        <receiver android:name=".WidgetPrayersL" android:exported="false" android:label="@string/widget_prayers_l">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_prayers_l_info" />
+        </receiver>
+
+        <receiver android:name=".WidgetAlarmL" android:exported="false" android:label="@string/widget_alarm_l">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_alarm_l_info" />
         </receiver>
 
         <activity

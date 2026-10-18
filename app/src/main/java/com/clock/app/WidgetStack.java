@@ -16,6 +16,11 @@ public class WidgetStack extends WBase {
     }
 
     @Override
+    int[][] sizes() {
+        return new int[][]{{R.id.wS1, 13}};
+    }
+
+    @Override
     int caps() {
         return TEXT | FMT | DATE;
     }

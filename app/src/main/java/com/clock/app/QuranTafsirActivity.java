@@ -261,7 +261,6 @@ public class QuranTafsirActivity extends BaseActivity {
     }
 
     private void share() {
-        Intent i = new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, shareText());
-        startActivity(Intent.createChooser(i, getString(R.string.quran_share)));
+        ShareCard.show(this, d.surahShort(d.surahOf[ayah]), QuranData.num(d.num[ayah]), d.text[ayah], shareText());
     }
 }

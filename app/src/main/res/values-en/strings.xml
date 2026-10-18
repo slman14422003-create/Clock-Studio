@@ -448,4 +448,39 @@
         <item>Tanwir al-Miqbas</item>
         <item>English</item>
     </string-array>
+
+    <string name="card_whatsapp">Share as WhatsApp status</string>
+    <string name="card_share_image">Share as image</string>
+    <string name="card_share_text">Share as text</string>
+    <string name="card_no_whatsapp">WhatsApp is not installed, pick another app</string>
+    <string name="card_failed">Could not create the card</string>
+    <string name="card_brand">Clock Studio</string>
+    <string name="standby_prayer">Prayer</string>
+    <string name="standby_verse">Verse of the day</string>
+    <string name="standby_calendar">Calendar</string>
+    <string name="standby_auto">Start automatically while charging</string>
+    <string name="standby_auto_sub">StandBy appears on the lock screen when the charger is connected</string>
+    <string name="standby_lock">Show over the lock screen</string>
+    <string name="standby_landscape">Landscape only</string>
+    <string name="standby_autonight">Auto night in the dark</string>
+    <string name="standby_color">Clock colour</string>
+    <string name="standby_colors">White,Orange,Blue,Green,Pink,Yellow</string>
+    <string name="standby_overlay_perm">Display over other apps</string>
+    <string name="standby_hint">Swipe sideways to change page, long-press to change colour, swipe down to exit</string>
+    <string name="standby_svc_title">StandBy is ready</string>
+    <string name="standby_svc_text">It will appear automatically when charging</string>
+    <string name="ch_standby">StandBy</string>
+    <string name="standby_no_prayer">Set your location in the Prayer screen</string>
+    <string name="standby_no_verse">Download the Quran text from the Quran screen</string>
+    <string name="standby_next_prayer">Next prayer</string>
+    <string name="card_surah">Surah %s</string>
+    <string name="widget_classic_l">Classic clock · Large</string>
+    <string name="widget_analog_l">Analog clock · Large</string>
+    <string name="widget_digital_l">Digital clock · Large</string>
+    <string name="widget_date_l">Date · Large</string>
+    <string name="widget_quran_l">Verse of the day · Large</string>
+    <string name="widget_prayer_l">Next prayer · Large</string>
+    <string name="widget_stack_l">Stacked clock · Large</string>
+    <string name="widget_prayers_l">Prayer times · Large</string>
+    <string name="widget_alarm_l">Alarm · Large</string>
 </resources>

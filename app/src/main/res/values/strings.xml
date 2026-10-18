@@ -448,4 +448,39 @@
         <item>تنوير المقباس</item>
         <item>English</item>
     </string-array>
+
+    <string name="card_whatsapp">مشاركة كحالة واتساب</string>
+    <string name="card_share_image">مشاركة كصورة</string>
+    <string name="card_share_text">مشاركة كنص</string>
+    <string name="card_no_whatsapp">واتساب غير مثبّت، اختر تطبيقاً آخر</string>
+    <string name="card_failed">تعذّر إنشاء البطاقة</string>
+    <string name="card_brand">Clock Studio</string>
+    <string name="standby_prayer">الصلاة</string>
+    <string name="standby_verse">آية اليوم</string>
+    <string name="standby_calendar">التقويم</string>
+    <string name="standby_auto">تشغيل تلقائي أثناء الشحن</string>
+    <string name="standby_auto_sub">يظهر وضع الاستعداد على شاشة القفل عند توصيل الشاحن</string>
+    <string name="standby_lock">العرض فوق شاشة القفل</string>
+    <string name="standby_landscape">فقط في الوضع الأفقي</string>
+    <string name="standby_autonight">ليلي تلقائي عند الظلام</string>
+    <string name="standby_color">لون الساعة</string>
+    <string name="standby_colors">أبيض,برتقالي,أزرق,أخضر,وردي,أصفر</string>
+    <string name="standby_overlay_perm">عرض فوق التطبيقات الأخرى</string>
+    <string name="standby_hint">اسحب يميناً ويساراً لتغيير الصفحة، واضغط مطولاً لتغيير اللون، واسحب للأسفل للخروج</string>
+    <string name="standby_svc_title">وضع الاستعداد جاهز</string>
+    <string name="standby_svc_text">سيظهر تلقائياً عند الشحن</string>
+    <string name="ch_standby">وضع الاستعداد</string>
+    <string name="standby_no_prayer">اضبط الموقع من شاشة الصلاة</string>
+    <string name="standby_no_verse">حمّل نص القرآن من شاشة القرآن</string>
+    <string name="standby_next_prayer">الصلاة القادمة</string>
+    <string name="card_surah">سورة %s</string>
+    <string name="widget_classic_l">ساعة كلاسيكية · كبيرة</string>
+    <string name="widget_analog_l">ساعة تناظرية · كبيرة</string>
+    <string name="widget_digital_l">ساعة رقمية · كبيرة</string>
+    <string name="widget_date_l">التاريخ · كبير</string>
+    <string name="widget_quran_l">آية اليوم · كبيرة</string>
+    <string name="widget_prayer_l">الصلاة القادمة · كبيرة</string>
+    <string name="widget_stack_l">ساعة مكدّسة · كبيرة</string>
+    <string name="widget_prayers_l">أوقات الصلاة · كبيرة</string>
+    <string name="widget_alarm_l">المنبه · كبير</string>
 </resources>

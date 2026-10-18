@@ -140,13 +140,32 @@ public class SettingsActivity extends BaseActivity {
 
         col.addView(Ui.sectionTitle(this, getString(R.string.sec_standby)));
         LinearLayout gsb = Ui.group(this);
-        final String[] sbNames = {getString(R.string.standby_digital), getString(R.string.standby_analog), getString(R.string.standby_night)};
+        final String[] sbNames = {getString(R.string.standby_digital), getString(R.string.standby_analog), getString(R.string.standby_night),
+                getString(R.string.standby_prayer), getString(R.string.standby_verse), getString(R.string.standby_calendar)};
         Ui.addRow(gsb, Ui.row(this, R.drawable.ic_standby, R.color.indigo, getString(R.string.standby_style),
                 sbNames[Store.standbyStyle(this)], true, v -> Dlg.choose(this, R.string.standby_style, sbNames,
                         Store.standbyStyle(this), i -> {
                             Store.setStandbyStyle(this, i);
                             build();
                         })), true);
+        final String[] colorNames = getString(R.string.standby_colors).split(",");
+        Ui.addRow(gsb, Ui.row(this, R.drawable.ic_palette, R.color.warn, getString(R.string.standby_color),
+                colorNames[Math.min(colorNames.length - 1, Store.standbyColor(this))], true,
+                v -> Dlg.choose(this, R.string.standby_color, colorNames, Store.standbyColor(this), i -> {
+                    Store.setStandbyColor(this, i);
+                    build();
+                })), true);
+        Ui.addRow(gsb, Ui.switchRow(this, R.drawable.ic_lock, R.color.info, getString(R.string.standby_lock), null,
+                Store.standbyLock(this), (v, on) -> Store.setStandbyLock(this, on)), true);
+        Ui.addRow(gsb, Ui.switchRow(this, R.drawable.ic_moon, R.color.indigo, getString(R.string.standby_autonight), null,
+                Store.standbyAutoNight(this), (v, on) -> Store.setStandbyAutoNight(this, on)), true);
+        Ui.addRow(gsb, Ui.switchRow(this, R.drawable.ic_standby, R.color.ok, getString(R.string.standby_auto),
+                getString(R.string.standby_auto_sub), Store.standbyAuto(this), (v, on) -> {
+                    Store.setStandbyAuto(this, on);
+                    StandByService.sync(this);
+                }), true);
+        Ui.addRow(gsb, Ui.switchRow(this, R.drawable.ic_sliders, R.color.accent, getString(R.string.standby_landscape), null,
+                Store.standbyLandscape(this), (v, on) -> Store.setStandbyLandscape(this, on)), true);
         Ui.addRow(gsb, Ui.row(this, R.drawable.ic_clock, R.color.info, getString(R.string.standby), null, true,
                 v -> Ui.openZoom(this, new Intent(this, StandByActivity.class))), true);
         col.addView(gsb);
@@ -162,6 +181,9 @@ public class SettingsActivity extends BaseActivity {
             Ui.addRow(g4, Ui.row(this, R.drawable.ic_lock, R.color.info, getString(R.string.full_screen),
                     getString(fs ? R.string.on : R.string.off), true, v -> openSettings(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)), true);
         }
+        Ui.addRow(g4, Ui.row(this, R.drawable.ic_standby, R.color.indigo, getString(R.string.standby_overlay_perm),
+                getString(Settings.canDrawOverlays(this) ? R.string.on : R.string.off), true,
+                v -> openSettings(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)), true);
         col.addView(g4);
         col.addView(Ui.footnote(this, getString(R.string.permissions_note)));
 
