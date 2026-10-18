@@ -30,7 +30,7 @@ final class AyahTextView extends TextView {
     @Override
     protected void onDraw(Canvas cv) {
         Layout l = getLayout();
-        if (l != null && colors.length > 0) {
+        if (l != null && colors.length > 0 && ranges.length >= colors.length * 2) {
             float d = getResources().getDisplayMetrics().density;
             Paint.FontMetrics fm = getPaint().getFontMetrics();
             float minX = -getTotalPaddingLeft() + 1.5f * d;
@@ -78,7 +78,7 @@ final class AyahTextView extends TextView {
                 if (i < offset) before++;
             }
         }
-        if (spaces == 0) return x;
+        if (spaces == 0 || end <= start) return x;
         float natural = Layout.getDesiredWidth(t, start, end, getPaint());
         float extra = (l.getWidth() - natural) / spaces;
         if (extra <= 0) return x;

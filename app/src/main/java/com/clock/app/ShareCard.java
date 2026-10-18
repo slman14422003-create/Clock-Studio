@@ -162,10 +162,16 @@ final class ShareCard {
         rp.setTextAlign(Paint.Align.CENTER);
         cv.drawText(surah + "  \u00B7  " + ayahNo, W / 2f, fy + 100f, rp);
 
-        rp.setTextSize(34f);
-        rp.setColor(Color.argb(0xB0, 255, 255, 255));
-        cv.drawText(brand, W / 2f, H - 112f, rp);
         return bm;
+    }
+
+    private static Bitmap safeRender(Activity a, String surah, String ayahNo, String text, int theme, Typeface face, String brand) {
+        try {
+            return render(surah, ayahNo, text, theme, face, brand);
+        } catch (Throwable e) {
+            Ui.toast(a, a.getString(R.string.card_failed));
+            return null;
+        }
     }
 
     private static StaticLayout build(String text, TextPaint tp, int w, int maxLines) {
@@ -232,7 +238,8 @@ final class ShareCard {
         final String surahName = a.getString(R.string.card_surah, surah);
         final String brand = a.getString(R.string.card_brand);
         final int[] theme = {Store.shareTheme(a)};
-        final Bitmap[] cur = {render(surahName, ayahNo, text, theme[0], face, brand)};
+        final Bitmap[] cur = {safeRender(a, surahName, ayahNo, text, theme[0], face, brand)};
+        if (cur[0] == null) return;
 
         LinearLayout root = new LinearLayout(a);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -272,8 +279,10 @@ final class ShareCard {
             v.setOnClickListener(x -> {
                 theme[0] = idx;
                 Store.setShareTheme(a, idx);
+                Bitmap nb = safeRender(a, surahName, ayahNo, text, idx, face, brand);
+                if (nb == null) return;
                 Bitmap old = cur[0];
-                cur[0] = render(surahName, ayahNo, text, idx, face, brand);
+                cur[0] = nb;
                 img.setImageBitmap(cur[0]);
                 if (old != null && !old.isRecycled()) old.recycle();
                 refresh[0].run();

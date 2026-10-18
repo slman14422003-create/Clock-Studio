@@ -521,6 +521,7 @@ public class QuranActivity extends BaseActivity {
 
     /** "Suggest a verse": the person picks what they need, or writes how they feel, and a verse about it becomes the verse of the day. */
     private void suggestFlow(final View hero) {
+        if (d == null) return;
         final int n = QuranSmart.TOPICS.length;
         CharSequence[] items = new CharSequence[n + 1];
         for (int i = 0; i < n; i++) items[i] = QuranSmart.TOPICS[i].label();
@@ -546,7 +547,7 @@ public class QuranActivity extends BaseActivity {
     }
 
     private void runSuggest(final View hero, int topic, String free) {
-        if (topic < 0 && (free == null || free.trim().isEmpty())) return;
+        if (d == null || (topic < 0 && (free == null || free.trim().isEmpty()))) return;
         Ui.toast(this, getString(R.string.quran_suggest_busy));
         QuranSmart.pick(this, d, topic, free, (ayah, label) -> {
             if (isFinishing() || isDestroyed()) return;

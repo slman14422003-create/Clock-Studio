@@ -18,23 +18,42 @@ public class ClockReceiver extends BroadcastReceiver {
         String a = i.getAction();
         if (a == null) return;
         int id = i.getIntExtra("id", 0);
-        if (Sched.ACTION_FIRE.equals(a)) {
-            fire(c, i.getStringExtra("kind"), id);
-        } else if (A_TIMER_PAUSE.equals(a)) {
-            Timers.pause(c, id);
-        } else if (A_TIMER_RESUME.equals(a)) {
-            Timers.resume(c, id);
-        } else if (A_TIMER_CANCEL.equals(a)) {
-            Timers.cancel(c, id);
-        } else if (A_TASK_DONE.equals(a)) {
-            Tasks.toggle(c, id);
-        } else if (A_TASK_LATER.equals(a)) {
-            Tasks.postpone(c, id, 10 * 60000L);
-        } else if (A_PRAYER_DONE.equals(a)) {
-            PrayerLog.markToday(c, id, true);
-            Notif.cancelPrayer(c, id);
+        try {
+            if (Sched.ACTION_FIRE.equals(a)) {
+                fire(c, i.getStringExtra("kind"), id);
+            } else if (A_TIMER_PAUSE.equals(a)) {
+                Timers.pause(c, id);
+            } else if (A_TIMER_RESUME.equals(a)) {
+                Timers.resume(c, id);
+            } else if (A_TIMER_CANCEL.equals(a)) {
+                Timers.cancel(c, id);
+            } else if (A_TASK_DONE.equals(a)) {
+                Tasks.toggle(c, id);
+            } else if (A_TASK_LATER.equals(a)) {
+                Tasks.postpone(c, id, 10 * 60000L);
+            } else if (A_PRAYER_DONE.equals(a)) {
+                PrayerLog.markToday(c, id, true);
+                Notif.cancelPrayer(c, id);
+            }
+        } catch (Throwable ignored) {
+            // A failure in one trigger must never crash the process that other alarms depend on.
         }
-        Bus.changed();
+        try {
+            Bus.changed();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** Starts the ringing service; when the system refuses, the person still gets a visible notification. */
+    private static void startRing(Context c, String kind, int id, String label, long chain, String chainLabel) {
+        try {
+            Ring.start(c, kind, id, label, chain, chainLabel);
+        } catch (Throwable e) {
+            try {
+                Notif.missedRing(c, kind, label);
+            } catch (Throwable ignored) {
+            }
+        }
     }
 
     private static void fire(Context c, String kind, int id) {
@@ -42,17 +61,20 @@ public class ClockReceiver extends BroadcastReceiver {
         if (Sched.KIND_ALARM.equals(kind)) {
             Alarm a = Alarms.get(c, id);
             if (a == null || !a.enabled) return;
-            Alarms.afterFire(c, a);
-            Ring.start(c, Ring.KIND_ALARM, id, a.label, 0, "");
+            try {
+                Alarms.afterFire(c, a);
+            } catch (Throwable ignored) {
+            }
+            startRing(c, Ring.KIND_ALARM, id, a.label, 0, "");
         } else if (Sched.KIND_SNOOZE.equals(kind)) {
             Alarm a = Alarms.get(c, id);
             if (a == null) return;
-            Ring.start(c, Ring.KIND_ALARM, id, a.label, 0, "");
+            startRing(c, Ring.KIND_ALARM, id, a.label, 0, "");
         } else if (Sched.KIND_TIMER.equals(kind)) {
             TimerItem t = Timers.get(c, id);
             if (t == null || t.state != TimerItem.RUNNING) return;
             Timers.cancel(c, id);
-            Ring.start(c, Ring.KIND_TIMER, id, t.label, t.chain, t.chainLabel);
+            startRing(c, Ring.KIND_TIMER, id, t.label, t.chain, t.chainLabel);
         } else if (Sched.KIND_TASK.equals(kind)) {
             Task t = Tasks.get(c, id);
             if (t == null || t.done) return;

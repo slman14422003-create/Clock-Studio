@@ -376,7 +376,7 @@ public class QuranReaderActivity extends BaseActivity {
     }
 
     private void playSelected() {
-        if (d == null || selected < 0) return;
+        if (d == null || selected < 0 || selected >= QuranData.AYAHS) return;
         player.listener = audioListener;
         player.play(this, d, QuranAudio.current(this), selected);
     }
@@ -402,7 +402,7 @@ public class QuranReaderActivity extends BaseActivity {
     /** The verse the options act on: the selected one, otherwise the first verse of the current page. */
     private int targetAyah() {
         if (selected >= 0) return selected;
-        return d.pageFirst[Math.max(0, curPos) + 1];
+        return d.pageFirst[Math.max(0, Math.min(QuranData.PAGES - 1, curPos)) + 1];
     }
 
     private void showMenu() {

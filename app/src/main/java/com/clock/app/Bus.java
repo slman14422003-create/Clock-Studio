@@ -28,7 +28,13 @@ final class Bus {
             copy = new ArrayList<>(LISTENERS);
         }
         MAIN.post(() -> {
-            for (Runnable r : copy) r.run();
+            for (Runnable r : copy) {
+                try {
+                    r.run();
+                } catch (Throwable ignored) {
+                    // one broken screen must not stop the others from refreshing
+                }
+            }
         });
     }
 }

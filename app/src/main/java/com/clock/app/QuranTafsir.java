@@ -71,7 +71,11 @@ final class QuranTafsir {
         return new File(dir, s + "_" + n + ".txt");
     }
 
+    private static volatile boolean oldDropped;
+
     private static void dropOld(Context c) {
+        if (oldDropped) return;
+        oldDropped = true;
         File old = new File(c.getApplicationContext().getFilesDir(), "tafsir");
         if (!old.exists()) return;
         File[] eds = old.listFiles();

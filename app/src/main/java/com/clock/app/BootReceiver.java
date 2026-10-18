@@ -8,12 +8,32 @@ import android.content.Intent;
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context c, Intent i) {
-        Alarms.rescheduleAll(c);
-        Timers.rescheduleAll(c);
-        Tasks.rescheduleAll(c);
-        Bedtime.reschedule(c);
-        PrayerTimes.scheduleNext(c);
-        String a = i.getAction();
-        if (Intent.ACTION_BOOT_COMPLETED.equals(a) || Intent.ACTION_MY_PACKAGE_REPLACED.equals(a)) StandByService.sync(c);
+        try {
+            Alarms.rescheduleAll(c);
+        } catch (Throwable ignored) {
+        }
+        try {
+            Timers.rescheduleAll(c);
+        } catch (Throwable ignored) {
+        }
+        try {
+            Tasks.rescheduleAll(c);
+        } catch (Throwable ignored) {
+        }
+        try {
+            Bedtime.reschedule(c);
+        } catch (Throwable ignored) {
+        }
+        try {
+            PrayerTimes.scheduleNext(c);
+        } catch (Throwable ignored) {
+        }
+        String a = i == null ? null : i.getAction();
+        if (Intent.ACTION_BOOT_COMPLETED.equals(a) || Intent.ACTION_MY_PACKAGE_REPLACED.equals(a)) {
+            try {
+                StandByService.sync(c);
+            } catch (Throwable ignored) {
+            }
+        }
     }
 }
