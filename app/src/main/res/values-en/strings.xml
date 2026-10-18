@@ -304,4 +304,24 @@
         <item>أستغفر الله</item>
         <item>اللهم صلِّ وسلِّم على نبينا محمد</item>
     </string-array>
+
+    <string name="tasbih_hint">Tap anywhere on the card to count</string>
+    <string name="qibla_dir">Qibla direction</string>
+    <string name="qibla_distance">Distance to the Kaaba</string>
+    <string name="qibla_km">%1$s km</string>
+    <string name="qibla_now">Your phone now</string>
+    <string name="qibla_turn_right">Turn the phone right %d°</string>
+    <string name="qibla_turn_left">Turn the phone left %d°</string>
+    <string name="qibla_true_north">Direction and distance are computed on the WGS-84 ellipsoid from your saved location, and the compass is corrected for the magnetic declination there. Keep away from metal and magnets for best accuracy.</string>
+    <string name="empty_text"></string>
+    <string-array name="compass_names">
+        <item>North</item>
+        <item>North-east</item>
+        <item>East</item>
+        <item>South-east</item>
+        <item>South</item>
+        <item>South-west</item>
+        <item>West</item>
+        <item>North-west</item>
+    </string-array>
 </resources>

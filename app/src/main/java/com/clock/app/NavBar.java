@@ -22,7 +22,7 @@ import android.widget.TextView;
 final class NavBar {
     static final int CLOCK = 0, ALARMS = 1, TIMERS = 2, TASKS = 3, SETTINGS = 4;
     private static final int COUNT = 5;
-    private static final long DURATION = 320;
+    private static final long DURATION = Anim.D_MED;
     private static final ArgbEvaluator ARGB = new ArgbEvaluator();
 
     interface Callback {

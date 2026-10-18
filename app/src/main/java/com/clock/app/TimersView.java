@@ -57,7 +57,7 @@ final class TimersView extends TabView {
             in.animate().cancel();
             in.setAlpha(0f);
             in.setTranslationX((i == 1 ? 1 : -1) * Ui.dp(getContext(), 22));
-            in.animate().alpha(1f).translationX(0f).setDuration(380).setInterpolator(Anim.OUT).start();
+            in.animate().alpha(1f).translationX(0f).setDuration(Anim.D_MED).setInterpolator(Anim.OUT).start();
         }
         shown = true;
     }

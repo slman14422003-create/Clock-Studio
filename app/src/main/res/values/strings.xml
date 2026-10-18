@@ -304,4 +304,24 @@
         <item>أستغفر الله</item>
         <item>اللهم صلِّ وسلِّم على نبينا محمد</item>
     </string-array>
+
+    <string name="tasbih_hint">اضغط في أي مكان داخل البطاقة للعدّ</string>
+    <string name="qibla_dir">اتجاه القبلة</string>
+    <string name="qibla_distance">المسافة إلى الكعبة</string>
+    <string name="qibla_km">%1$s كم</string>
+    <string name="qibla_now">اتجاه هاتفك الآن</string>
+    <string name="qibla_turn_right">أدِر الهاتف يمينًا %d°</string>
+    <string name="qibla_turn_left">أدِر الهاتف يسارًا %d°</string>
+    <string name="qibla_true_north">الاتجاه والمسافة محسوبان بدقة على المجسّم الأرضي WGS-84 من موقعك المحفوظ، والبوصلة مصحّحة بالانحراف المغناطيسي لموقعك. ابتعد عن المعادن والمغناطيس لنتيجة أدق.</string>
+    <string name="empty_text"></string>
+    <string-array name="compass_names">
+        <item>شمال</item>
+        <item>شمال شرق</item>
+        <item>شرق</item>
+        <item>جنوب شرق</item>
+        <item>جنوب</item>
+        <item>جنوب غرب</item>
+        <item>غرب</item>
+        <item>شمال غرب</item>
+    </string-array>
 </resources>

@@ -313,8 +313,8 @@ final class TasksView extends TabView {
             sub.setText(s);
             sub.setVisibility(s.isEmpty() ? View.GONE : View.VISIBLE);
             sub.setTextColor(Ui.color(c, overdue ? R.color.bad : R.color.text_secondary));
-            check.setOnClickListener(v -> check.animate().scaleX(0.7f).scaleY(0.7f).setDuration(90).withEndAction(() -> {
-                check.animate().scaleX(1f).scaleY(1f).setDuration(120).start();
+            check.setOnClickListener(v -> check.animate().scaleX(0.7f).scaleY(0.7f).setDuration(Anim.D_TAP).withEndAction(() -> {
+                check.animate().scaleX(1f).scaleY(1f).setDuration(Anim.D_TAP).start();
                 Tasks.toggle(c, t.id);
             }).start());
             box.setOnClickListener(v -> host.editTask(t.id));

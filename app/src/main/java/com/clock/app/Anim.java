@@ -16,13 +16,25 @@ final class Anim {
     /** Damped spring: 1 - e^(-7.5t) * cos(9t). */
     static final TimeInterpolator SPRING = t -> t >= 1f ? 1f : (float) (1.0 - Math.exp(-7.5 * t) * Math.cos(9.0 * t));
 
+    /** One duration scale for the whole app. */
+    static final long D_TAP = 120, D_SHORT = 220, D_MED = 420, D_LONG = 600;
+
+    /** Quick scale pulse for a value that just changed (counters). */
+    static void pulse(View v) {
+        if (v == null) return;
+        v.animate().cancel();
+        v.setScaleX(1.08f);
+        v.setScaleY(1.08f);
+        v.animate().scaleX(1f).scaleY(1f).setDuration(D_MED).setInterpolator(SPRING).start();
+    }
+
     /** Icon "pop" when a tab becomes selected. */
     static void bounce(View v) {
         if (v == null) return;
         v.animate().cancel();
         v.setScaleX(0.78f);
         v.setScaleY(0.78f);
-        v.animate().scaleX(1f).scaleY(1f).setDuration(520).setInterpolator(SPRING).start();
+        v.animate().scaleX(1f).scaleY(1f).setDuration(D_LONG).setInterpolator(SPRING).start();
     }
 
     /** A view appears with a small spring zoom. */
@@ -32,7 +44,7 @@ final class Anim {
         v.setAlpha(0f);
         v.setScaleX(0.9f);
         v.setScaleY(0.9f);
-        v.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(480).setInterpolator(SPRING).start();
+        v.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(D_MED).setInterpolator(SPRING).start();
     }
 
     /** A view rises from below and settles. */
@@ -41,6 +53,6 @@ final class Anim {
         v.animate().cancel();
         v.setAlpha(0f);
         v.setTranslationY(Ui.dpf(v.getContext(), fromDp));
-        v.animate().alpha(1f).translationY(0f).setStartDelay(delay).setDuration(620).setInterpolator(SPRING).start();
+        v.animate().alpha(1f).translationY(0f).setStartDelay(delay).setDuration(D_LONG).setInterpolator(SPRING).start();
     }
 }

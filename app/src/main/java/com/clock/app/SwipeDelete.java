@@ -91,7 +91,7 @@ final class SwipeDelete extends ItemTouchHelper.SimpleCallback {
         if (state == ItemTouchHelper.ACTION_STATE_DRAG && vh != null) {
             View v = vh.itemView;
             if (Store.haptics(v.getContext())) v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-            v.animate().scaleX(1.03f).scaleY(1.03f).setDuration(420).setInterpolator(Anim.SPRING).start();
+            v.animate().scaleX(1.03f).scaleY(1.03f).setDuration(Anim.D_MED).setInterpolator(Anim.SPRING).start();
             v.setElevation(Ui.dpf(v.getContext(), 10));
         }
     }
@@ -99,7 +99,7 @@ final class SwipeDelete extends ItemTouchHelper.SimpleCallback {
     @Override
     public void clearView(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder vh) {
         super.clearView(rv, vh);
-        vh.itemView.animate().scaleX(1f).scaleY(1f).setDuration(260).setInterpolator(Anim.OUT).start();
+        vh.itemView.animate().scaleX(1f).scaleY(1f).setDuration(Anim.D_SHORT).setInterpolator(Anim.OUT).start();
         vh.itemView.setElevation(0f);
     }
 

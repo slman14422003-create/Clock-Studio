@@ -81,11 +81,11 @@ final class StandByView extends View {
     private void change(int dir) {
         final int next = ((style + dir) % COUNT + COUNT) % COUNT;
         animate().cancel();
-        animate().alpha(0f).scaleX(0.96f).scaleY(0.96f).setDuration(150).setInterpolator(Anim.IN).withEndAction(() -> {
+        animate().alpha(0f).scaleX(0.96f).scaleY(0.96f).setDuration(Anim.D_SHORT).setInterpolator(Anim.IN).withEndAction(() -> {
             style = next;
             if (styleCb != null) styleCb.on(next);
             invalidate();
-            animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(460).setInterpolator(Anim.OUT).start();
+            animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(Anim.D_MED).setInterpolator(Anim.OUT).start();
         }).start();
     }
 

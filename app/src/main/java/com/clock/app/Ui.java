@@ -423,7 +423,7 @@ final class Ui {
         v.setTranslationY(dp(v.getContext(), 22));
         v.animate().alpha(1f).translationY(0f)
                 .setStartDelay(Math.min(Math.max(index, 0), 9) * 34L)
-                .setDuration(480)
+                .setDuration(Anim.D_MED)
                 .setInterpolator(Anim.OUT)
                 .start();
     }

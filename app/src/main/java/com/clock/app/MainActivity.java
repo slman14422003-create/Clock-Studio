@@ -71,11 +71,11 @@ public class MainActivity extends BaseActivity implements TabView.Host {
                 final long delay = wait;
                 reveal(delay + 90);
                 if (ic != null) {
-                    ic.animate().setStartDelay(delay).scaleX(1.7f).scaleY(1.7f).alpha(0f).setDuration(440)
+                    ic.animate().setStartDelay(delay).scaleX(1.7f).scaleY(1.7f).alpha(0f).setDuration(Anim.D_MED)
                             .setInterpolator(Anim.IN).start();
                 }
                 if (sv != null) {
-                    sv.animate().setStartDelay(delay + 90).alpha(0f).setDuration(380).setInterpolator(Anim.OUT)
+                    sv.animate().setStartDelay(delay + 90).alpha(0f).setDuration(Anim.D_MED).setInterpolator(Anim.OUT)
                             .withEndAction(provider::remove).start();
                 } else {
                     provider.remove();
@@ -162,12 +162,12 @@ public class MainActivity extends BaseActivity implements TabView.Host {
     private void reveal(long delay) {
         if (revealed || rootView == null) return;
         revealed = true;
-        rootView.animate().alpha(1f).scaleX(1f).scaleY(1f).setStartDelay(delay).setDuration(560)
+        rootView.animate().alpha(1f).scaleX(1f).scaleY(1f).setStartDelay(delay).setDuration(Anim.D_LONG)
                 .setInterpolator(Anim.OUT).start();
         if (nav != null) {
             View bar = nav.view();
             bar.setTranslationY(Ui.dp(this, 90));
-            bar.animate().translationY(0f).setStartDelay(delay + 120).setDuration(720).setInterpolator(Anim.SPRING).start();
+            bar.animate().translationY(0f).setStartDelay(delay + 120).setDuration(Anim.D_LONG).setInterpolator(Anim.SPRING).start();
         }
     }
 
@@ -211,7 +211,7 @@ public class MainActivity extends BaseActivity implements TabView.Host {
             float dir = i > prev ? 1f : -1f;
             tabs[i].setAlpha(0f);
             tabs[i].setTranslationX(dir * Ui.dp(this, 26));
-            tabs[i].animate().alpha(1f).translationX(0f).setStartDelay(0).setDuration(400).setInterpolator(Anim.OUT).start();
+            tabs[i].animate().alpha(1f).translationX(0f).setStartDelay(0).setDuration(Anim.D_MED).setInterpolator(Anim.OUT).start();
         } else {
             tabs[i].setAlpha(1f);
             tabs[i].setTranslationX(0f);
@@ -253,7 +253,7 @@ public class MainActivity extends BaseActivity implements TabView.Host {
         pill.setTranslationY(Ui.dp(this, 36));
         pill.setScaleX(0.92f);
         pill.setScaleY(0.92f);
-        pill.animate().alpha(1f).translationY(0f).scaleX(1f).scaleY(1f).setStartDelay(0).setDuration(560)
+        pill.animate().alpha(1f).translationY(0f).scaleX(1f).scaleY(1f).setStartDelay(0).setDuration(Anim.D_LONG)
                 .setInterpolator(Anim.SPRING).start();
         ui.removeCallbacks(hideUndo);
         ui.postDelayed(hideUndo, 4500);
@@ -264,7 +264,7 @@ public class MainActivity extends BaseActivity implements TabView.Host {
         ui.removeCallbacks(hideUndo);
         if (pill.getVisibility() != View.VISIBLE) return;
         pill.animate().cancel();
-        pill.animate().alpha(0f).translationY(Ui.dp(this, 20)).setStartDelay(0).setDuration(220)
+        pill.animate().alpha(0f).translationY(Ui.dp(this, 20)).setStartDelay(0).setDuration(Anim.D_SHORT)
                 .setInterpolator(Anim.IN).withEndAction(() -> pill.setVisibility(View.GONE)).start();
     }
 

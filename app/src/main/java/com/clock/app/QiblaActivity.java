@@ -1,11 +1,15 @@
 package com.clock.app;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.RadialGradient;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
@@ -19,25 +23,29 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.core.graphics.ColorUtils;
+
 import java.util.Locale;
 
-/** Live qibla compass: needs the saved prayer location and the phone's rotation sensor (no internet, no permission). */
+/** Live qibla compass: true bearing and distance on the WGS-84 ellipsoid from the saved prayer location. */
 public class QiblaActivity extends BaseActivity implements SensorEventListener {
-    private static final double KAABA_LAT = 21.4225, KAABA_LON = 39.8262;
+    /** Centre of the Kaaba. */
+    private static final double KAABA_LAT = 21.422487, KAABA_LON = 39.826206;
 
     private SensorManager sm;
     private Sensor rot, acc, mag;
     private CompassView compass;
-    private TextView degText, distText, hint;
+    private TextView guide, hint;
+    private LinearLayout rowNow;
     private double qibla = -1;
-    private double distKm;
     private float declination;
     private float heading = Float.NaN;
     private boolean aligned;
     private final float[] grav = new float[3], geo = new float[3];
-    private boolean hasAcc, hasMag;
+    private boolean hasAcc;
     private final float[] rm = new float[9], rm2 = new float[9], ori = new float[3];
     private int accuracy = SensorManager.SENSOR_STATUS_ACCURACY_HIGH;
+    private long lastText;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -53,10 +61,10 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener {
 
         ScrollView sv = new ScrollView(this);
         sv.setVerticalScrollBarEnabled(false);
+        hd.bindScroll(sv);
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
-        col.setGravity(Gravity.CENTER_HORIZONTAL);
-        col.setPadding(Ui.dp(this, 16), Ui.dp(this, 8), Ui.dp(this, 16), Ui.dp(this, 30));
+        col.setPadding(0, Ui.dp(this, 4), 0, Ui.dp(this, 30));
         sv.addView(col, new ScrollView.LayoutParams(-1, -2));
         root.addView(sv, new LinearLayout.LayoutParams(-1, 0, 1f));
         setContentView(root);
@@ -77,29 +85,48 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener {
             col.addView(go);
             return;
         }
-        qibla = bearing(g.lat, g.lon);
-        distKm = distance(g.lat, g.lon);
+        double[] geod = geodesic(g.lat, g.lon);
+        qibla = geod[1];
+        double distKm = geod[0] / 1000.0;
         declination = new GeomagneticField((float) g.lat, (float) g.lon, 0f, System.currentTimeMillis()).getDeclination();
 
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setGravity(Gravity.CENTER_HORIZONTAL);
+        card.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 28)));
+        card.setPadding(Ui.dp(this, 10), Ui.dp(this, 14), Ui.dp(this, 10), Ui.dp(this, 16));
         compass = new CompassView(this, qibla);
-        col.addView(compass, new LinearLayout.LayoutParams(-1, -2));
-
-        degText = Ui.text(this, getString(R.string.qibla_deg, Math.round(qibla)), 22, R.color.text_primary);
-        degText.setTypeface(Ui.medium());
-        degText.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams dl = new LinearLayout.LayoutParams(-2, -2);
-        dl.topMargin = Ui.dp(this, 14);
-        col.addView(degText, dl);
-        distText = Ui.text(this, getString(R.string.qibla_dist, String.format(Locale.US, "%,d", Math.round(distKm))), 15, R.color.text_secondary);
-        distText.setGravity(Gravity.CENTER);
-        col.addView(distText);
-        hint = Ui.text(this, "", 14, R.color.text_secondary);
+        card.addView(compass, new LinearLayout.LayoutParams(-1, -2));
+        guide = Ui.text(this, getString(R.string.qibla_hold_flat), 19, R.color.text_primary);
+        guide.setTypeface(Ui.medium());
+        guide.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams gl = new LinearLayout.LayoutParams(-1, -2);
+        gl.topMargin = Ui.dp(this, 8);
+        card.addView(guide, gl);
+        hint = Ui.text(this, "", 13, R.color.text_secondary);
         hint.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams hl = new LinearLayout.LayoutParams(-2, -2);
-        hl.topMargin = Ui.dp(this, 12);
-        col.addView(hint, hl);
-        if (rot == null && (acc == null || mag == null)) hint.setText(R.string.qibla_no_sensor);
-        else hint.setText(R.string.qibla_hold_flat);
+        card.addView(hint, new LinearLayout.LayoutParams(-1, -2));
+        LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(-1, -2);
+        cardLp.setMargins(Ui.dp(this, 16), 0, Ui.dp(this, 16), Ui.dp(this, 14));
+        col.addView(card, cardLp);
+        Anim.riseIn(card, 24, 0);
+
+        String[] winds = getResources().getStringArray(R.array.compass_names);
+        String wind = winds[(int) Math.round(qibla / 45.0) % 8];
+        LinearLayout rows = Ui.group(this);
+        Ui.addRow(rows, Ui.row(this, R.drawable.ic_compass, R.color.ok, getString(R.string.qibla_dir),
+                getString(R.string.qibla_deg, Math.round(qibla)) + " · " + wind, false, null), true);
+        Ui.addRow(rows, Ui.row(this, R.drawable.ic_globe, R.color.info, getString(R.string.qibla_distance),
+                getString(R.string.qibla_km, String.format(Locale.US, "%,d", Math.round(distKm))), false, null), true);
+        Ui.addRow(rows, Ui.row(this, R.drawable.ic_prayer, R.color.violet, getString(R.string.location),
+                g.place, true, v -> startActivity(new Intent(this, PrayerActivity.class))), true);
+        rowNow = Ui.row(this, R.drawable.ic_standby, R.color.warn, getString(R.string.qibla_now), "--", false, null);
+        Ui.addRow(rows, rowNow, true);
+        col.addView(rows);
+        col.addView(Ui.footnote(this, getString(R.string.qibla_true_north)));
+
+        if (rot == null && (acc == null || mag == null)) guide.setText(R.string.qibla_no_sensor);
+        Anim.riseIn(rows, 20, 90);
     }
 
     @Override
@@ -123,21 +150,24 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor s, int a) {
         accuracy = a;
+        if (hint != null) {
+            hint.setText(a <= SensorManager.SENSOR_STATUS_ACCURACY_LOW ? R.string.qibla_calibrate : R.string.empty_text);
+        }
     }
 
     @Override
     public void onSensorChanged(SensorEvent e) {
         float az;
-        if (e.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+        int type = e.sensor.getType();
+        if (type == Sensor.TYPE_ROTATION_VECTOR) {
             SensorManager.getRotationMatrixFromVector(rm, e.values);
             az = azimuth();
-        } else if (e.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        } else if (type == Sensor.TYPE_ACCELEROMETER) {
             for (int i = 0; i < 3; i++) grav[i] = grav[i] * 0.8f + e.values[i] * 0.2f;
             hasAcc = true;
             return;
-        } else if (e.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+        } else if (type == Sensor.TYPE_MAGNETIC_FIELD) {
             for (int i = 0; i < 3; i++) geo[i] = geo[i] * 0.8f + e.values[i] * 0.2f;
-            hasMag = true;
             if (!hasAcc || !SensorManager.getRotationMatrix(rm, null, grav, geo)) return;
             az = azimuth();
         } else {
@@ -145,17 +175,27 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener {
         }
         float h = (az + declination + 360f) % 360f;
         if (Float.isNaN(heading)) heading = h;
-        else heading = (heading + delta(heading, h) * 0.18f + 360f) % 360f;
+        else heading = (heading + delta(heading, h) * 0.2f + 360f) % 360f;
         compass.setHeading(heading);
-        boolean now = Math.abs(delta(heading, (float) qibla)) <= 3f;
+
+        float diff = delta(heading, (float) qibla);
+        boolean now = Math.abs(diff) <= 3f;
         if (now != aligned) {
             aligned = now;
             compass.setAligned(now);
-            if (now) Ui.tick(compass);
-            hint.setText(now ? R.string.qibla_aligned
-                    : accuracy <= SensorManager.SENSOR_STATUS_ACCURACY_LOW ? R.string.qibla_calibrate : R.string.qibla_hold_flat);
-        } else if (!now && accuracy <= SensorManager.SENSOR_STATUS_ACCURACY_LOW) {
-            hint.setText(R.string.qibla_calibrate);
+            if (now) {
+                Ui.tick(compass);
+                Anim.bounce(guide);
+            }
+        }
+        long t = System.currentTimeMillis();
+        if (t - lastText > 120) {
+            lastText = t;
+            guide.setTextColor(Ui.color(this, now ? R.color.ok : R.color.text_primary));
+            int deg = Math.round(Math.abs(diff));
+            guide.setText(now ? getString(R.string.qibla_aligned)
+                    : getString(diff > 0 ? R.string.qibla_turn_right : R.string.qibla_turn_left, deg));
+            if (rowNow != null) Ui.setValue(rowNow, Math.round(heading) + "°");
         }
     }
 
@@ -177,32 +217,62 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener {
         return d;
     }
 
-    static double bearing(double lat, double lon) {
+    /** {distance in metres, initial bearing in degrees from true north} on the WGS-84 ellipsoid (Vincenty inverse). */
+    static double[] geodesic(double lat1d, double lon1d) {
+        final double a = 6378137.0, f = 1 / 298.257223563, bb = (1 - f) * a;
+        double L = Math.toRadians(KAABA_LON - lon1d);
+        double u1 = Math.atan((1 - f) * Math.tan(Math.toRadians(lat1d)));
+        double u2 = Math.atan((1 - f) * Math.tan(Math.toRadians(KAABA_LAT)));
+        double sinU1 = Math.sin(u1), cosU1 = Math.cos(u1), sinU2 = Math.sin(u2), cosU2 = Math.cos(u2);
+        double lambda = L, lambdaP;
+        double sinSigma = 0, cosSigma = 0, sigma = 0, cosSqAlpha = 0, cos2SigmaM = 0, sinLambda, cosLambda;
+        int iter = 0;
+        do {
+            sinLambda = Math.sin(lambda);
+            cosLambda = Math.cos(lambda);
+            sinSigma = Math.sqrt(Math.pow(cosU2 * sinLambda, 2) + Math.pow(cosU1 * sinU2 - sinU1 * cosU2 * cosLambda, 2));
+            if (sinSigma == 0) return new double[]{0, 0};
+            cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda;
+            sigma = Math.atan2(sinSigma, cosSigma);
+            double sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma;
+            cosSqAlpha = 1 - sinAlpha * sinAlpha;
+            cos2SigmaM = cosSqAlpha == 0 ? 0 : cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha;
+            double c = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
+            lambdaP = lambda;
+            lambda = L + (1 - c) * f * sinAlpha * (sigma + c * sinSigma * (cos2SigmaM + c * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
+        } while (Math.abs(lambda - lambdaP) > 1e-12 && ++iter < 100);
+        if (iter >= 100) return sphere(lat1d, lon1d);
+        double uSq = cosSqAlpha * (a * a - bb * bb) / (bb * bb);
+        double A = 1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)));
+        double B = uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)));
+        double dSigma = B * sinSigma * (cos2SigmaM + B / 4 * (cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)
+                - B / 6 * cos2SigmaM * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2SigmaM * cos2SigmaM)));
+        double s = bb * A * (sigma - dSigma);
+        double az = Math.atan2(cosU2 * Math.sin(lambda), cosU1 * sinU2 - sinU1 * cosU2 * Math.cos(lambda));
+        return new double[]{s, (Math.toDegrees(az) + 360.0) % 360.0};
+    }
+
+    private static double[] sphere(double lat, double lon) {
         double p1 = Math.toRadians(lat), p2 = Math.toRadians(KAABA_LAT);
         double dl = Math.toRadians(KAABA_LON - lon);
         double y = Math.sin(dl) * Math.cos(p2);
         double x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
-        return (Math.toDegrees(Math.atan2(y, x)) + 360.0) % 360.0;
+        double dp = p2 - p1;
+        double h = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+        return new double[]{2 * 6371008.8 * Math.asin(Math.min(1.0, Math.sqrt(h))), (Math.toDegrees(Math.atan2(y, x)) + 360.0) % 360.0};
     }
 
-    static double distance(double lat, double lon) {
-        double r = 6371.0;
-        double p1 = Math.toRadians(lat), p2 = Math.toRadians(KAABA_LAT);
-        double dp = p2 - p1, dl = Math.toRadians(KAABA_LON - lon);
-        double a = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
-        return 2 * r * Math.asin(Math.min(1.0, Math.sqrt(a)));
-    }
-
-    /** Dial that turns with the phone; the qibla arrow and the Kaaba mark are fixed on the dial. */
+    /** Dial that turns with the phone; the qibla needle and the Kaaba mark are fixed on the dial. */
     static final class CompassView extends View {
         private final double qibla;
-        private float heading;
+        private float heading, glow;
         private boolean aligned;
+        private ValueAnimator glowAnim;
         private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint text = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final String[] dirs;
-        private final Path arrow = new Path();
+        private final Path path = new Path();
         private final RectF box = new RectF();
 
         CompassView(Context c, double qibla) {
@@ -210,6 +280,7 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener {
             this.qibla = qibla;
             dirs = c.getResources().getStringArray(R.array.compass_dirs);
             stroke.setStyle(Paint.Style.STROKE);
+            stroke.setStrokeCap(Paint.Cap.ROUND);
             text.setTextAlign(Paint.Align.CENTER);
             text.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         }
@@ -221,13 +292,21 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener {
 
         void setAligned(boolean a) {
             aligned = a;
-            invalidate();
+            if (glowAnim != null) glowAnim.cancel();
+            glowAnim = ValueAnimator.ofFloat(glow, a ? 1f : 0f);
+            glowAnim.setDuration(Anim.D_MED);
+            glowAnim.setInterpolator(Anim.OUT);
+            glowAnim.addUpdateListener(v -> {
+                glow = (float) v.getAnimatedValue();
+                invalidate();
+            });
+            glowAnim.start();
         }
 
         @Override
         protected void onMeasure(int w, int h) {
-            int s = MeasureSpec.getSize(w);
-            setMeasuredDimension(s, s);
+            int s = Math.min(MeasureSpec.getSize(w), Ui.dp(getContext(), 340));
+            setMeasuredDimension(MeasureSpec.getSize(w), s);
         }
 
         @Override
@@ -235,67 +314,82 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener {
             Context c = getContext();
             float d = Ui.dpf(c, 1);
             float cx = getWidth() / 2f, cy = getHeight() / 2f;
-            float r = Math.min(cx, cy) - 14 * d;
-            int accent = Ui.color(c, aligned ? R.color.ok : R.color.accent);
+            float r = Math.min(cx, cy) - 16 * d;
+            int ok = Ui.color(c, R.color.ok);
+            int accent = ColorUtils.blendARGB(Ui.color(c, R.color.accent), ok, glow);
 
-            fill.setColor(Ui.color(c, R.color.surface));
+            // glow behind the dial when facing the qibla
+            if (glow > 0.01f) {
+                fill.setShader(new RadialGradient(cx, cy, r + 16 * d, new int[]{Ui.alpha(ok, 0), Ui.alpha(ok, (int) (110 * glow))},
+                        new float[]{0.86f, 1f}, Shader.TileMode.CLAMP));
+                cv.drawCircle(cx, cy, r + 16 * d, fill);
+                fill.setShader(null);
+            }
+            fill.setColor(Ui.color(c, R.color.field));
             cv.drawCircle(cx, cy, r, fill);
-            stroke.setStrokeWidth(aligned ? 5 * d : 2 * d);
-            stroke.setColor(aligned ? accent : Ui.color(c, R.color.stroke));
+            stroke.setStrokeWidth(2 * d);
+            stroke.setColor(ColorUtils.blendARGB(Ui.color(c, R.color.stroke), ok, glow));
             cv.drawCircle(cx, cy, r, stroke);
+            fill.setColor(Ui.color(c, R.color.surface));
+            cv.drawCircle(cx, cy, r * 0.62f, fill);
 
-            // fixed marker for the phone's own direction
-            Path top = new Path();
-            top.moveTo(cx, cy - r + 4 * d);
-            top.lineTo(cx - 9 * d, cy - r - 12 * d);
-            top.lineTo(cx + 9 * d, cy - r - 12 * d);
-            top.close();
-            fill.setColor(Ui.color(c, R.color.text_secondary));
-            cv.drawPath(top, fill);
+            // fixed pointer for the direction the phone faces
+            path.reset();
+            path.moveTo(cx, cy - r + 6 * d);
+            path.lineTo(cx - 8 * d, cy - r - 10 * d);
+            path.lineTo(cx + 8 * d, cy - r - 10 * d);
+            path.close();
+            fill.setColor(accent);
+            cv.drawPath(path, fill);
 
             cv.save();
             cv.rotate(-heading, cx, cy);
-            stroke.setStrokeCap(Paint.Cap.ROUND);
             for (int i = 0; i < 72; i++) {
                 boolean big = i % 6 == 0;
                 stroke.setStrokeWidth((big ? 2.2f : 1.2f) * d);
                 stroke.setColor(Ui.color(c, big ? R.color.text_primary : R.color.text_hint));
-                float len = (big ? 13 : 7) * d;
-                cv.drawLine(cx, cy - r + 6 * d, cx, cy - r + 6 * d + len, stroke);
+                float len = (big ? 12 : 6) * d;
+                cv.drawLine(cx, cy - r + 8 * d, cx, cy - r + 8 * d + len, stroke);
                 cv.rotate(5f, cx, cy);
             }
-            text.setTextSize(17 * d);
+            text.setTextSize(18 * d);
             for (int i = 0; i < 4; i++) {
                 text.setColor(Ui.color(c, i == 0 ? R.color.bad : R.color.text_secondary));
                 cv.drawText(dirs[i], cx, cy - r + 42 * d, text);
                 cv.rotate(90f, cx, cy);
             }
 
-            // qibla direction
+            // qibla needle and Kaaba mark
             cv.save();
             cv.rotate((float) qibla, cx, cy);
-            stroke.setStrokeCap(Paint.Cap.ROUND);
             stroke.setStrokeWidth(4 * d);
             stroke.setColor(accent);
-            cv.drawLine(cx, cy, cx, cy - r * 0.50f, stroke);
+            cv.drawLine(cx, cy, cx, cy - r * 0.40f, stroke);
+            path.reset();
+            path.moveTo(cx, cy - r * 0.54f);
+            path.lineTo(cx - 10 * d, cy - r * 0.38f);
+            path.lineTo(cx + 10 * d, cy - r * 0.38f);
+            path.close();
             fill.setColor(accent);
-            arrow.reset();
-            arrow.moveTo(cx, cy - r * 0.62f);
-            arrow.lineTo(cx - 11 * d, cy - r * 0.46f);
-            arrow.lineTo(cx + 11 * d, cy - r * 0.46f);
-            arrow.close();
-            cv.drawPath(arrow, fill);
-            float kw = 15 * d;
-            box.set(cx - kw, cy - r * 0.78f - kw, cx + kw, cy - r * 0.78f + kw);
+            cv.drawPath(path, fill);
+            float kw = 15 * d * (1f + 0.12f * glow);
+            float ky = cy - r * 0.76f;
+            box.set(cx - kw, ky - kw, cx + kw, ky + kw);
             fill.setColor(0xFF1C1C1E);
             cv.drawRoundRect(box, 4 * d, 4 * d, fill);
             fill.setColor(0xFFD4AF37);
-            cv.drawRect(box.left, box.top + kw * 0.55f, box.right, box.top + kw * 0.85f, fill);
+            cv.drawRect(box.left, box.top + kw * 0.5f, box.right, box.top + kw * 0.82f, fill);
             cv.restore();
             cv.restore();
 
+            // centre hub and live heading
             fill.setColor(accent);
-            cv.drawCircle(cx, cy, 6 * d, fill);
+            cv.drawCircle(cx, cy, 7 * d, fill);
+            fill.setColor(Ui.color(c, R.color.surface));
+            cv.drawCircle(cx, cy, 3 * d, fill);
+            text.setTextSize(15 * d);
+            text.setColor(Ui.color(c, R.color.text_secondary));
+            cv.drawText(Math.round(heading) + "°", cx, cy + r * 0.34f, text);
         }
     }
 }
