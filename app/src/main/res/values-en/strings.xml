@@ -437,18 +437,24 @@
     <string name="quran_sect_ayahs">Verses</string>
     <string name="quran_tafsir_loading">Loading explanation…</string>
     <string name="quran_tafsir_fail">Could not load the explanation. Check your connection and tap to retry.</string>
-    <string name="quran_tafsir_hint">Explanations are saved once opened so they work offline</string>
+    <string name="quran_tafsir_hint">Explanations come from the classical tafsir books and are saved once opened so they work offline</string>
     <string name="quran_need_quran">Download the Mushaf first from the Quran screen</string>
     <string-array name="tafsir_names">
         <item>Al-Muyassar</item>
-        <item>Al-Jalalayn</item>
+        <item>As-Sa\'di</item>
+        <item>Ibn Kathir</item>
+        <item>At-Tabari</item>
         <item>Al-Qurtubi</item>
         <item>Al-Baghawi</item>
         <item>Al-Waseet</item>
-        <item>Tanwir al-Miqbas</item>
-        <item>English</item>
+        <item>English translation</item>
     </string-array>
 
+    <string name="quran_suggest">Suggest a verse</string>
+    <string name="quran_suggest_done">Verse of the day changed</string>
+    <string name="quran_listen_here">Listen</string>
+    <string name="quran_more">Options</string>
+    <string name="quran_reciter_now">Reciter: %s</string>
     <string name="card_whatsapp">Share as WhatsApp status</string>
     <string name="card_share_image">Share as image</string>
     <string name="card_share_text">Share as text</string>

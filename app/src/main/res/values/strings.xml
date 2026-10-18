@@ -437,18 +437,24 @@
     <string name="quran_sect_ayahs">الآيات</string>
     <string name="quran_tafsir_loading">جارٍ تحميل التفسير…</string>
     <string name="quran_tafsir_fail">تعذّر تحميل التفسير. تحقّق من الاتصال بالإنترنت ثم اضغط للمحاولة مرة أخرى.</string>
-    <string name="quran_tafsir_hint">يُحفظ التفسير بعد فتحه ليعمل دون إنترنت</string>
+    <string name="quran_tafsir_hint">التفاسير من كتب التفسير المعتمدة وتُحفظ بعد فتحها لتعمل دون إنترنت</string>
     <string name="quran_need_quran">نزّل المصحف أولاً من شاشة القرآن</string>
     <string-array name="tafsir_names">
         <item>الميسر</item>
-        <item>الجلالين</item>
+        <item>السعدي</item>
+        <item>ابن كثير</item>
+        <item>الطبري</item>
         <item>القرطبي</item>
         <item>البغوي</item>
         <item>الوسيط</item>
-        <item>تنوير المقباس</item>
-        <item>English</item>
+        <item>ترجمة English</item>
     </string-array>
 
+    <string name="quran_suggest">اقترح لي آية</string>
+    <string name="quran_suggest_done">تم تغيير آية اليوم</string>
+    <string name="quran_listen_here">استمع</string>
+    <string name="quran_more">خيارات</string>
+    <string name="quran_reciter_now">القارئ: %s</string>
     <string name="card_whatsapp">مشاركة كحالة واتساب</string>
     <string name="card_share_image">مشاركة كصورة</string>
     <string name="card_share_text">مشاركة كنص</string>

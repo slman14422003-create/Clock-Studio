@@ -50,6 +50,23 @@ final class QuranAudio {
             new Reciter("Saood_ash-Shuraym_128kbps", "سعود الشريم", "Saud Ash-Shuraim"),
             new Reciter("Hani_Rifai_192kbps", "هاني الرفاعي", "Hani Ar-Rifai"),
             new Reciter("Abu_Bakr_Ash-Shaatree_128kbps", "أبو بكر الشاطري", "Abu Bakr Ash-Shatri"),
+            new Reciter("Maher_AlMuaiqly_64kbps", "ماهر المعيقلي", "Maher Al-Muaiqly"),
+            new Reciter("Ghamadi_40kbps", "سعد الغامدي", "Saad Al-Ghamdi"),
+            new Reciter("Salah_Al_Budair_128kbps", "صلاح البدير", "Salah Al-Budair"),
+            new Reciter("Hudhaify_128kbps", "علي الحذيفي", "Ali Al-Hudhaify"),
+            new Reciter("Abdullah_Basfar_64kbps", "عبد الله بصفر", "Abdullah Basfar"),
+            new Reciter("Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net", "أحمد العجمي", "Ahmed Al-Ajamy"),
+            new Reciter("Yasser_Ad-Dussary_128kbps", "ياسر الدوسري", "Yasser Ad-Dossari"),
+            new Reciter("Nasser_Alqatami_128kbps", "ناصر القطامي", "Nasser Al-Qatami"),
+            new Reciter("Muhammad_Ayyoub_128kbps", "محمد أيوب", "Muhammad Ayyub"),
+            new Reciter("Muhammad_Jibreel_128kbps", "محمد جبريل", "Muhammad Jibreel"),
+            new Reciter("Khaalid_Abdullaah_al-Qahtaanee_192kbps", "خالد القحطاني", "Khalid Al-Qahtani"),
+            new Reciter("Muhsin_Al_Qasim_192kbps", "محسن القاسم", "Muhsin Al-Qasim"),
+            new Reciter("Abdullaah_3awwaad_Al-Juhaynee_128kbps", "عبد الله الجهني", "Abdullah Al-Juhani"),
+            new Reciter("Fares_Abbad_64kbps", "فارس عباد", "Fares Abbad"),
+            new Reciter("Ayman_Sowaid_64kbps", "أيمن سويد (تعليمي)", "Ayman Sowaid (Teaching)"),
+            new Reciter("Ali_Hajjaj_AlSuesy_128kbps", "علي حجاج السويسي", "Ali Hajjaj Al-Suesy"),
+            new Reciter("Mustafa_Ismail_48kbps", "مصطفى إسماعيل", "Mustafa Ismail"),
     };
 
     private static final Handler MAIN = new Handler(Looper.getMainLooper());

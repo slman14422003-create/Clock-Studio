@@ -476,7 +476,16 @@ public class QuranActivity extends BaseActivity {
         actions.addView(read, a);
         actions.addView(tafsir, new LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f));
         c.addView(actions);
-        c.setTag(new TextView[]{verse, ref, read, tafsir});
+        LinearLayout actions2 = new LinearLayout(this);
+        actions2.setPadding(0, Ui.dp(this, 10), 0, 0);
+        TextView share = heroButton(R.string.quran_share, 0x33FFFFFF, Color.WHITE);
+        TextView suggest = heroButton(R.string.quran_suggest, 0x33FFFFFF, Color.WHITE);
+        LinearLayout.LayoutParams b = new LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f);
+        b.setMarginEnd(Ui.dp(this, 10));
+        actions2.addView(share, b);
+        actions2.addView(suggest, new LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f));
+        c.addView(actions2);
+        c.setTag(new TextView[]{verse, ref, read, tafsir, share, suggest});
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(-1, -2);
         lp.setMargins(Ui.dp(this, 16), Ui.dp(this, 2), Ui.dp(this, 16), Ui.dp(this, 12));
         c.setLayoutParams(lp);
@@ -505,6 +514,15 @@ public class QuranActivity extends BaseActivity {
         t[1].setText(d.surahTitle(d.surahOf[a]) + " \u00B7 " + QuranData.num(d.num[a]));
         t[2].setOnClickListener(x -> open(d.page[a], a));
         t[3].setOnClickListener(x -> openTafsir(a));
+        t[4].setOnClickListener(x -> ShareCard.show(this, d.surahShort(d.surahOf[a]), QuranData.num(d.num[a]), d.text[a],
+                "\uFD3F" + d.text[a] + "\uFD3E [" + d.surahShort(d.surahOf[a]) + ": " + QuranData.num(d.num[a]) + "]"));
+        t[5].setOnClickListener(x -> {
+            d.suggestVerse(this);
+            bindHero(v);
+            t[0].setAlpha(0f);
+            t[0].animate().alpha(1f).setDuration(Anim.D_MED).start();
+            Ui.toast(this, getString(R.string.quran_suggest_done));
+        });
     }
 
     private void openTafsir(int ayah) {

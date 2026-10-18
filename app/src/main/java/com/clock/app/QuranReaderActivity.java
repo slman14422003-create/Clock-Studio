@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.widget.ImageView;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Layout;
@@ -197,12 +199,15 @@ public class QuranReaderActivity extends BaseActivity {
         minus.setPadding(Ui.dp(this, 12), Ui.dp(this, 8), Ui.dp(this, 12), Ui.dp(this, 8));
         plus.setPadding(Ui.dp(this, 12), Ui.dp(this, 8), Ui.dp(this, 12), Ui.dp(this, 8));
         playBtn = Ui.iconButton(this, R.drawable.ic_play_fill, R.string.quran_play, true, v -> togglePlay());
-        ImageButton audio = Ui.iconButton(this, R.drawable.ic_sound, R.string.quran_audio, false,
-                v -> startActivity(new Intent(this, QuranAudioActivity.class)));
-        bar.addView(playBtn, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
-        bar.addView(audio, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
+        ImageButton more = Ui.iconButton(this, R.drawable.ic_more, R.string.quran_more, false, v -> showMenu());
         bar.addView(minus);
         bar.addView(plus);
+        LinearLayout.LayoutParams pb = new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40));
+        pb.setMarginStart(Ui.dp(this, 6));
+        bar.addView(playBtn, pb);
+        LinearLayout.LayoutParams mb = new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40));
+        mb.setMarginStart(Ui.dp(this, 6));
+        bar.addView(more, mb);
         return bar;
     }
 
@@ -246,7 +251,9 @@ public class QuranReaderActivity extends BaseActivity {
         pill.setGravity(Gravity.CENTER_VERTICAL);
         pill.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         pill.setPadding(Ui.dp(this, 10), Ui.dp(this, 6), Ui.dp(this, 14), Ui.dp(this, 6));
-        pill.setBackground(Ui.rect(Ui.color(this, R.color.surface_high), Ui.dpf(this, 30)));
+        GradientDrawable pbg = Ui.rect(Ui.alpha(Ui.color(this, R.color.surface_high), 0xF0), Ui.dpf(this, 30));
+        pbg.setStroke(Ui.dp(this, 1), Ui.alpha(Ui.color(this, R.color.text_secondary), 0x30));
+        pill.setBackground(pbg);
         pill.setElevation(Ui.dpf(this, 6));
         pill.setVisibility(View.GONE);
         ImageButton prev = Ui.iconButton(this, R.drawable.ic_ayah_prev, R.string.quran_prev_ayah, false, v -> player.previous());
@@ -264,6 +271,8 @@ public class QuranReaderActivity extends BaseActivity {
         LinearLayout.LayoutParams wl = new LinearLayout.LayoutParams(0, Ui.dp(this, 64), 1f);
         wl.setMarginStart(Ui.dp(this, 8));
         pill.addView(wave, wl);
+        ImageButton rec = Ui.iconButton(this, R.drawable.ic_mic, R.string.quran_reciter, false, v -> showReciters());
+        pill.addView(rec, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
         lp.setMargins(Ui.dp(this, 14), Ui.dp(this, 6), Ui.dp(this, 14), Ui.dp(this, 4));
         pill.setLayoutParams(lp);
@@ -278,7 +287,7 @@ public class QuranReaderActivity extends BaseActivity {
         boolean was = pill.getVisibility() == View.VISIBLE;
         pill.setVisibility(show ? View.VISIBLE : View.GONE);
         if (selLp != null && selBar != null) {
-            selLp.bottomMargin = Ui.dp(this, show ? 150 : 62);
+            selLp.bottomMargin = Ui.dp(this, show ? 144 : 56);
             selBar.setLayoutParams(selLp);
         }
         pill.removeCallbacks(tick);
@@ -294,27 +303,126 @@ public class QuranReaderActivity extends BaseActivity {
 
     private void buildSelectionBar() {
         selBar = new LinearLayout(this);
-        selBar.setGravity(Gravity.CENTER_VERTICAL);
-        selBar.setPaddingRelative(Ui.dp(this, 18), Ui.dp(this, 6), Ui.dp(this, 8), Ui.dp(this, 6));
-        selBar.setBackground(Ui.rect(Ui.color(this, R.color.surface_high), Ui.dpf(this, 26)));
-        selBar.setElevation(Ui.dpf(this, 10));
+        selBar.setOrientation(LinearLayout.VERTICAL);
+        selBar.setPadding(Ui.dp(this, 14), Ui.dp(this, 6), Ui.dp(this, 14), Ui.dp(this, 12));
+        GradientDrawable bg = Ui.rect(Ui.alpha(Ui.color(this, R.color.surface_high), 0xF2), Ui.dpf(this, 28));
+        bg.setStroke(Ui.dp(this, 1), Ui.alpha(Ui.color(this, R.color.text_secondary), 0x30));
+        selBar.setBackground(bg);
+        selBar.setElevation(Ui.dpf(this, 12));
         selBar.setVisibility(View.GONE);
-        selText = Ui.text(this, "", 15, R.color.text_primary);
+
+        LinearLayout head = new LinearLayout(this);
+        head.setGravity(Gravity.CENTER_VERTICAL);
+        head.setPaddingRelative(Ui.dp(this, 6), 0, 0, 0);
+        selText = Ui.text(this, "", 15, R.color.text_secondary);
         selText.setTypeface(Ui.medium());
         selText.setSingleLine(true);
-        selBar.addView(selText, new LinearLayout.LayoutParams(0, -2, 1f));
+        head.addView(selText, new LinearLayout.LayoutParams(0, -2, 1f));
         selMark = Ui.iconButton(this, R.drawable.ic_bookmark, R.string.quran_marks, false, v -> toggleMark());
-        ImageButton tafsir = Ui.iconButton(this, R.drawable.ic_info, R.string.quran_tafsir, false, v -> openTafsir());
-        ImageButton copy = Ui.iconButton(this, R.drawable.ic_copy, R.string.quran_copy, false, v -> copy());
-        ImageButton share = Ui.iconButton(this, R.drawable.ic_share, R.string.quran_share, false, v -> share());
         ImageButton close = Ui.iconButton(this, R.drawable.ic_x, R.string.cancel, false, v -> select(-1));
-        for (View v : new View[]{selMark, tafsir, copy, share, close}) {
-            selBar.addView(v, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
-        }
+        head.addView(selMark, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
+        head.addView(close, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
+        selBar.addView(head);
+
+        LinearLayout row = new LinearLayout(this);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(0, Ui.dp(this, 4), 0, 0);
+        View tafsir = actionPill(R.drawable.ic_quran, R.string.quran_tafsir, true, v -> openTafsir());
+        View listen = actionPill(R.drawable.ic_play_fill, R.string.quran_listen_here, false, v -> playSelected());
+        View share = actionPill(R.drawable.ic_share, R.string.quran_share, false, v -> share());
+        ImageButton copy = Ui.iconButton(this, R.drawable.ic_copy, R.string.quran_copy, false, v -> copy());
+        LinearLayout.LayoutParams t1 = new LinearLayout.LayoutParams(0, Ui.dp(this, 46), 1.35f);
+        t1.setMarginEnd(Ui.dp(this, 8));
+        LinearLayout.LayoutParams t2 = new LinearLayout.LayoutParams(0, Ui.dp(this, 46), 1f);
+        t2.setMarginEnd(Ui.dp(this, 8));
+        LinearLayout.LayoutParams t3 = new LinearLayout.LayoutParams(0, Ui.dp(this, 46), 1f);
+        t3.setMarginEnd(Ui.dp(this, 6));
+        row.addView(tafsir, t1);
+        row.addView(listen, t2);
+        row.addView(share, t3);
+        row.addView(copy, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
+        selBar.addView(row);
+
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM);
-        lp.setMargins(Ui.dp(this, 14), 0, Ui.dp(this, 14), Ui.dp(this, 62));
+        lp.setMargins(Ui.dp(this, 12), 0, Ui.dp(this, 12), Ui.dp(this, 56));
         selLp = lp;
         root.addView(selBar, lp);
+    }
+
+    /** Capsule button with an icon and a label; the primary one is filled with the accent colour. */
+    private View actionPill(int icon, int label, boolean primary, View.OnClickListener click) {
+        LinearLayout b = new LinearLayout(this);
+        b.setGravity(Gravity.CENTER);
+        b.setPadding(Ui.dp(this, 8), 0, Ui.dp(this, 8), 0);
+        int fg = Ui.color(this, primary ? R.color.on_accent : R.color.text_primary);
+        b.setBackground(Ui.rect(Ui.color(this, primary ? R.color.accent : R.color.neutral_soft), Ui.dpf(this, 100)));
+        ImageView ic = new ImageView(this);
+        ic.setImageResource(icon);
+        ic.setImageTintList(ColorStateList.valueOf(fg));
+        b.addView(ic, new LinearLayout.LayoutParams(Ui.dp(this, 18), Ui.dp(this, 18)));
+        TextView t = new TextView(this);
+        t.setText(label);
+        t.setTextSize(15);
+        t.setTypeface(Ui.medium());
+        t.setTextColor(fg);
+        t.setSingleLine(true);
+        t.setIncludeFontPadding(false);
+        LinearLayout.LayoutParams tl = new LinearLayout.LayoutParams(-2, -2);
+        tl.setMarginStart(Ui.dp(this, 6));
+        b.addView(t, tl);
+        b.setOnClickListener(click);
+        Ui.press(this, b);
+        return b;
+    }
+
+    private void playSelected() {
+        if (d == null || selected < 0) return;
+        player.listener = audioListener;
+        player.play(this, d, QuranAudio.current(this), selected);
+    }
+
+    private void showReciters() {
+        final QuranAudio.Reciter cur = QuranAudio.current(this);
+        CharSequence[] items = new CharSequence[QuranAudio.RECITERS.length];
+        for (int i = 0; i < items.length; i++) {
+            QuranAudio.Reciter r = QuranAudio.RECITERS[i];
+            items[i] = (r == cur ? "\u2713 " : "") + r.name();
+        }
+        new Dlg(this).setTitle(R.string.quran_reciter).setItems(items, (dlg, which) -> {
+            QuranAudio.Reciter r = QuranAudio.RECITERS[which];
+            QuranAudio.setCurrent(this, r);
+            Ui.toast(this, getString(R.string.quran_reciter_now, r.name()));
+            if (d != null && player.isPlaying() && playing >= 0) {
+                player.listener = audioListener;
+                player.play(this, d, r, playing);
+            }
+        }).show();
+    }
+
+    /** The verse the options act on: the selected one, otherwise the first verse of the current page. */
+    private int targetAyah() {
+        if (selected >= 0) return selected;
+        return d.pageFirst[Math.max(0, curPos) + 1];
+    }
+
+    private void showMenu() {
+        if (d == null) return;
+        CharSequence[] items = {
+                getString(R.string.quran_reciter_now, QuranAudio.current(this).name()),
+                getString(R.string.quran_audio),
+                getString(R.string.quran_tafsir),
+                getString(R.string.quran_share)
+        };
+        new Dlg(this).setTitle(R.string.quran_more).setItems(items, (dlg, which) -> {
+            if (which == 0) showReciters();
+            else if (which == 1) startActivity(new Intent(this, QuranAudioActivity.class));
+            else if (which == 2) startActivity(new Intent(this, QuranTafsirActivity.class)
+                    .putExtra(QuranTafsirActivity.EXTRA_AYAH, targetAyah()));
+            else {
+                int a = targetAyah();
+                ShareCard.show(this, d.surahShort(d.surahOf[a]), QuranData.num(d.num[a]), d.text[a], ayahShare(a));
+            }
+        }).show();
     }
 
     // ------------------------------------------------------------------ paging
@@ -458,7 +566,9 @@ public class QuranReaderActivity extends BaseActivity {
             lp.setMargins(Ui.dp(QuranReaderActivity.this, 14), Ui.dp(QuranReaderActivity.this, 4),
                     Ui.dp(QuranReaderActivity.this, 14), Ui.dp(QuranReaderActivity.this, 4));
             card.setLayoutParams(lp);
-            card.setBackground(Ui.rect(Ui.color(QuranReaderActivity.this, R.color.surface), Ui.dpf(QuranReaderActivity.this, 22)));
+            GradientDrawable cbg = Ui.rect(Ui.color(QuranReaderActivity.this, R.color.surface), Ui.dpf(QuranReaderActivity.this, 26));
+            cbg.setStroke(Ui.dp(QuranReaderActivity.this, 1), Ui.alpha(Ui.color(QuranReaderActivity.this, R.color.text_secondary), 0x22));
+            card.setBackground(cbg);
             card.setClipToOutline(true);
             ScrollView sv = new ScrollView(QuranReaderActivity.this);
             sv.setVerticalScrollBarEnabled(false);
@@ -612,6 +722,7 @@ public class QuranReaderActivity extends BaseActivity {
         if (Build.VERSION.SDK_INT >= 26) t.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
         t.setMovementMethod(LinkMovementMethod.getInstance());
         t.setHighlightColor(Color.TRANSPARENT);
+        t.setPadding(Ui.dp(this, 6), 0, Ui.dp(this, 6), 0);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
         lp.topMargin = Ui.dp(this, 6);
         t.setLayoutParams(lp);

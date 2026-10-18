@@ -57,6 +57,7 @@ final class QuranData {
     final int[] juzFirst = new int[31];
 
     private static volatile QuranData cache;
+    private static volatile Context appCtx;
     private static boolean loading;
 
     // ------------------------------------------------------------------ access
@@ -67,6 +68,7 @@ final class QuranData {
 
     /** The data if it is already downloaded (loads it from disk on first use), else null. Safe on the main thread but not free. */
     static QuranData peek(Context c) {
+        appCtx = c.getApplicationContext();
         QuranData d = cache;
         if (d != null) return d;
         synchronized (QuranData.class) {
@@ -290,15 +292,49 @@ final class QuranData {
         return sp > 0 && norm(x.name.substring(0, sp)).startsWith("سور") ? x.name.substring(sp + 1) : x.name;
     }
 
-    /** Global index of the verse shown by the verse-of-the-day widget: short, stable for the whole day. */
+    /** Global index of the verse of the day: a verse picked with "suggest a verse" today, otherwise a stable pick for the whole day. */
     int dailyVerse() {
         long day = System.currentTimeMillis() / 86400000L;
+        Context c = appCtx;
+        if (c != null) {
+            try {
+                String s = Store.raw(c, "quran_daily_pick");
+                if (s != null && s.startsWith(day + ":")) {
+                    int v = Integer.parseInt(s.substring(s.indexOf(':') + 1));
+                    if (v >= 0 && v < AYAHS) return v;
+                }
+            } catch (Exception ignored) {
+            }
+        }
         int i = (int) Math.floorMod(day * 2654435761L, (long) AYAHS);
         for (int k = 0; k < 400; k++) {
             int j = (i + k) % AYAHS;
             if (text[j].length() <= 130) return j;
         }
         return i;
+    }
+
+    /** Replaces today's verse of the day with a new random short verse and refreshes the widgets. */
+    int suggestVerse(Context c) {
+        final Context app = c.getApplicationContext();
+        long day = System.currentTimeMillis() / 86400000L;
+        int cur = dailyVerse();
+        java.util.Random r = new java.util.Random();
+        int pick = cur;
+        for (int k = 0; k < 600; k++) {
+            int j = r.nextInt(AYAHS);
+            if (j != cur && text[j].length() <= 130) {
+                pick = j;
+                break;
+            }
+        }
+        Store.putRaw(app, "quran_daily_pick", day + ":" + pick);
+        try {
+            WBase.refresh(app, WidgetQuran.class);
+            WBase.refresh(app, WidgetQuranL.class);
+        } catch (Throwable ignored) {
+        }
+        return pick;
     }
 
     /** All surahs / ayahs whose name or number matches the query (empty query = everything). */

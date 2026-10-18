@@ -21,7 +21,7 @@ import androidx.core.view.WindowInsetsCompat;
 /** Shows one verse with an explanation (tafsir) loaded from the internet and cached for offline use. */
 public class QuranTafsirActivity extends BaseActivity {
     static final String EXTRA_AYAH = "ayah";
-    private static final String PREF = "quran_ui", KEY_ED = "tafsir_ed";
+    private static final String PREF = "quran_ui", KEY_ED = "tafsir_ed2";
 
     private QuranData d;
     private int ayah, edition, token;
