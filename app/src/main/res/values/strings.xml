@@ -455,6 +455,12 @@
     <string name="quran_listen_here">استمع</string>
     <string name="quran_more">خيارات</string>
     <string name="quran_reciter_now">القارئ: %s</string>
+    <string name="quran_suggest_title">ما الذي تحتاجه اليوم؟</string>
+    <string name="quran_suggest_write">اكتب ما تشعر به</string>
+    <string name="quran_suggest_hint">مثال: أشعر بالقلق من المستقبل</string>
+    <string name="quran_suggest_busy">جارٍ اختيار آية مناسبة…</string>
+    <string name="quran_suggest_topic">آية عن: %s</string>
+    <string name="quran_suggest_none">لم أجد آية مناسبة، جرّب كلمات أخرى</string>
     <string name="card_whatsapp">مشاركة كحالة واتساب</string>
     <string name="card_share_image">مشاركة كصورة</string>
     <string name="card_share_text">مشاركة كنص</string>

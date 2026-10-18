@@ -516,12 +516,50 @@ public class QuranActivity extends BaseActivity {
         t[3].setOnClickListener(x -> openTafsir(a));
         t[4].setOnClickListener(x -> ShareCard.show(this, d.surahShort(d.surahOf[a]), QuranData.num(d.num[a]), d.text[a],
                 "\uFD3F" + d.text[a] + "\uFD3E [" + d.surahShort(d.surahOf[a]) + ": " + QuranData.num(d.num[a]) + "]"));
-        t[5].setOnClickListener(x -> {
-            d.suggestVerse(this);
-            bindHero(v);
+        t[5].setOnClickListener(x -> suggestFlow(v));
+    }
+
+    /** "Suggest a verse": the person picks what they need, or writes how they feel, and a verse about it becomes the verse of the day. */
+    private void suggestFlow(final View hero) {
+        final int n = QuranSmart.TOPICS.length;
+        CharSequence[] items = new CharSequence[n + 1];
+        for (int i = 0; i < n; i++) items[i] = QuranSmart.TOPICS[i].label();
+        items[n] = getString(R.string.quran_suggest_write);
+        new Dlg(this).setTitle(R.string.quran_suggest_title).setItems(items, (dlg, w) -> {
+            if (w < n) runSuggest(hero, w, null);
+            else askFeeling(hero);
+        }).show();
+    }
+
+    private void askFeeling(final View hero) {
+        final android.widget.EditText in = new android.widget.EditText(this);
+        in.setHint(R.string.quran_suggest_hint);
+        in.setTextColor(Ui.color(this, R.color.text_primary));
+        in.setHintTextColor(Ui.color(this, R.color.text_secondary));
+        in.setMaxLines(3);
+        android.widget.FrameLayout box = new android.widget.FrameLayout(this);
+        box.setPadding(Ui.dp(this, 22), Ui.dp(this, 8), Ui.dp(this, 22), Ui.dp(this, 4));
+        box.addView(in, new android.widget.FrameLayout.LayoutParams(-1, -2));
+        new Dlg(this).setTitle(R.string.quran_suggest_write).setView(box)
+                .setPositiveButton(R.string.quran_suggest, (dlg, w) -> runSuggest(hero, -1, in.getText().toString()))
+                .setNegativeButton(R.string.cancel, null).show();
+    }
+
+    private void runSuggest(final View hero, int topic, String free) {
+        if (topic < 0 && (free == null || free.trim().isEmpty())) return;
+        Ui.toast(this, getString(R.string.quran_suggest_busy));
+        QuranSmart.pick(this, d, topic, free, (ayah, label) -> {
+            if (isFinishing() || isDestroyed()) return;
+            if (ayah < 0) {
+                Ui.toast(this, getString(R.string.quran_suggest_none));
+                return;
+            }
+            d.setDailyVerse(this, ayah);
+            bindHero(hero);
+            TextView[] t = (TextView[]) hero.getTag();
             t[0].setAlpha(0f);
             t[0].animate().alpha(1f).setDuration(Anim.D_MED).start();
-            Ui.toast(this, getString(R.string.quran_suggest_done));
+            Ui.toast(this, getString(R.string.quran_suggest_topic, label));
         });
     }
 

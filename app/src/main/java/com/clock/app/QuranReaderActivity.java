@@ -707,7 +707,7 @@ public class QuranReaderActivity extends BaseActivity {
         for (int q = 0; q < hl.size(); q++) {
             rr[q * 2] = hl.get(q)[0];
             rr[q * 2 + 1] = hl.get(q)[1];
-            cc[q] = Ui.alpha(accent, 0xFF);
+            cc[q] = Ui.alpha(Ui.color(this, R.color.text_primary), 0xFF);
         }
         t.setHighlights(rr, cc);
         t.setTypeface(face);

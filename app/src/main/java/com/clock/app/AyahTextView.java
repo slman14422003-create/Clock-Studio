@@ -51,8 +51,8 @@ final class AyahTextView extends TextView {
                     float x1 = xAt(l, line, ls);
                     float x2 = xAt(l, line, le);
                     float base = l.getLineBaseline(line);
-                    float top = Math.max(base + fm.ascent * 0.9f, l.getLineTop(line));
-                    float bottom = Math.min(base + fm.descent * 1.2f, l.getLineBottom(line));
+                    float top = Math.max(base + fm.ascent * 1.0f, l.getLineTop(line));
+                    float bottom = Math.min(base + fm.descent * 1.7f, l.getLineBottom(line));
                     float left = Math.max(minX, Math.min(x1, x2) - 5 * d);
                     float right = Math.min(maxX, Math.max(x1, x2) + 5 * d);
                     rect.set(left, top, right, bottom);
@@ -79,17 +79,18 @@ final class AyahTextView extends TextView {
             }
         }
         if (spaces == 0) return x;
-        float extra = (l.getWidth() - l.getLineMax(line)) / spaces;
+        float natural = Layout.getDesiredWidth(t, start, end, getPaint());
+        float extra = (l.getWidth() - natural) / spaces;
         if (extra <= 0) return x;
         return l.getParagraphDirection(line) == Layout.DIR_RIGHT_TO_LEFT ? x - extra * before : x + extra * before;
     }
 
     private void drawBubble(Canvas cv, RectF r, int tint, float d) {
         float radius = Math.min(r.height() / 2f, 14 * d);
-        fill.setColor(tint | (0x26 << 24));
+        fill.setColor(tint | (0x22 << 24));
         cv.drawRoundRect(r, radius, radius, fill);
         edge.setStrokeWidth(1f * d);
-        edge.setColor(tint | (0x59 << 24));
+        edge.setColor(tint | (0x40 << 24));
         r.inset(0.5f * d, 0.5f * d);
         cv.drawRoundRect(r, radius, radius, edge);
     }

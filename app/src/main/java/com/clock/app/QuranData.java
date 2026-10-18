@@ -314,6 +314,18 @@ final class QuranData {
         return i;
     }
 
+    /** Makes the given verse today's verse of the day and refreshes the widgets. */
+    void setDailyVerse(Context c, int ayah) {
+        final Context app = c.getApplicationContext();
+        long day = System.currentTimeMillis() / 86400000L;
+        Store.putRaw(app, "quran_daily_pick", day + ":" + ayah);
+        try {
+            WBase.refresh(app, WidgetQuran.class);
+            WBase.refresh(app, WidgetQuranL.class);
+        } catch (Throwable ignored) {
+        }
+    }
+
     /** Replaces today's verse of the day with a new random short verse and refreshes the widgets. */
     int suggestVerse(Context c) {
         final Context app = c.getApplicationContext();
@@ -328,12 +340,7 @@ final class QuranData {
                 break;
             }
         }
-        Store.putRaw(app, "quran_daily_pick", day + ":" + pick);
-        try {
-            WBase.refresh(app, WidgetQuran.class);
-            WBase.refresh(app, WidgetQuranL.class);
-        } catch (Throwable ignored) {
-        }
+        setDailyVerse(app, pick);
         return pick;
     }
 
