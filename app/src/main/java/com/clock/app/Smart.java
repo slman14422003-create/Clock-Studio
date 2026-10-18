@@ -60,6 +60,9 @@ final class Smart {
                 "fifteen", "twenty", "thirty", "forty", "fifty", "sixty"};
         int[] env = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20, 30, 40, 50, 60};
         for (int i = 0; i < en.length; i++) WORDS.put(en[i], env[i]);
+        String[] dia = {"ثنتين", "تنتين", "احداشر", "اطناشر", "اثناعشر", "طناشر", "تلات", "تلاتين"};
+        int[] diav = {2, 2, 11, 12, 12, 12, 3, 30};
+        for (int i = 0; i < dia.length; i++) WORDS.put(dia[i], diav[i]);
     }
 
     private static String wordAlt() {
@@ -78,48 +81,66 @@ final class Smart {
     private static final String FRAC = "(نصف|نص|ربع|ثلث|half|quarter)";
     private static final String UNIT = "(ثانيتين|ثانيه|ثواني|ثوان|seconds?|secs?|دقيقتين|دقيقه|دقايق|minutes?|mins?|ساعتين|ساعات|ساعه|hours?|hrs?"
             + "|يومين|ايام|يوم|days?|اسبوعين|اسابيع|اسبوع|weeks?|شهرين|اشهر|شهور|شهر|months?)";
+    private static String nc(String g) {
+        return g.startsWith("(") && !g.startsWith("(?") ? "(?:" + g.substring(1) : g;
+    }
+
     private static final String NL = "(?<!\\p{L})";
     private static final String NR = "(?!\\p{L})";
     private static final Pattern DUR = Pattern.compile("(?:" + NUM + "\\s*|" + FRAC + "\\s+(?:of\\s+an?\\s+)?)?" + UNIT + "(?:\\s*(?:و|and)?\\s*" + FRAC + NR + ")?" + NR);
     private static final Pattern REL_MARK = Pattern.compile(NL + "(بعد|خلال|in|after|within)\\s+");
     private static final Pattern SEP = Pattern.compile("\\s*(?:،|,|و|and)?\\s*");
 
-    private static final String PERIOD = "(صباحا|صباح|الصبح|فجرا|ظهرا|عصرا|مساء|مساءا|ليلا|بالليل|الليل|am|pm|a\\.m\\.|p\\.m\\.|ص|م)";
-    private static final Pattern T_PREFIX = Pattern.compile(NL + "(?:الساعه|ساعه|عند|at|@)\\s*(\\d{1,2}|" + WA + ")(?::(\\d{2}))?"
-            + "(?:\\s*(و|الا)\\s*(?:" + FRAC + "|(\\d{1,2})\\s*(?:دقيقه|دقايق)))?(?:\\s*" + PERIOD + NR + ")?");
+    private static final String PERIOD = "(بعد\\s+(?:ال)?(?:ظهر|ضهر)|بالصبح|الصبحيه|الصبح|صباحا|صباح|صبحا|فجرا|ضهرا|ظهرا|الضهر|عصرا|العصريه|مساءا|مساء|بالمسا|المسا|مسا|ليلا|بالليل|الليل|ليل|العشيه|am|pm|a\\.m\\.|p\\.m\\.|ص|م)";
+    private static final String TIME_BODY = "(\\d{1,2}|" + WA + ")(?=[^\\p{L}]|و|$)(?::(\\d{2}))?"
+            + "(?:\\s*(و|الا)\\s*(?:" + FRAC + "|(\\d{1,2})\\s*(?:دقيقه|دقايق)))?(?:\\s*" + PERIOD + NR + ")?";
+    private static final Pattern T_PREFIX = Pattern.compile(NL + "(?:على الساعه|عالساعه|ع الساعه|الساعه|ساعه|عند|at|@)\\s*" + TIME_BODY);
+    /** Bare hour for alarms ("alarm 6", "wake me at the six"): only used when the sentence asks for an alarm. */
+    private static final Pattern T_BARE = Pattern.compile("(?:" + NL + "(?:على|عال|ع)\\s*(?:ال)?|(?<![\\d:/.\\p{L}]))" + TIME_BODY);
     private static final Pattern T_COLON = Pattern.compile("(?<![\\d:])(\\d{1,2}):(\\d{2})(?!\\d)(?:\\s*" + PERIOD + NR + ")?");
     private static final Pattern T_PERIOD = Pattern.compile("(?<![\\d:/.])(\\d{1,2})\\s*" + PERIOD + NR);
-    private static final Pattern T_PART = Pattern.compile(NL + "(منتصف الليل|midnight|الظهيره|noon|tonight|الليله|صباحا|الصبح|ظهرا|عصرا|مساء|المساء|ليلا|morning|afternoon|evening)" + NR);
+    private static final Pattern T_PART = Pattern.compile(NL + "(منتصف الليل|نص الليل|midnight|الظهيره|noon|tonight|هالليله|هلليله|الليله|بالصبح|الصبحيه|الصبح|صباحا|ضهرا|ظهرا|الضهر|عصرا|العصريه|المسا|مسا|مساء|المساء|ليلا|بالليل|الليل|العشيه|morning|afternoon|evening)" + NR);
+    private static final Pattern P_SOON = Pattern.compile(NL + "بعد\\s+(?:شوي|شويه|شويات|قليل|لحظات|دقايق)" + NR);
 
     private static final String[] PRAYER_KEYS = {"فجر", "شروق", "ظهر", "عصر", "مغرب", "عشاء"};
-    private static final Pattern PRAYER = Pattern.compile("(?:(?:" + NUM + "\\s*)?" + UNIT + "\\s+)?(قبل|بعد|عند|مع|وقت|اذان|before|after|at)\\s*(?:صلاه\\s*|اذان\\s*|prayer\\s*)?(?:ال)?(فجر|ظهر|عصر|مغرب|عشاء|fajr|dhuhr|zuhr|asr|maghrib|isha)" + NR);
+    private static final String KEYS = "(فجر|ظهر|عصر|مغرب|عشاء|fajr|dhuhr|zuhr|asr|maghrib|isha)";
+    private static final Pattern PRAYER = Pattern.compile("(?<!\\p{L})(?<!\\d)(?<!\\d\\s)(?:(?:" + nc(NUM) + "\\s*)?" + nc(UNIT) + "\\s+)?(قبل|بعد|عند|مع|وقت|اذان|على|عال|ع|ل|before|after|at)\\s*(?:صلاه\\s*|اذان\\s*|prayer\\s*)?(?:ال)?" + KEYS
+            + "(?:\\s*ب\\s*(?:" + nc(NUM) + "\\s*)?" + nc(UNIT) + ")?" + NR);
+    private static final Pattern PRAYER_NAMED = Pattern.compile("(?<!\\p{L})(?:صلاه|اذان)\\s*(?:ال)?" + KEYS + NR);
+    private static final Pattern PRAYER_BARE = Pattern.compile("(?<!\\p{L})(?:(?:صلاه|اذان)\\s*)?(?:ال)?" + KEYS + NR);
 
-    private static final String WD_AR = "(احد|اثنين|اتنين|ثلاثاء|تلاتاء|اربعاء|خميس|جمعه|سبت)";
+    private static final String WD_AR = "(احد|اثنين|اتنين|ثنين|تنين|ثلاثاء|تلاتاء|ثلاثا|تلاتا|اربعاء|اربعا|خميس|جمعه|سبت)";
     private static final String WD_EN = "(sunday|sun|monday|mon|tuesday|tues|tue|wednesday|wed|thursday|thurs|thu|friday|fri|saturday|sat)";
-    private static final Pattern WEEKDAY = Pattern.compile("(?:(كل|every|each)\\s+)?(?:" + NL + "(?:يوم\\s+(?:ال)?|بال|لل|ال)" + WD_AR + NR + "|" + NL + "(?:on\\s+|next\\s+)?" + WD_EN + NR + ")(?:\\s+(?:القادم|الجاي|المقبل|next))?");
+    private static final Pattern WEEKDAY = Pattern.compile("(?:(كل|every|each)\\s+)?(?:" + NL + "(?:يوم\\s+(?:ال)?|بال|لل|ال)" + WD_AR + NR + "|" + NL + "(?:on\\s+|next\\s+)?" + WD_EN + NR + ")(?:\\s+(?:القادم|القادمه|الجاي|الجايه|المقبل|المقبله|next))?");
 
     private static final String MON_AR = "(كانون\\s+(?:ال)?ثاني|شباط|اذار|نيسان|ايار|حزيران|تموز|اب|ايلول|تشرين\\s+(?:ال)?اول|تشرين\\s+(?:ال)?ثاني|كانون\\s+(?:ال)?اول|يناير|فبراير|مارس|ابريل|مايو|يونيو|يوليو|اغسطس|سبتمبر|اكتوبر|نوفمبر|ديسمبر|january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sept|sep|october|oct|november|nov|december|dec)";
     private static final Pattern DATE_NUM = Pattern.compile("(?<![\\d/:.-])(\\d{1,2})[/-](\\d{1,2})(?:[/-](\\d{2,4}))?(?![\\d/:])");
     private static final Pattern DATE_MON = Pattern.compile("(?<![\\d:])(\\d{1,2})\\s*(?:من\\s+|of\\s+)?" + MON_AR + NR + "(?:\\s+(\\d{4}))?");
 
     private static final Pattern P_AFTER_TOMORROW = Pattern.compile(NL + "(?:بعد\\s+(?:غد|بكره|بكرا)|day after tomorrow)" + NR);
-    private static final Pattern P_TOMORROW = Pattern.compile(NL + "(?:ل?غدا|ل?غد|بكره|بكرا|tomorrow|tmrw)" + NR);
-    private static final Pattern P_TODAY = Pattern.compile(NL + "(?:اليوم|هذا اليوم|today)" + NR);
-    private static final Pattern P_NEXT_WEEK = Pattern.compile(NL + "(?:الاسبوع\\s+(?:القادم|الجاي|المقبل)|next week)" + NR);
+    private static final Pattern P_TOMORROW = Pattern.compile(NL + "(?:ل?غدا|ل?غد|بكره|بكرا|bokra|bukra|tomorrow|tmrw)" + NR);
+    private static final Pattern P_TODAY = Pattern.compile(NL + "(?:اليوم|هاليوم|هذا اليوم|today)" + NR);
+    private static final Pattern P_NEXT_WEEK = Pattern.compile(NL + "(?:الاسبوع\\s+(?:القادم|الجاي|الجايه|المقبل)|الجمعه الجايه الاسبوع|next week)" + NR);
     private static final Pattern P_NEXT_MONTH = Pattern.compile(NL + "(?:الشهر\\s+(?:القادم|الجاي|المقبل)|next month)" + NR);
     private static final Pattern P_WEEKEND = Pattern.compile(NL + "(?:نهايه الاسبوع|weekend)" + NR);
-    private static final Pattern R_DAILY = Pattern.compile(NL + "(?:كل يوم(?!\\s+(?:ال)?(?:احد|اثنين|ثلاثاء|اربعاء|خميس|جمعه|سبت))|يوميا|every ?day|daily)" + NR);
+    private static final Pattern R_DAILY = Pattern.compile(NL + "(?:كل (?:يوم|صباح|مساء|ليله|صبح|فجر)(?!\\s+(?:ال)?(?:احد|اثنين|ثلاثاء|اربعاء|خميس|جمعه|سبت))|يوميا|يوميه|every ?day|daily)" + NR);
     private static final Pattern R_WEEKLY = Pattern.compile(NL + "(?:كل اسبوع|اسبوعيا|every week|weekly)" + NR);
     private static final Pattern R_MONTHLY = Pattern.compile(NL + "(?:كل شهر|شهريا|every month|monthly)" + NR);
     private static final Pattern R_WORKDAYS = Pattern.compile(NL + "(?:ايام العمل|ايام الدوام|ايام الاسبوع|weekdays|workdays)" + NR);
 
-    private static final Pattern PRI3 = Pattern.compile(NL + "(?:عاجل|عاجله|ضروري|ضروريه|urgent|asap|critical|اولويه (?:قصوي|قصوى|عاليه جدا))" + NR + "|!{3}");
-    private static final Pattern PRI2 = Pattern.compile(NL + "(?:مهم|مهمه جدا|important|high priority|اولويه عاليه)" + NR + "|!{2}");
+    private static final Pattern PRI3 = Pattern.compile(NL + "(?:عاجل|عاجله|ضروري|ضروريه|ضروري كتير|مستعجل|urgent|asap|critical|اولويه (?:قصوي|قصوى|عاليه جدا))" + NR + "|!{3}");
+    private static final Pattern PRI2 = Pattern.compile(NL + "(?:مهم|مهمه جدا|مهم كتير|مهم هيك|لازم|لا تنسي|ما تنسي|ماتنسي|لاتنسي|important|high priority|اولويه عاليه)" + NR + "|!{2}");
     private static final Pattern PRI1 = Pattern.compile(NL + "(?:اولويه (?:منخفضه|متوسطه)|low priority|medium priority)" + NR + "|!");
 
-    private static final Pattern KW_ALARM = Pattern.compile(NL + "(?:منبه|المنبه|صحيني|اصحيني|ايقظني|alarm|wake me(?: up)?)" + NR);
-    private static final Pattern KW_TIMER = Pattern.compile(NL + "(?:موقت|المؤقت|الموقت|تايمر|timer|countdown)" + NR + "|^\\s*عداد" + NR);
-    private static final Pattern LEAD = Pattern.compile("^\\s*(?:ذكرني|ذكروني|نبهني|ضيف|اضف|اضافه|انشئ|سوي|اعمل|اضبط|ضبط|شغل|ابدا|سجل|حط|ممكن|لو سمحت|من فضلك|الرجاء|يا|مهمه|مهام|منبه|المنبه|موقت|المؤقت|الموقت|تايمر|عداد|صحيني|اصحيني|ايقظني|remind me|reminder|please|alarm|timer|task|add|create|set|start|new|wake me up|wake me|set an|set a|a|an|the|ان|بان|ب|ل|لل|عن|عند|في|على|الي|الى|to|that|about|at|on|in|for|of|and|و|ثم|من|مع|by)" + NR);
+    private static final Pattern KW_ALARM = Pattern.compile(NL + "(?:منبه|المنبه|منبهه|صحيني|اصحيني|صحيلي|فيقني|فيقيني|فوقني|فوقيني|ايقظني|رنلي|manbeh|monabbeh|monabeh|alarm|wake me(?: up)?)" + NR);
+    private static final Pattern KW_TIMER = Pattern.compile(NL + "(?:موقت|المؤقت|الموقت|تايمر|تايمير|كرونو|وقتلي|timer|countdown)" + NR + "|^\\s*عداد" + NR);
+    private static final String STEM_SURE = "(?:ذكر|فكر|نبه|صحي|فيق|فوق|ايقظ|خلي|حضر|سجل|ضيف|اضف|زيد|ظبط|ضبط|اضبط|شغل|حط|عط|اعط|سوي|اعمل|اكتب|ابدا)(?:ي)?(?:لي|ني|لنا|نا|لك)?";
+    private static final Pattern LEAD = Pattern.compile("^\\s*(?:" + STEM_SURE + "|zakkerni|thakkerni|zakerni|"
+            + "بدي|بدنا|بدك|بدو|بغيت|ابغي|ابي|اريد|نفسي|عايز|عاوز|ودي|ممكن|لو سمحت|لو بتسمح|من فضلك|رجاء|الرجاء|يرجي|ياريت|يا ريت|بليز|please|plz|احبك|يحفظك|الله يخليك|تكرم|تكرمي|يعطيك العافيه|عيوني|حبيبي|يا حبيبي|يا صاحبي|يا غالي|يا عمي|لي|لك|ياك|"
+            + "لا تنسني|ما تنسني|لا تخليني انسي|ما تخليني انسي|خليني افتكر|خليني اتذكر|"
+            + "اضافه|انشئ|مهمه|مهام|تذكير|ريمايندر|منبه|المنبه|موقت|المؤقت|الموقت|تايمر|عداد|"
+            + "remind me|reminder|alarm|timer|task|add|create|set|start|new|wake me up|wake me|set an|set a|a|an|the|"
+            + "انو|انه|اني|ان|بانو|بان|ب|ل|لل|عن|عند|في|على|الي|الى|to|that|about|at|on|in|for|of|and|و|ثم|من|مع|by|يا)" + NR);
     private static final Pattern TAIL = Pattern.compile("(?:" + NL + "(?:في|على|عند|الى|الي|من|مع|ب|ل|و|to|at|on|in|for|and|by|from|of|the|a|an)\\s*[,،.]?\\s*)$");
 
     // ------------------------------------------------------------------ text preparation
@@ -262,16 +283,21 @@ final class Smart {
                 return Calendar.SUNDAY;
             case "اثنين":
             case "اتنين":
+            case "ثنين":
+            case "تنين":
             case "monday":
             case "mon":
                 return Calendar.MONDAY;
             case "ثلاثاء":
             case "تلاتاء":
+            case "ثلاثا":
+            case "تلاتا":
             case "tuesday":
             case "tues":
             case "tue":
                 return Calendar.TUESDAY;
             case "اربعاء":
+            case "اربعا":
             case "wednesday":
             case "wed":
                 return Calendar.WEDNESDAY;
@@ -416,23 +442,29 @@ final class Smart {
             dateExplicit = true;
         }
 
-        // prayer anchored time ("after Asr", "30 minutes before Maghrib")
+        // prayer anchored time ("after Asr", "wake me at Fajr", "an hour before Maghrib")
         long prayerAt = 0;
         m = b.take(PRAYER);
+        boolean prayerNamed = false;
+        if (m == null) {
+            m = b.take(wantAlarm ? PRAYER_BARE : PRAYER_NAMED);
+            prayerNamed = m != null;
+        }
         if (m != null) {
-            String key = m.group(4);
+            String whole = m.group();
+            String key = m.group(prayerNamed ? 1 : 2);
+            String rel = prayerNamed ? "" : m.group(1);
             int idx = prayerIndex(key);
             long off = 0;
-            boolean hasAmount = m.group(2) != null;
-            if (hasAmount) {
-                Matcher dm = DUR.matcher(m.group().trim().toLowerCase(Locale.ROOT));
-                if (dm.find()) off = durationOf(dm);
+            boolean hasAmount = false;
+            Matcher dm = DUR.matcher(whole);
+            if (dm.find()) {
+                off = durationOf(dm);
+                hasAmount = true;
             }
-            String rel = m.group(3);
             boolean before = "قبل".equals(rel) || "before".equals(rel);
             boolean after = "بعد".equals(rel) || "after".equals(rel);
-            if (!hasAmount && before) off = 10 * 60000L;
-            else if (!hasAmount && after) off = 10 * 60000L;
+            if (!hasAmount && (before || after)) off = 10 * 60000L;
             PrayerTimes.Cfg g = PrayerTimes.cfg(c);
             if (!g.configured) {
                 r.prayerUnset = true;
@@ -503,6 +535,12 @@ final class Smart {
         boolean relFound = false;
         Matcher rm = b.find(REL_MARK);
         if (!wantTimer) {
+            if (b.take(P_SOON) != null) {
+                relMs += 15 * 60000L;
+                relFine = true;
+                relFound = true;
+                rm = b.find(REL_MARK);
+            }
             int from = 0;
             while (rm.find(from)) {
                 int pos = rm.end();
@@ -570,18 +608,10 @@ final class Smart {
         String period = null;
         m = b.take(T_PREFIX);
         if (m != null) {
-            hour = (int) numOf(m.group(1));
-            minute = m.group(2) == null ? 0 : parseInt(m.group(2));
-            String conj = m.group(3);
-            if (conj != null) {
-                int add = m.group(4) != null ? Math.round((float) (fracOf(m.group(4)) * 60)) : m.group(5) != null ? parseInt(m.group(5)) : 0;
-                if ("الا".equals(conj)) {
-                    minute -= add;
-                } else {
-                    minute += add;
-                }
-            }
-            period = m.group(6);
+            Object[] ck = clockOf(m);
+            hour = (Integer) ck[0];
+            minute = (Integer) ck[1];
+            period = (String) ck[2];
         } else {
             m = b.take(T_COLON);
             if (m != null) {
@@ -593,6 +623,14 @@ final class Smart {
                 if (m != null) {
                     hour = parseInt(m.group(1));
                     period = m.group(2);
+                } else if (wantAlarm) {
+                    m = b.take(T_BARE);
+                    if (m != null) {
+                        Object[] ck = clockOf(m);
+                        hour = (Integer) ck[0];
+                        minute = (Integer) ck[1];
+                        period = (String) ck[2];
+                    }
                 }
             }
         }
@@ -627,7 +665,7 @@ final class Smart {
                 date = d;
                 dateExplicit = true;
                 if (wantTime) {
-                    applyClock(r, date, hour, minute, period, partHour, now, true);
+                    applyClock(r, date, hour, minute, period, partHour, now, true, wantAlarm);
                 } else {
                     r.due = date.getTimeInMillis();
                     r.hasTime = false;
@@ -637,7 +675,7 @@ final class Smart {
             Calendar d = date;
             boolean explicitDay = dateExplicit;
             if (d == null) d = dayPlus(now, 0);
-            applyClock(r, d, hour, minute, period, partHour, now, explicitDay);
+            applyClock(r, d, hour, minute, period, partHour, now, explicitDay, wantAlarm);
         } else if (date != null) {
             r.due = date.getTimeInMillis();
             r.hasTime = false;
@@ -682,6 +720,18 @@ final class Smart {
         return r;
     }
 
+    private static Object[] clockOf(Matcher m) {
+        int hour = (int) numOf(m.group(1));
+        int minute = m.group(2) == null ? 0 : parseInt(m.group(2));
+        String conj = m.group(3);
+        if (conj != null) {
+            int add = m.group(4) != null ? Math.round((float) (fracOf(m.group(4)) * 60)) : m.group(5) != null ? parseInt(m.group(5)) : 0;
+            if ("الا".equals(conj)) minute -= add;
+            else minute += add;
+        }
+        return new Object[]{hour, minute, m.group(6)};
+    }
+
     private static boolean sameDayAs(long a, long b) {
         if (b <= 0) return false;
         return Fmt.startOfDay(a) == Fmt.startOfDay(b);
@@ -720,8 +770,52 @@ final class Smart {
         return c;
     }
 
+    /** 1 morning, 2 afternoon / evening, 3 noon, 4 night, 0 none. */
+    private static int periodKind(String period) {
+        if (period == null) return 0;
+        String p = period.replaceAll("\\s+", " ").trim();
+        if (p.startsWith("بعد")) return 2;
+        p = p.replaceFirst("^ب", "").replaceFirst("^ال", "");
+        switch (p) {
+            case "am":
+            case "a.m.":
+            case "ص":
+            case "صباحا":
+            case "صباح":
+            case "صبحا":
+            case "صبح":
+            case "صبحيه":
+            case "فجرا":
+                return 1;
+            case "pm":
+            case "p.m.":
+            case "م":
+            case "مساء":
+            case "مساءا":
+            case "مسا":
+            case "عصرا":
+            case "عصريه":
+            case "عشيه":
+                return 2;
+            case "ظهرا":
+            case "ضهرا":
+            case "ضهر":
+                return 3;
+            case "ليلا":
+            case "ليل":
+                return 4;
+            default:
+                return 0;
+        }
+    }
+
     private static int partHourOf(String w) {
-        if (w.startsWith("منتصف") || w.equals("midnight")) return 24;
+        if (w.startsWith("منتصف") || w.startsWith("نص ") || w.equals("midnight")) return 24;
+        w = w.replaceFirst("^ب", "").replaceFirst("^ال", "");
+        if (w.startsWith("ضهر") || w.equals("ظهرا") || w.equals("ظهيره")) return 12;
+        if (w.equals("عصريه")) return 16;
+        if (w.equals("مسا") || w.equals("مساء") || w.equals("عشيه")) return 18;
+        if (w.equals("ليل") || w.equals("ليله") || w.equals("هالليله") || w.equals("هلليله")) return 21;
         if (w.equals("الظهيره") || w.equals("noon") || w.equals("ظهرا")) return 12;
         if (w.equals("عصرا") || w.equals("afternoon")) return 16;
         if (w.equals("مساء") || w.equals("المساء") || w.equals("evening")) return 18;
@@ -757,7 +851,7 @@ final class Smart {
         return 0;
     }
 
-    private static void applyClock(Result r, Calendar day, int hour, int minute, String period, int partHour, long now, boolean dayChosen) {
+    private static void applyClock(Result r, Calendar day, int hour, int minute, String period, int partHour, long now, boolean dayChosen, boolean forAlarm) {
         int h;
         int min = minute;
         if (hour < 0) {
@@ -773,11 +867,8 @@ final class Smart {
             min = 0;
         } else {
             h = hour;
-            String p = period == null ? "" : period;
-            boolean pm = p.equals("pm") || p.equals("p.m.") || p.equals("م") || p.startsWith("مساء") || p.equals("عصرا");
-            boolean am = p.equals("am") || p.equals("a.m.") || p.equals("ص") || p.startsWith("صباح") || p.equals("الصبح") || p.equals("فجرا");
-            boolean noon = p.equals("ظهرا");
-            boolean night = p.equals("ليلا") || p.equals("بالليل") || p.equals("الليل");
+            int kind = periodKind(period);
+            boolean am = kind == 1, pm = kind == 2, noon = kind == 3, night = kind == 4;
             if (h > 12 || h == 0) {
                 // 24 hour already
             } else if (pm) {
@@ -799,7 +890,9 @@ final class Smart {
                 Calendar p2 = (Calendar) day.clone();
                 p2.set(Calendar.HOUR_OF_DAY, pmH);
                 p2.set(Calendar.MINUTE, min);
-                if (!dayChosen) {
+                if (forAlarm) {
+                    h = (h >= 4 && h <= 11) ? amH : pmH;
+                } else if (!dayChosen) {
                     if (a.getTimeInMillis() > now) h = amH;
                     else if (p2.getTimeInMillis() > now) h = pmH;
                     else h = amH;

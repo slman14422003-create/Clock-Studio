@@ -255,7 +255,7 @@
     <string name="ai_cleared">Removed %d completed tasks.</string>
     <string name="ai_done_ok">Completed “%s”.</string>
     <string name="ai_done_none">I could not find a matching task.</string>
-    <string name="ai_help">I can:\n• Create a task: “Remind me tomorrow 5pm to call Sam” or “Meeting every Thursday at 10am important”\n• Set an alarm: “Alarm 6:30am every day”\n• Start a timer: “Timer 1 hour 30 minutes”\n• Remind around prayers: “Remind me after Asr to read”\n• Answer: “Plan my day”, “My tasks today”, “Overdue tasks”, “Next prayer”, “Next alarm”\n• Finish things: “Finished call Sam” or “Clear completed”</string>
+    <string name="ai_help">I can:\n• Create a task: “Remind me tomorrow 5pm to call Sam” or “Meeting every Thursday at 10am important”\n• Set an alarm: “Alarm 6:30am every day” or just “Alarm 6”\n• Start a timer: “Timer 1 hour 30 minutes”\n• Remind around prayers: “Remind me after Asr to read”\n• Answer: “Plan my day”, “My tasks today”, “Overdue tasks”, “Next prayer”, “Next alarm”\n• Finish things: “Finished call Sam” or “Clear completed”</string>
     <string name="ai_item_alarm">Alarm</string>
     <string name="ai_plan_head">Your day:</string>
     <string name="ai_plan_anytime">Any time:</string>
