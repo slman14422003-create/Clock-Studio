@@ -64,6 +64,19 @@ public class QuranReaderActivity extends BaseActivity {
     private ImageButton playBtn;
     private int playing = -1;
     private final QuranPlayer player = QuranPlayer.get();
+    private LinearLayout pill;
+    private WaveView wave;
+    private ImageButton pillPlay;
+    private FrameLayout.LayoutParams selLp;
+    private final Runnable tick = new Runnable() {
+        @Override
+        public void run() {
+            if (pill == null || pill.getVisibility() != View.VISIBLE) return;
+            int dur = player.duration();
+            if (dur > 0) wave.setProgress(player.position() / (float) dur);
+            pill.postDelayed(this, 90);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle b) {
@@ -118,6 +131,7 @@ public class QuranReaderActivity extends BaseActivity {
             }
         });
         main.addView(pager, new LinearLayout.LayoutParams(-1, 0, 1f));
+        main.addView(playerPill());
         main.addView(bottomBar());
 
         loading = Ui.text(this, getString(R.string.quran_loading), 16, R.color.text_secondary);
@@ -227,6 +241,57 @@ public class QuranReaderActivity extends BaseActivity {
         return bar;
     }
 
+    private View playerPill() {
+        pill = new LinearLayout(this);
+        pill.setGravity(Gravity.CENTER_VERTICAL);
+        pill.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        pill.setPadding(Ui.dp(this, 10), Ui.dp(this, 6), Ui.dp(this, 14), Ui.dp(this, 6));
+        pill.setBackground(Ui.rect(Ui.color(this, R.color.surface_high), Ui.dpf(this, 30)));
+        pill.setElevation(Ui.dpf(this, 6));
+        pill.setVisibility(View.GONE);
+        ImageButton prev = Ui.iconButton(this, R.drawable.ic_ayah_prev, R.string.quran_prev_ayah, false, v -> player.previous());
+        pillPlay = Ui.iconButton(this, R.drawable.ic_play_fill, R.string.quran_play, true, v -> togglePlay());
+        ImageButton next = Ui.iconButton(this, R.drawable.ic_ayah_next, R.string.quran_next_ayah, false, v -> player.next());
+        pill.addView(prev, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
+        LinearLayout.LayoutParams pl = new LinearLayout.LayoutParams(Ui.dp(this, 48), Ui.dp(this, 48));
+        pl.setMarginStart(Ui.dp(this, 4));
+        pl.setMarginEnd(Ui.dp(this, 4));
+        pill.addView(pillPlay, pl);
+        pill.addView(next, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
+        wave = new WaveView(this);
+        wave.setColors(Ui.color(this, R.color.accent_text), Ui.alpha(Ui.color(this, R.color.text_secondary), 0x66));
+        wave.seek = f -> player.seekFraction(f);
+        LinearLayout.LayoutParams wl = new LinearLayout.LayoutParams(0, Ui.dp(this, 64), 1f);
+        wl.setMarginStart(Ui.dp(this, 8));
+        pill.addView(wave, wl);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
+        lp.setMargins(Ui.dp(this, 14), Ui.dp(this, 6), Ui.dp(this, 14), Ui.dp(this, 4));
+        pill.setLayoutParams(lp);
+        return pill;
+    }
+
+    private void updatePill() {
+        if (pill == null) return;
+        boolean show = player.isPlaying() || player.canResume();
+        pillPlay.setImageResource(player.isPlaying() ? R.drawable.ic_pause_fill : R.drawable.ic_play_fill);
+        wave.setLive(player.isPlaying());
+        boolean was = pill.getVisibility() == View.VISIBLE;
+        pill.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (selLp != null && selBar != null) {
+            selLp.bottomMargin = Ui.dp(this, show ? 150 : 62);
+            selBar.setLayoutParams(selLp);
+        }
+        pill.removeCallbacks(tick);
+        if (show) {
+            if (!was) {
+                pill.setAlpha(0f);
+                pill.setTranslationY(Ui.dp(this, 16));
+                pill.animate().alpha(1f).translationY(0f).setDuration(Anim.D_MED).setInterpolator(Anim.OUT).start();
+            }
+            pill.post(tick);
+        }
+    }
+
     private void buildSelectionBar() {
         selBar = new LinearLayout(this);
         selBar.setGravity(Gravity.CENTER_VERTICAL);
@@ -248,6 +313,7 @@ public class QuranReaderActivity extends BaseActivity {
         }
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM);
         lp.setMargins(Ui.dp(this, 14), 0, Ui.dp(this, 14), Ui.dp(this, 62));
+        selLp = lp;
         root.addView(selBar, lp);
     }
 
@@ -499,6 +565,7 @@ public class QuranReaderActivity extends BaseActivity {
         final int accent = Ui.color(this, R.color.accent_text);
         final int warn = Ui.color(this, R.color.warn);
         SpannableStringBuilder sb = new SpannableStringBuilder();
+        final java.util.ArrayList<int[]> hl = new java.util.ArrayList<>();
         java.util.List<Integer> marks = QuranData.marks(this);
         for (int k = from; k < to; k++) {
             final int ayah = k;
@@ -511,7 +578,7 @@ public class QuranReaderActivity extends BaseActivity {
             sb.setSpan(new ForegroundColorSpan(marks.contains(k) ? warn : accent), mk, en, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new RelativeSizeSpan(0.8f), mk, en, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             if (k == selected || k == playing) {
-                sb.setSpan(new BackgroundColorSpan(Ui.alpha(accent, 0x33)), st, en, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                hl.add(new int[]{st, en});
             }
             sb.setSpan(new ClickableSpan() {
                 @Override
@@ -525,8 +592,15 @@ public class QuranReaderActivity extends BaseActivity {
                 }
             }, st, en, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-        TextView t = new TextView(this);
+        AyahTextView t = new AyahTextView(this);
         t.setText(sb);
+        int[] rr = new int[hl.size() * 2], cc = new int[hl.size()];
+        for (int q = 0; q < hl.size(); q++) {
+            rr[q * 2] = hl.get(q)[0];
+            rr[q * 2 + 1] = hl.get(q)[1];
+            cc[q] = Ui.alpha(accent, 0x30);
+        }
+        t.setHighlights(rr, cc);
         t.setTypeface(face);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSp);
         t.setTextColor(Ui.color(this, R.color.text_primary));
@@ -555,6 +629,8 @@ public class QuranReaderActivity extends BaseActivity {
                 if (old >= 0 && d.page[old] != d.page[ayah]) ad.notifyItemChanged(d.page[old] - 1);
                 ad.notifyItemChanged(d.page[ayah] - 1);
             }
+            wave.setAyah(ayah, QuranData.ar(d.num[ayah]));
+            updatePill();
             int pg = d.page[ayah] - 1;
             if (pg != curPos && pager.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) pager.smoothScrollToPosition(pg);
         }
@@ -562,6 +638,7 @@ public class QuranReaderActivity extends BaseActivity {
         @Override
         public void onState(boolean on) {
             playBtn.setImageResource(on ? R.drawable.ic_pause_fill : R.drawable.ic_play_fill);
+            updatePill();
             if (!on && !player.canResume() && playing >= 0) {
                 int old = playing;
                 playing = -1;
@@ -590,6 +667,7 @@ public class QuranReaderActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        if (pill != null) pill.removeCallbacks(tick);
         if (player.listener == audioListener) {
             player.listener = null;
             player.stop();

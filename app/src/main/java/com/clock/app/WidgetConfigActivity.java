@@ -172,7 +172,8 @@ public class WidgetConfigActivity extends BaseActivity {
         holder.removeAllViews();
         try {
             RemoteViews rv = w.build(getApplicationContext(), cfg);
-            View v = rv.apply(this, holder);
+            android.content.Context pc = new android.view.ContextThemeWrapper(getApplicationContext(), R.style.AppTheme);
+            View v = rv.apply(pc, holder);
             holder.addView(v, new FrameLayout.LayoutParams(-1, -1));
         } catch (Throwable e) {
             TextView t = Ui.text(this, getString(R.string.cfg_preview_failed), 14, R.color.text_secondary);

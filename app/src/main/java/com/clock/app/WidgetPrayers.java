@@ -7,6 +7,7 @@ import android.widget.RemoteViews;
 public class WidgetPrayers extends WBase {
     private static final int[] NAMES = {R.id.wN0, R.id.wN1, R.id.wN2, R.id.wN3, R.id.wN4};
     private static final int[] TIMES = {R.id.wH0, R.id.wH1, R.id.wH2, R.id.wH3, R.id.wH4};
+    private static final int[] CELLS = {R.id.wC0, R.id.wC1, R.id.wC2, R.id.wC3, R.id.wC4};
 
     @Override
     int layout(boolean rtl, WCfg cfg) {
@@ -86,6 +87,10 @@ public class WidgetPrayers extends WBase {
         } catch (Exception ignored) {
         }
         int ac = cfg.accentColor() != 0 ? cfg.accentColor() : defaultAccent(cfg);
+        for (int i = 0; i < 5; i++) {
+            boolean on = nx != null && PrayerTimes.PRAYERS[i] == nx.idx;
+            rv.setInt(CELLS[i], "setBackgroundResource", on ? R.drawable.wb_cell_on : R.drawable.wb_cell_off);
+        }
         if (nx != null) {
             for (int i = 0; i < 5; i++) {
                 if (PrayerTimes.PRAYERS[i] == nx.idx) {

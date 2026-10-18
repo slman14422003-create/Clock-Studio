@@ -40,6 +40,43 @@ final class QuranPlayer {
         return playing;
     }
 
+    int current() {
+        return idx;
+    }
+
+    int position() {
+        try {
+            return mp != null && prepared ? mp.getCurrentPosition() : 0;
+        } catch (Throwable e) {
+            return 0;
+        }
+    }
+
+    int duration() {
+        try {
+            return mp != null && prepared ? mp.getDuration() : 0;
+        } catch (Throwable e) {
+            return 0;
+        }
+    }
+
+    void seekFraction(float f) {
+        int dur = duration();
+        if (dur <= 0) return;
+        try {
+            mp.seekTo((int) (Math.max(0f, Math.min(1f, f)) * dur));
+        } catch (Throwable ignored) {
+        }
+    }
+
+    void next() {
+        if (idx >= 0 && d != null) start(Math.min(QuranData.AYAHS - 1, idx + 1));
+    }
+
+    void previous() {
+        if (idx >= 0 && d != null) start(Math.max(0, idx - 1));
+    }
+
     /** Paused with a loaded ayah that can continue. */
     boolean canResume() {
         return mp != null && prepared && !playing;

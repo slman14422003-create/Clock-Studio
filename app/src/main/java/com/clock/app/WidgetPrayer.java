@@ -49,7 +49,7 @@ public class WidgetPrayer extends WBase {
 
     @Override
     int[][] sizes() {
-        return new int[][]{{R.id.wS1, 13}, {R.id.wP1, 32}, {R.id.wA1, 15}, {R.id.wP2, 24}, {R.id.wS2, 12}};
+        return new int[][]{{R.id.wS1, 13}, {R.id.wP1, 32}, {R.id.wA1, 15}, {R.id.wP2, 26}, {R.id.wS2, 12}};
     }
 
     @Override
