@@ -194,8 +194,12 @@ public class PrayerActivity extends BaseActivity {
             col.addView(Ui.footnote(this, getString(R.string.prayer_setup_sub)));
         }
 
+        col.addView(quranCard());
+
         col.addView(Ui.sectionTitle(this, getString(R.string.prayer_tools)));
         LinearLayout gt = Ui.group(this);
+        Ui.addRow(gt, Ui.row(this, R.drawable.ic_quran, R.color.ok, getString(R.string.quran), null, true,
+                v -> startActivity(new Intent(this, QuranActivity.class))), true);
         Ui.addRow(gt, Ui.row(this, R.drawable.ic_compass, R.color.ok, getString(R.string.qibla), null, true,
                 v -> startActivity(new Intent(this, QiblaActivity.class))), true);
         Ui.addRow(gt, Ui.row(this, R.drawable.ic_beads, R.color.indigo, getString(R.string.tasbih), null, true,
@@ -259,6 +263,48 @@ public class PrayerActivity extends BaseActivity {
             note += "\n" + getString(R.string.prayer_updated, Fmt.date(this, ts, "d MMM, HH:mm"));
         }
         col.addView(Ui.footnote(this, note));
+    }
+
+    /** Entry to the Quran: a green card that shows where the last reading stopped. */
+    private View quranCard() {
+        LinearLayout c = new LinearLayout(this);
+        c.setGravity(Gravity.CENTER_VERTICAL);
+        c.setPadding(Ui.dp(this, 18), Ui.dp(this, 16), Ui.dp(this, 18), Ui.dp(this, 16));
+        GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[]{0xFF12906B, 0xFF0B3D4A});
+        g.setCornerRadius(Ui.dpf(this, 18));
+        c.setBackground(g);
+        LinearLayout t = new LinearLayout(this);
+        t.setOrientation(LinearLayout.VERTICAL);
+        TextView h = new TextView(this);
+        h.setText(R.string.quran);
+        h.setTextSize(22);
+        h.setTypeface(Ui.medium());
+        h.setTextColor(Color.WHITE);
+        TextView s = new TextView(this);
+        s.setTextSize(14);
+        s.setTextColor(0xCCFFFFFF);
+        int last = QuranData.lastPage(this);
+        s.setText(last > 0 ? QuranData.lastLabel(this) + " \u00B7 " + getString(R.string.quran_page, QuranData.num(last))
+                : getString(R.string.prayer_quran_start));
+        t.addView(h);
+        t.addView(s);
+        c.addView(t, new LinearLayout.LayoutParams(0, -2, 1f));
+        ImageView ic = new ImageView(this);
+        ic.setImageResource(R.drawable.ic_quran);
+        ic.setImageTintList(ColorStateList.valueOf(0x80FFFFFF));
+        c.addView(ic, new LinearLayout.LayoutParams(Ui.dp(this, 44), Ui.dp(this, 44)));
+        Ui.press(this, c);
+        c.setOnClickListener(v -> {
+            if (last > 0 && QuranData.ready(this)) {
+                startActivity(new Intent(this, QuranReaderActivity.class).putExtra(QuranReaderActivity.EXTRA_PAGE, last));
+            } else {
+                startActivity(new Intent(this, QuranActivity.class));
+            }
+        });
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
+        lp.setMargins(Ui.dp(this, 16), Ui.dp(this, 8), Ui.dp(this, 16), Ui.dp(this, 4));
+        c.setLayoutParams(lp);
+        return c;
     }
 
     private FrameLayout check(final int pos, final String ymd) {

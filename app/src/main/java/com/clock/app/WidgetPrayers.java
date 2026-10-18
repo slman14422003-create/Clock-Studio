@@ -85,7 +85,7 @@ public class WidgetPrayers extends WBase {
             nx = PrayerTimes.next(c);
         } catch (Exception ignored) {
         }
-        int ac = cfg.accent != 0 ? WCfg.PALETTE[cfg.accent] : defaultAccent(cfg);
+        int ac = cfg.accentColor() != 0 ? cfg.accentColor() : defaultAccent(cfg);
         if (nx != null) {
             for (int i = 0; i < 5; i++) {
                 if (PrayerTimes.PRAYERS[i] == nx.idx) {

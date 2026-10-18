@@ -11,6 +11,14 @@
         android:importantForAccessibility="no"
         android:scaleType="fitXY"
         android:src="@drawable/wb_adaptive_1" />
+    <ImageView
+        android:id="@+id/wBorder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/wb_bd_adaptive_2"
+        android:visibility="gone" />
 
     <AnalogClock
         android:layout_width="match_parent"

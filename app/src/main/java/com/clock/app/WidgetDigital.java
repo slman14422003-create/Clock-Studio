@@ -11,6 +11,11 @@ public class WidgetDigital extends WBase {
     }
 
     @Override
+    int caps() {
+        return TEXT | ACCENT | SIZE | FMT | DATE | HIJRI;
+    }
+
+    @Override
     int[] primary() {
         return new int[]{R.id.wP1, R.id.wP2};
     }
@@ -38,6 +43,11 @@ public class WidgetDigital extends WBase {
         rv.setViewVisibility(R.id.wP2, cfg.date ? View.VISIBLE : View.GONE);
         rv.setViewVisibility(R.id.wS1, cfg.date ? View.VISIBLE : View.GONE);
         rv.setTextViewText(R.id.wP2, Fmt.date(c, now, "EEEE"));
-        rv.setTextViewText(R.id.wS1, Fmt.date(c, now, "d MMMM"));
+        String dm = Fmt.date(c, now, "d MMMM");
+        if (cfg.hijri) {
+            String h = hijri(c);
+            if (h != null) dm = dm + " \u00B7 " + h;
+        }
+        rv.setTextViewText(R.id.wS1, dm);
     }
 }

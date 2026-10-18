@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.util.TypedValue;
 import android.widget.RemoteViews;
 
@@ -16,9 +17,9 @@ import java.util.Locale;
 
 abstract class WBase extends AppWidgetProvider {
     static final String REFRESH = "com.clock.app.WIDGET_REFRESH";
-    static final int TEXT = 1, ACCENT = 2, SIZE = 4, FMT = 8, DATE = 16, FACE = 32;
+    static final int TEXT = 1, ACCENT = 2, SIZE = 4, FMT = 8, DATE = 16, FACE = 32, HIJRI = 64;
     static final Class<?>[] ALL = {ClockWidget.class, WidgetDigital.class, WidgetStack.class, WidgetAnalog.class,
-            WidgetDate.class, WidgetPrayer.class, WidgetPrayers.class, WidgetAlarm.class};
+            WidgetDate.class, WidgetPrayer.class, WidgetPrayers.class, WidgetAlarm.class, WidgetQuran.class};
 
     abstract int layout(boolean rtl, WCfg cfg);
 
@@ -68,13 +69,13 @@ abstract class WBase extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context c, AppWidgetManager m, int[] ids) {
-        for (int id : ids) {
-            try {
-                m.updateAppWidget(id, build(c, id));
-            } catch (Exception ignored) {
-            }
-        }
+        for (int id : ids) push(c, m, id);
         scheduleTicks(c);
+    }
+
+    @Override
+    public void onAppWidgetOptionsChanged(Context c, AppWidgetManager m, int id, Bundle options) {
+        push(c, m, id);
     }
 
     @Override
@@ -87,6 +88,39 @@ abstract class WBase extends AppWidgetProvider {
         for (int id : ids) WCfg.delete(c, id);
     }
 
+    /** The launcher re-creates widgets with new ids after a restore or a launcher change: carry the settings over. */
+    @Override
+    public void onRestored(Context c, int[] oldIds, int[] newIds) {
+        if (oldIds == null || newIds == null) return;
+        for (int i = 0; i < Math.min(oldIds.length, newIds.length); i++) WCfg.move(c, oldIds[i], newIds[i]);
+    }
+
+    /** Never leaves a widget empty: if the full build fails it falls back to defaults, then to a bare clock. */
+    private void push(Context c, AppWidgetManager m, int id) {
+        RemoteViews rv = null;
+        try {
+            rv = build(c, id);
+        } catch (Throwable first) {
+            try {
+                rv = build(c, new WCfg());
+            } catch (Throwable second) {
+                try {
+                    rv = new RemoteViews(c.getPackageName(), R.layout.wl_classic_ltr);
+                    rv.setImageViewResource(R.id.wBg, R.drawable.wb_adaptive_2);
+                    rv.setOnClickPendingIntent(R.id.wRoot, PendingIntent.getActivity(c, 29,
+                            new Intent(c, MainActivity.class), PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
+                } catch (Throwable ignored) {
+                    rv = null;
+                }
+            }
+        }
+        if (rv == null) return;
+        try {
+            m.updateAppWidget(id, rv);
+        } catch (Throwable ignored) {
+        }
+    }
+
     @Override
     public void onReceive(Context c, Intent i) {
         super.onReceive(c, i);
@@ -96,11 +130,18 @@ abstract class WBase extends AppWidgetProvider {
     }
 
     RemoteViews build(Context app, int id) {
+        return build(app, WCfg.load(app, id, defaultBg()));
+    }
+
+    /** Builds the widget for an explicit configuration; the settings screen uses it for its live preview. */
+    RemoteViews build(Context app, WCfg cfg) {
         Context c = localized(app);
-        WCfg cfg = WCfg.load(app, id, defaultBg());
         RemoteViews rv = new RemoteViews(app.getPackageName(), layout(Lang.isAr(), cfg));
         applyBg(rv, cfg);
-        fill(c, rv, cfg);
+        try {
+            fill(c, rv, cfg);
+        } catch (Throwable ignored) {
+        }
         applyColors(c, rv, cfg);
         post(c, rv, cfg);
         PendingIntent open = PendingIntent.getActivity(app, 30 + (getClass().getSimpleName().hashCode() & 0xFFF), target(app),
@@ -112,23 +153,48 @@ abstract class WBase extends AppWidgetProvider {
     void applyBg(RemoteViews rv, WCfg cfg) {
         int r = cfg.radius;
         rv.setImageViewResource(R.id.wBg, WRes.bg(cfg.bg, r));
-        rv.setInt(R.id.wBg, "setColorFilter", cfg.bg > WCfg.GRAD_LAST ? cfg.bgColor() : 0);
+        rv.setInt(R.id.wBg, "setColorFilter", cfg.bg >= WCfg.SOLID_FIRST ? cfg.bgColor() : 0);
         rv.setInt(R.id.wBg, "setImageAlpha", cfg.alpha * 255 / 100);
+        if (cfg.border) {
+            rv.setViewVisibility(R.id.wBorder, android.view.View.VISIBLE);
+            rv.setImageViewResource(R.id.wBorder, WRes.border(cfg.adaptive(), r));
+            if (!cfg.adaptive()) {
+                int base = cfg.autoText() == 0 ? 0xFFFFFFFF : cfg.autoText();
+                rv.setInt(R.id.wBorder, "setColorFilter", (base & 0x00FFFFFF) | 0x59000000);
+            } else {
+                rv.setInt(R.id.wBorder, "setColorFilter", 0);
+            }
+        } else {
+            rv.setViewVisibility(R.id.wBorder, android.view.View.GONE);
+        }
     }
 
     void applyColors(Context c, RemoteViews rv, WCfg cfg) {
-        int main = cfg.text != 0 ? WCfg.PALETTE[cfg.text] : cfg.autoText();
+        int main = cfg.textColor();
         boolean setMain = main != 0;
         int sec = setMain ? (main & 0x00FFFFFF) | 0xB3000000 : 0;
         for (int id : primary()) if (setMain) rv.setTextColor(id, main);
         for (int id : secondary()) if (setMain) rv.setTextColor(id, sec);
-        int ac = cfg.accent != 0 ? WCfg.PALETTE[cfg.accent] : defaultAccent(cfg);
+        int ac = cfg.accentColor() != 0 ? cfg.accentColor() : defaultAccent(cfg);
         if (ac != 0) for (int id : accents()) rv.setTextColor(id, ac);
         if (setMain) tint(rv, sec);
         if (ac != 0) tintAccent(rv, ac);
         float s = cfg.scale();
         if ((caps() & SIZE) != 0 && s != 1f) {
             for (int[] t : sizes()) rv.setTextViewTextSize(t[0], TypedValue.COMPLEX_UNIT_SP, t[1] * s);
+        }
+    }
+
+    /** Hijri date line from the cached prayer data, or null when the prayer location is not set up. */
+    static String hijri(Context c) {
+        try {
+            PrayerTimes.Cfg g = PrayerTimes.cfg(c);
+            if (!g.configured) return null;
+            PrayerTimes.Day d = PrayerTimes.day(c, g, PrayerTimes.today(g));
+            if (d == null || d.hd.isEmpty()) return null;
+            return c.getString(R.string.hijri_fmt, d.hd, Lang.isAr() ? d.hma : d.hme, d.hy);
+        } catch (Throwable e) {
+            return null;
         }
     }
 

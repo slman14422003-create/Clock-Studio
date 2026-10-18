@@ -17,6 +17,11 @@ public class ClockWidget extends WBase {
     }
 
     @Override
+    int caps() {
+        return TEXT | ACCENT | SIZE | FMT | DATE | HIJRI;
+    }
+
+    @Override
     int[] primary() {
         return new int[]{R.id.wP1};
     }
@@ -45,7 +50,12 @@ public class ClockWidget extends WBase {
     void fill(Context c, RemoteViews rv, WCfg cfg) {
         timeFormat(rv, R.id.wP1, cfg, c, "h:mm", "HH:mm");
         rv.setViewVisibility(R.id.wA1, cfg.date ? android.view.View.VISIBLE : android.view.View.GONE);
-        rv.setTextViewText(R.id.wA1, Fmt.date(c, System.currentTimeMillis(), "EEEE d MMMM"));
+        String line = Fmt.date(c, System.currentTimeMillis(), "EEEE d MMMM");
+        if (cfg.hijri) {
+            String h = hijri(c);
+            if (h != null) line = Fmt.date(c, System.currentTimeMillis(), "EEEE d MMMM") + " \u00B7 " + h;
+        }
+        rv.setTextViewText(R.id.wA1, line);
         String next = c.getString(R.string.no_alarm);
         try {
             AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
