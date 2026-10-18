@@ -239,10 +239,11 @@ public class QuranReaderActivity extends BaseActivity {
         selText.setSingleLine(true);
         selBar.addView(selText, new LinearLayout.LayoutParams(0, -2, 1f));
         selMark = Ui.iconButton(this, R.drawable.ic_bookmark, R.string.quran_marks, false, v -> toggleMark());
+        ImageButton tafsir = Ui.iconButton(this, R.drawable.ic_info, R.string.quran_tafsir, false, v -> openTafsir());
         ImageButton copy = Ui.iconButton(this, R.drawable.ic_copy, R.string.quran_copy, false, v -> copy());
         ImageButton share = Ui.iconButton(this, R.drawable.ic_share, R.string.quran_share, false, v -> share());
         ImageButton close = Ui.iconButton(this, R.drawable.ic_x, R.string.cancel, false, v -> select(-1));
-        for (View v : new View[]{selMark, copy, share, close}) {
+        for (View v : new View[]{selMark, tafsir, copy, share, close}) {
             selBar.addView(v, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
         }
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM);
@@ -345,6 +346,11 @@ public class QuranReaderActivity extends BaseActivity {
         selMark.setImageResource(on ? R.drawable.ic_bookmark_fill : R.drawable.ic_bookmark);
         Ui.toast(this, getString(on ? R.string.quran_bookmarked : R.string.quran_unbookmarked));
         if (pager.getAdapter() != null) pager.getAdapter().notifyItemChanged(d.page[selected] - 1);
+    }
+
+    private void openTafsir() {
+        if (selected < 0) return;
+        startActivity(new Intent(this, QuranTafsirActivity.class).putExtra(QuranTafsirActivity.EXTRA_AYAH, selected));
     }
 
     private void copy() {

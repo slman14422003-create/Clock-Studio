@@ -372,7 +372,7 @@
     <string name="quran_surahs">السور</string>
     <string name="quran_juz">الأجزاء</string>
     <string name="quran_marks">العلامات</string>
-    <string name="quran_search_hint">ابحث عن سورة</string>
+    <string name="quran_search_hint">ابحث عن سورة أو آية أو كلمة</string>
     <string name="quran_continue">تابع القراءة</string>
     <string name="quran_page">صفحة %s</string>
     <string name="quran_juz_n">الجزء %s</string>
@@ -427,4 +427,25 @@
     <string name="quran_audio_need_text">نزّل المصحف أولاً</string>
     <string name="quran_play">تشغيل التلاوة</string>
     <string name="quran_audio_err">تعذّر تشغيل التلاوة. تحقّق من الاتصال أو نزّل السورة.</string>
+    <string name="quran_tafsir">التفسير</string>
+    <string name="quran_daily">آية اليوم</string>
+    <string name="quran_read">اقرأ</string>
+    <string name="quran_prev_ayah">الآية السابقة</string>
+    <string name="quran_next_ayah">الآية التالية</string>
+    <string name="quran_ayah_n">الآية %s</string>
+    <string name="quran_sect_surahs">السور</string>
+    <string name="quran_sect_ayahs">الآيات</string>
+    <string name="quran_tafsir_loading">جارٍ تحميل التفسير…</string>
+    <string name="quran_tafsir_fail">تعذّر تحميل التفسير. تحقّق من الاتصال بالإنترنت ثم اضغط للمحاولة مرة أخرى.</string>
+    <string name="quran_tafsir_hint">يُحفظ التفسير بعد فتحه ليعمل دون إنترنت</string>
+    <string name="quran_need_quran">نزّل المصحف أولاً من شاشة القرآن</string>
+    <string-array name="tafsir_names">
+        <item>الميسر</item>
+        <item>الجلالين</item>
+        <item>القرطبي</item>
+        <item>البغوي</item>
+        <item>الوسيط</item>
+        <item>تنوير المقباس</item>
+        <item>English</item>
+    </string-array>
 </resources>

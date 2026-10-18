@@ -372,7 +372,7 @@
     <string name="quran_surahs">Surahs</string>
     <string name="quran_juz">Juz</string>
     <string name="quran_marks">Bookmarks</string>
-    <string name="quran_search_hint">Search surah</string>
+    <string name="quran_search_hint">Search a surah, verse or word</string>
     <string name="quran_continue">Continue reading</string>
     <string name="quran_page">Page %s</string>
     <string name="quran_juz_n">Juz %s</string>
@@ -427,4 +427,25 @@
     <string name="quran_audio_need_text">Download the Mushaf first</string>
     <string name="quran_play">Play recitation</string>
     <string name="quran_audio_err">Could not play the recitation. Check your connection or download the surah.</string>
+    <string name="quran_tafsir">Tafsir</string>
+    <string name="quran_daily">Verse of the day</string>
+    <string name="quran_read">Read</string>
+    <string name="quran_prev_ayah">Previous verse</string>
+    <string name="quran_next_ayah">Next verse</string>
+    <string name="quran_ayah_n">Verse %s</string>
+    <string name="quran_sect_surahs">Surahs</string>
+    <string name="quran_sect_ayahs">Verses</string>
+    <string name="quran_tafsir_loading">Loading explanation…</string>
+    <string name="quran_tafsir_fail">Could not load the explanation. Check your connection and tap to retry.</string>
+    <string name="quran_tafsir_hint">Explanations are saved once opened so they work offline</string>
+    <string name="quran_need_quran">Download the Mushaf first from the Quran screen</string>
+    <string-array name="tafsir_names">
+        <item>Al-Muyassar</item>
+        <item>Al-Jalalayn</item>
+        <item>Al-Qurtubi</item>
+        <item>Al-Baghawi</item>
+        <item>Al-Waseet</item>
+        <item>Tanwir al-Miqbas</item>
+        <item>English</item>
+    </string-array>
 </resources>

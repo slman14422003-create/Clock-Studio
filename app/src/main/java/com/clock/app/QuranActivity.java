@@ -25,7 +25,7 @@ import java.util.List;
 
 /** Quran index: continue reading, surahs, juz and bookmarks. The text is downloaded once and then works offline. */
 public class QuranActivity extends BaseActivity {
-    private static final int T_CONTINUE = 0, T_DOWNLOAD = 1, T_SURAH = 2, T_JUZ = 3, T_MARK = 4, T_EMPTY = 5, T_FOOT = 6, T_PAD = 7;
+    private static final int T_CONTINUE = 0, T_DOWNLOAD = 1, T_SURAH = 2, T_JUZ = 3, T_MARK = 4, T_EMPTY = 5, T_FOOT = 6, T_PAD = 7, T_HERO = 8, T_SECT = 9, T_AYAH = 10;
 
     private static final class Row {
         final int type;
@@ -47,11 +47,17 @@ public class QuranActivity extends BaseActivity {
     private String query = "";
     private boolean downloading, failed, loaded;
     private final List<Row> rows = new ArrayList<>();
+    private Typeface face = Typeface.SERIF;
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         useGroupedBackground();
+        try {
+            face = Typeface.createFromAsset(getAssets(), "fonts/quran.ttf");
+        } catch (Throwable e) {
+            face = Typeface.SERIF;
+        }
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         hd = new Header(this, getString(R.string.quran));
@@ -163,8 +169,17 @@ public class QuranActivity extends BaseActivity {
         } else {
             tools.setVisibility(View.VISIBLE);
             if (tab == 0) {
-                if (QuranData.lastPage(this) > 0 && query.trim().isEmpty()) rows.add(new Row(T_CONTINUE));
+                boolean searching = !query.trim().isEmpty();
+                if (!searching) {
+                    rows.add(new Row(T_HERO));
+                    if (QuranData.lastPage(this) > 0) rows.add(new Row(T_CONTINUE));
+                }
                 List<QuranData.Surah> l = d.search(query);
+                if (searching && !l.isEmpty()) {
+                    Row h = new Row(T_SECT);
+                    h.data = getString(R.string.quran_sect_surahs);
+                    rows.add(h);
+                }
                 for (int i = 0; i < l.size(); i++) {
                     Row r = new Row(T_SURAH);
                     r.data = l.get(i);
@@ -172,7 +187,20 @@ public class QuranActivity extends BaseActivity {
                     r.last = i == l.size() - 1;
                     rows.add(r);
                 }
-                if (l.isEmpty()) {
+                List<Integer> hits = searching ? d.searchAyahs(query, 80) : new ArrayList<Integer>();
+                if (!hits.isEmpty()) {
+                    Row h = new Row(T_SECT);
+                    h.data = getString(R.string.quran_sect_ayahs);
+                    rows.add(h);
+                }
+                for (int i = 0; i < hits.size(); i++) {
+                    Row r = new Row(T_AYAH);
+                    r.data = hits.get(i);
+                    r.first = i == 0;
+                    r.last = i == hits.size() - 1;
+                    rows.add(r);
+                }
+                if (l.isEmpty() && hits.isEmpty()) {
                     Row r = new Row(T_EMPTY);
                     r.data = getString(R.string.quran_no_results);
                     rows.add(r);
@@ -252,6 +280,15 @@ public class QuranActivity extends BaseActivity {
                 case T_CONTINUE:
                     v = continueCard();
                     break;
+                case T_HERO:
+                    v = heroCard();
+                    break;
+                case T_SECT:
+                    v = Ui.sectionTitle(QuranActivity.this, "");
+                    break;
+                case T_AYAH:
+                    v = ayahRow();
+                    break;
                 case T_DOWNLOAD:
                     v = downloadCard();
                     break;
@@ -280,6 +317,15 @@ public class QuranActivity extends BaseActivity {
             switch (r.type) {
                 case T_CONTINUE:
                     bindContinue(v);
+                    break;
+                case T_HERO:
+                    bindHero(v);
+                    break;
+                case T_SECT:
+                    ((TextView) v).setText((String) r.data);
+                    break;
+                case T_AYAH:
+                    bindAyah(v, r);
                     break;
                 case T_DOWNLOAD:
                     bindDownload(v);
@@ -383,6 +429,146 @@ public class QuranActivity extends BaseActivity {
         wrap.getChildAt(1).setVisibility(r.last ? View.INVISIBLE : View.VISIBLE);
         wrap.setOnLongClickListener(null);
         wrap.setOnClickListener(x -> click.run());
+        Ui.ripple(this, wrap);
+    }
+
+    private View heroCard() {
+        LinearLayout c = new LinearLayout(this);
+        c.setOrientation(LinearLayout.VERTICAL);
+        c.setPadding(Ui.dp(this, 20), Ui.dp(this, 18), Ui.dp(this, 20), Ui.dp(this, 16));
+        GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[]{0xFF1AA37A, 0xFF0B3D4A});
+        g.setCornerRadius(Ui.dpf(this, 24));
+        c.setBackground(g);
+        LinearLayout top = new LinearLayout(this);
+        top.setGravity(Gravity.CENTER_VERTICAL);
+        TextView cap = new TextView(this);
+        cap.setTextSize(13);
+        cap.setTypeface(Ui.medium());
+        cap.setTextColor(0xB3FFFFFF);
+        cap.setText(R.string.quran_daily);
+        top.addView(cap, new LinearLayout.LayoutParams(0, -2, 1f));
+        ImageView ic = new ImageView(this);
+        ic.setImageResource(R.drawable.ic_quran);
+        ic.setImageTintList(android.content.res.ColorStateList.valueOf(0x80FFFFFF));
+        top.addView(ic, new LinearLayout.LayoutParams(Ui.dp(this, 22), Ui.dp(this, 22)));
+        c.addView(top);
+        TextView verse = new TextView(this);
+        verse.setTypeface(face);
+        verse.setTextSize(24);
+        verse.setLineSpacing(0f, 1.45f);
+        verse.setTextColor(Color.WHITE);
+        verse.setGravity(Gravity.CENTER);
+        verse.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        verse.setPadding(0, Ui.dp(this, 14), 0, Ui.dp(this, 10));
+        c.addView(verse, new LinearLayout.LayoutParams(-1, -2));
+        TextView ref = new TextView(this);
+        ref.setTextSize(13);
+        ref.setTextColor(0xCCFFFFFF);
+        ref.setGravity(Gravity.CENTER);
+        ref.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        c.addView(ref, new LinearLayout.LayoutParams(-1, -2));
+        LinearLayout actions = new LinearLayout(this);
+        actions.setPadding(0, Ui.dp(this, 14), 0, 0);
+        TextView read = heroButton(R.string.quran_read, 0x33FFFFFF, Color.WHITE);
+        TextView tafsir = heroButton(R.string.quran_tafsir, Color.WHITE, 0xFF0B3D4A);
+        LinearLayout.LayoutParams a = new LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f);
+        a.setMarginEnd(Ui.dp(this, 10));
+        actions.addView(read, a);
+        actions.addView(tafsir, new LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f));
+        c.addView(actions);
+        c.setTag(new TextView[]{verse, ref, read, tafsir});
+        RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(-1, -2);
+        lp.setMargins(Ui.dp(this, 16), Ui.dp(this, 2), Ui.dp(this, 16), Ui.dp(this, 12));
+        c.setLayoutParams(lp);
+        return c;
+    }
+
+    private TextView heroButton(int label, int bg, int color) {
+        TextView t = new TextView(this);
+        t.setText(label);
+        t.setTextSize(15);
+        t.setTypeface(Ui.medium());
+        t.setTextColor(color);
+        t.setGravity(Gravity.CENTER);
+        t.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        t.setSingleLine(true);
+        t.setIncludeFontPadding(false);
+        t.setBackground(Ui.rect(bg, Ui.dpf(this, 100)));
+        Ui.press(this, t);
+        return t;
+    }
+
+    private void bindHero(View v) {
+        TextView[] t = (TextView[]) v.getTag();
+        final int a = d.dailyVerse();
+        t[0].setText("\uFD3F" + d.text[a] + "\uFD3E");
+        t[1].setText(d.surahTitle(d.surahOf[a]) + " \u00B7 " + QuranData.num(d.num[a]));
+        t[2].setOnClickListener(x -> open(d.page[a], a));
+        t[3].setOnClickListener(x -> openTafsir(a));
+    }
+
+    private void openTafsir(int ayah) {
+        startActivity(new Intent(this, QuranTafsirActivity.class).putExtra(QuranTafsirActivity.EXTRA_AYAH, ayah));
+    }
+
+    private View ayahRow() {
+        LinearLayout wrap = new LinearLayout(this);
+        wrap.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout row = new LinearLayout(this);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPaddingRelative(Ui.dp(this, 16), Ui.dp(this, 12), Ui.dp(this, 10), Ui.dp(this, 12));
+        LinearLayout mid = new LinearLayout(this);
+        mid.setOrientation(LinearLayout.VERTICAL);
+        TextView ref = Ui.text(this, "", 13, R.color.accent_text);
+        ref.setTypeface(Ui.medium());
+        ref.setSingleLine(true);
+        TextView txt = new TextView(this);
+        txt.setTypeface(face);
+        txt.setTextSize(19);
+        txt.setLineSpacing(0f, 1.35f);
+        txt.setMaxLines(2);
+        txt.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        txt.setTextColor(Ui.color(this, R.color.text_primary));
+        txt.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+        txt.setPadding(0, Ui.dp(this, 4), 0, 0);
+        mid.addView(ref);
+        mid.addView(txt);
+        row.addView(mid, new LinearLayout.LayoutParams(0, -2, 1f));
+        TextView tf = Ui.text(this, getString(R.string.quran_tafsir), 14, R.color.accent_text);
+        tf.setTypeface(Ui.medium());
+        tf.setGravity(Gravity.CENTER);
+        tf.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        tf.setSingleLine(true);
+        tf.setBackground(Ui.rect(Ui.color(this, R.color.accent_soft), Ui.dpf(this, 100)));
+        tf.setPadding(Ui.dp(this, 14), Ui.dp(this, 7), Ui.dp(this, 14), Ui.dp(this, 7));
+        Ui.press(this, tf);
+        LinearLayout.LayoutParams tl = new LinearLayout.LayoutParams(-2, -2);
+        tl.setMarginStart(Ui.dp(this, 10));
+        row.addView(tf, tl);
+        wrap.addView(row, new LinearLayout.LayoutParams(-1, -2));
+        wrap.addView(Ui.hairline(this, 16));
+        wrap.setTag(new TextView[]{ref, txt, tf});
+        return wrap;
+    }
+
+    private void bindAyah(View v, Row r) {
+        final int a = (Integer) r.data;
+        LinearLayout wrap = (LinearLayout) v;
+        TextView[] t = (TextView[]) wrap.getTag();
+        t[0].setText(d.surahTitle(d.surahOf[a]) + " \u00B7 " + QuranData.num(d.num[a]) + " \u00B7 "
+                + getString(R.string.quran_page, QuranData.num(d.page[a])));
+        t[1].setText(d.text[a]);
+        t[2].setOnClickListener(x -> openTafsir(a));
+        wrap.setBackground(Ui.groupShape(this, r.first, r.last, R.color.surface));
+        ViewGroup.MarginLayoutParams lp = new RecyclerView.LayoutParams(-1, -2);
+        lp.setMargins(Ui.dp(this, 16), 0, Ui.dp(this, 16), 0);
+        wrap.setLayoutParams(lp);
+        wrap.getChildAt(1).setVisibility(r.last ? View.INVISIBLE : View.VISIBLE);
+        wrap.setOnClickListener(x -> open(d.page[a], a));
+        wrap.setOnLongClickListener(x -> {
+            openTafsir(a);
+            return true;
+        });
         Ui.ripple(this, wrap);
     }
 

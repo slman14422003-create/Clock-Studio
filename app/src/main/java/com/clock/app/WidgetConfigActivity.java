@@ -395,7 +395,8 @@ public class WidgetConfigActivity extends BaseActivity {
         bar.setBackgroundColor(Ui.color(this, R.color.bg_group));
         bar.addView(Ui.hairline(this, 0));
         LinearLayout actions = new LinearLayout(this);
-        actions.setPadding(Ui.dp(this, 16), Ui.dp(this, 10), Ui.dp(this, 16), Ui.dp(this, 10));
+        actions.setPadding(Ui.dp(this, 16), Ui.dp(this, 12), Ui.dp(this, 16), Ui.dp(this, 12));
+        actions.setLayoutDirection(View.LAYOUT_DIRECTION_LOCALE);
         TextView reset = button(R.string.cfg_reset, R.drawable.btn_secondary, R.color.text_primary);
         reset.setOnClickListener(v -> {
             int keepBg = w.defaultBg();
@@ -411,10 +412,10 @@ public class WidgetConfigActivity extends BaseActivity {
             setResult(RESULT_OK, new Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id));
             finish();
         });
-        LinearLayout.LayoutParams a = new LinearLayout.LayoutParams(0, Ui.dp(this, 50), 1f);
+        LinearLayout.LayoutParams a = new LinearLayout.LayoutParams(0, Ui.dp(this, 52), 1f);
         a.setMarginEnd(Ui.dp(this, 10));
         actions.addView(reset, a);
-        actions.addView(save, new LinearLayout.LayoutParams(0, Ui.dp(this, 50), 1.6f));
+        actions.addView(save, new LinearLayout.LayoutParams(0, Ui.dp(this, 52), 1.6f));
         bar.addView(actions);
         return bar;
     }
@@ -423,6 +424,10 @@ public class WidgetConfigActivity extends BaseActivity {
         TextView t = Ui.text(this, getString(label), 16, color);
         t.setTypeface(Ui.medium());
         t.setGravity(Gravity.CENTER);
+        t.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        t.setSingleLine(true);
+        t.setIncludeFontPadding(false);
+        t.setPadding(Ui.dp(this, 12), 0, Ui.dp(this, 12), 0);
         t.setBackgroundResource(bg);
         Ui.press(this, t);
         return t;

@@ -72,6 +72,7 @@
         <activity android:name=".TasbihActivity" android:exported="false" />
         <activity android:name=".QuranActivity" android:exported="false" />
         <activity android:name=".QuranAudioActivity" android:exported="false" />
+        <activity android:name=".QuranTafsirActivity" android:exported="false" />
         <activity
             android:name=".QuranReaderActivity"
             android:exported="false"

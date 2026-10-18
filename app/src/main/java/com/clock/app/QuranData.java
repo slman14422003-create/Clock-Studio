@@ -314,6 +314,55 @@ final class QuranData {
         return r;
     }
 
+    private String[] normCache;
+
+    /** Global indices of the ayahs whose text contains the query, ignoring diacritics; also understands "2:255" style references. */
+    List<Integer> searchAyahs(String q, int limit) {
+        List<Integer> r = new ArrayList<>();
+        if (q == null) return r;
+        int ref = locate(q);
+        if (ref >= 0) {
+            r.add(ref);
+            return r;
+        }
+        String nq = norm(q.trim());
+        if (nq.length() < 2) return r;
+        String[] nt = normCache;
+        if (nt == null) {
+            nt = new String[AYAHS];
+            for (int i = 0; i < AYAHS; i++) nt[i] = norm(text[i]);
+            normCache = nt;
+        }
+        for (int i = 0; i < AYAHS && r.size() < limit; i++) if (nt[i].contains(nq)) r.add(i);
+        return r;
+    }
+
+    /** Resolves "surah:ayah" (digits in any script) or "surah name ayah" to a global ayah index, or -1. */
+    int locate(String q) {
+        String t = q.trim();
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < t.length(); i++) {
+            char c = t.charAt(i);
+            if (c >= 0x0660 && c <= 0x0669) c = (char) ('0' + (c - 0x0660));
+            else if (c >= 0x06F0 && c <= 0x06F9) c = (char) ('0' + (c - 0x06F0));
+            b.append(c);
+        }
+        t = b.toString().trim();
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("^(\\d{1,3})\\s*[:/\\-.]\\s*(\\d{1,3})$").matcher(t);
+        if (m.matches()) return at(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)));
+        m = java.util.regex.Pattern.compile("^(.*\\D)\\s+(\\d{1,3})$").matcher(t);
+        if (m.matches()) {
+            List<Surah> l = search(m.group(1).trim());
+            if (l.size() == 1) return at(l.get(0).n, Integer.parseInt(m.group(2)));
+        }
+        return -1;
+    }
+
+    private int at(int s, int n) {
+        if (s < 1 || s > SURAHS || n < 1 || n > surahs[s].ayahs) return -1;
+        return surahs[s].first + n - 1;
+    }
+
     /** Strips Arabic diacritics and unifies letter forms so searching works without typing the marks. */
     static String norm(String s) {
         StringBuilder b = new StringBuilder(s.length());

@@ -114,7 +114,6 @@ final class Ui {
         v.setText(t);
         v.setTextSize(sp);
         v.setTextColor(color(c, colorRes));
-        v.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
         return v;
     }
 
