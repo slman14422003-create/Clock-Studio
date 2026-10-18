@@ -232,7 +232,7 @@ public class TasbihActivity extends BaseActivity {
         private final Paint small = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final RectF rect = new RectF();
         private Shader shLit, shDim, glow, spacerSh, shieldSh, capSh;
-        private float cx, cy, R, rb, thick;
+        private float cx, cy, rad, rb, thick;
         private final float d;
 
         Rosary(Context c) {
@@ -265,11 +265,11 @@ public class TasbihActivity extends BaseActivity {
         @Override
         protected void onSizeChanged(int w, int h, int ow, int oh) {
             Context c = getContext();
-            R = radius(w);
+            rad = radius(w);
             cx = w / 2f;
-            cy = 12f * d + R;
+            cy = 12f * d + rad;
             double step = Math.PI * 2 / 36;
-            float half = (float) (R * Math.sin(step / 2));
+            float half = (float) (rad * Math.sin(step / 2));
             rb = half * 0.93f;
             thick = half * 0.9f;
             int accent = Ui.color(c, R.color.accent);
@@ -281,7 +281,7 @@ public class TasbihActivity extends BaseActivity {
             shDim = new RadialGradient(-rb * 0.35f, -rb * 0.4f, rb * 1.45f,
                     new int[]{ColorUtils.blendARGB(dim, Color.WHITE, 0.3f), dim, ColorUtils.blendARGB(dim, Color.BLACK, 0.45f)},
                     new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
-            glow = new RadialGradient(cx, cy, R * 0.95f, new int[]{Ui.alpha(accent, 48), Ui.alpha(accent, 0)}, null, Shader.TileMode.CLAMP);
+            glow = new RadialGradient(cx, cy, rad * 0.95f, new int[]{Ui.alpha(accent, 48), Ui.alpha(accent, 0)}, null, Shader.TileMode.CLAMP);
             spacerSh = new LinearGradient(0, -thick * 0.45f, 0, thick * 0.45f,
                     new int[]{0xFFF4F6F8, 0xFF9BA3AB, 0xFFE3E7EA}, null, Shader.TileMode.CLAMP);
             shieldSh = new LinearGradient(0, -7f * d, 0, 13f * d,
@@ -417,7 +417,7 @@ public class TasbihActivity extends BaseActivity {
         }
 
         private void tassel(Canvas cv) {
-            float ay = cy + R;
+            float ay = cy + rad;
             cv.save();
             cv.rotate(ang, cx, ay);
             cv.translate(cx, ay);
@@ -467,20 +467,20 @@ public class TasbihActivity extends BaseActivity {
             int accent = Ui.color(c, R.color.accent);
             fill.setShader(glow);
             fill.setAlpha(255);
-            cv.drawCircle(cx, cy, R * 0.95f, fill);
+            cv.drawCircle(cx, cy, rad * 0.95f, fill);
             fill.setShader(null);
 
             line.setStrokeWidth(1.8f * d);
             line.setColor(Ui.alpha(Ui.color(c, R.color.text_hint), 170));
-            cv.drawCircle(cx, cy, R, line);
+            cv.drawCircle(cx, cy, rad, line);
 
             tassel(cv);
 
             double step = Math.PI * 2 / 36;
             for (int j = 1; j <= 35; j++) {
                 float th = (float) (Math.PI / 2 + j * step);
-                float x = cx + R * (float) Math.cos(th);
-                float y = cy + R * (float) Math.sin(th);
+                float x = cx + rad * (float) Math.cos(th);
+                float y = cy + rad * (float) Math.sin(th);
                 if (j == 12 || j == 24) {
                     spacer(cv, x, y, th);
                     continue;
@@ -512,16 +512,16 @@ public class TasbihActivity extends BaseActivity {
             }
 
             big.setColor(Ui.color(c, R.color.text_primary));
-            big.setTextSize(R * 0.5f);
+            big.setTextSize(rad * 0.5f);
             Paint.FontMetrics fm = big.getFontMetrics();
-            float by = cy - R * 0.06f - (fm.ascent + fm.descent) / 2f;
+            float by = cy - rad * 0.06f - (fm.ascent + fm.descent) / 2f;
             cv.save();
-            cv.scale(num, num, cx, cy - R * 0.06f);
+            cv.scale(num, num, cx, cy - rad * 0.06f);
             cv.drawText(String.valueOf(count), cx, by, big);
             cv.restore();
             small.setColor(Ui.color(c, R.color.text_secondary));
             small.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16, getResources().getDisplayMetrics()));
-            cv.drawText(sub, cx, cy + R * 0.42f, small);
+            cv.drawText(sub, cx, cy + rad * 0.42f, small);
         }
     }
 }
