@@ -113,7 +113,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".ClockWidget" android:exported="true" android:label="@string/widget_classic">
+        <receiver android:name=".ClockWidget" android:exported="false" android:label="@string/widget_classic">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -122,7 +122,7 @@
                 android:resource="@xml/widget_clock_info" />
         </receiver>
 
-        <receiver android:name=".WidgetDigital" android:exported="true" android:label="@string/widget_digital">
+        <receiver android:name=".WidgetDigital" android:exported="false" android:label="@string/widget_digital">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -131,7 +131,7 @@
                 android:resource="@xml/widget_digital_info" />
         </receiver>
 
-        <receiver android:name=".WidgetStack" android:exported="true" android:label="@string/widget_stack">
+        <receiver android:name=".WidgetStack" android:exported="false" android:label="@string/widget_stack">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -140,7 +140,7 @@
                 android:resource="@xml/widget_stack_info" />
         </receiver>
 
-        <receiver android:name=".WidgetAnalog" android:exported="true" android:label="@string/widget_analog">
+        <receiver android:name=".WidgetAnalog" android:exported="false" android:label="@string/widget_analog">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -149,7 +149,7 @@
                 android:resource="@xml/widget_analog_info" />
         </receiver>
 
-        <receiver android:name=".WidgetDate" android:exported="true" android:label="@string/widget_date">
+        <receiver android:name=".WidgetDate" android:exported="false" android:label="@string/widget_date">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.intent.action.TIME_SET" />
@@ -162,7 +162,7 @@
                 android:resource="@xml/widget_date_info" />
         </receiver>
 
-        <receiver android:name=".WidgetPrayer" android:exported="true" android:label="@string/widget_prayer">
+        <receiver android:name=".WidgetPrayer" android:exported="false" android:label="@string/widget_prayer">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.clock.app.WIDGET_REFRESH" />
@@ -172,7 +172,7 @@
                 android:resource="@xml/widget_prayer_info" />
         </receiver>
 
-        <receiver android:name=".WidgetPrayers" android:exported="true" android:label="@string/widget_prayers">
+        <receiver android:name=".WidgetPrayers" android:exported="false" android:label="@string/widget_prayers">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -181,7 +181,7 @@
                 android:resource="@xml/widget_prayers_info" />
         </receiver>
 
-        <receiver android:name=".WidgetAlarm" android:exported="true" android:label="@string/widget_alarm">
+        <receiver android:name=".WidgetAlarm" android:exported="false" android:label="@string/widget_alarm">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -190,7 +190,7 @@
                 android:resource="@xml/widget_alarm_info" />
         </receiver>
 
-        <receiver android:name=".WidgetQuran" android:exported="true" android:label="@string/widget_quran">
+        <receiver android:name=".WidgetQuran" android:exported="false" android:label="@string/widget_quran">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.clock.app.WIDGET_REFRESH" />
@@ -202,7 +202,7 @@
 
         <activity
             android:name=".WidgetConfigActivity"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />

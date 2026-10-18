@@ -20,7 +20,7 @@
 - ملفات: PrayerTimes, PrayerLoc, PrayerCities, PrayerActivity, ic_prayer. أذونات جديدة: INTERNET, ACCESS_COARSE_LOCATION.
 
 ## مهمة: إصلاح الويدجتس + تخصيص أدق + القرآن الكريم
-- الويدجتس: مزوّدات الويدجت و WidgetConfigActivity أصبحت exported=true (بعض اللانشرات لا تتعامل مع غير المصدّر)، وwidgetFeatures فيها configuration_optional كي لا يفشل الإضافة عند إلغاء التخصيص، وWBase لا يترك ويدجت فارغاً أبداً (بناء كامل ← افتراضي ← ساعة بسيطة)، مع onRestored لنقل الإعدادات و onAppWidgetOptionsChanged.
+- الويدجتس: (المكوّنات تبقى غير مصدّرة: فحص CI يسمح بتصدير MainActivity فقط) وwidgetFeatures فيها configuration_optional كي لا يفشل الإضافة عند إلغاء التخصيص، وWBase لا يترك ويدجت فارغاً أبداً (بناء كامل ← افتراضي ← ساعة بسيطة)، مع onRestored لنقل الإعدادات و onAppWidgetOptionsChanged.
 - شاشة التخصيص: معاينة حقيقية (نفس RemoteViews) بحجم الويدجت، تبديل خلفية المعاينة بالضغط، عناصر تتحدّث دون إعادة بناء، لون مخصص (درجة/تشبع/سطوع) للخلفية والنص والتمييز، 12 تدرجاً و14 لوناً، 6 مستويات زوايا، إطار رفيع، حجم خط 70–150٪، التاريخ الهجري، شريط حفظ ثابت.
 - ويدجت جديد: آية اليوم (WidgetQuran).
 - القرآن: QuranData (تنزيل مرة واحدة من api.alquran.cloud نص Tanzil العثماني المطابق لمصحف المدينة مع رقم الصفحة، ويُخزَّن للعمل دون إنترنت)، QuranActivity (متابعة القراءة/السور/الأجزاء/العلامات/بحث)، QuranReaderActivity (604 صفحة، تقليب سلس بـ PagerSnapHelper مع تلاشي وتصغير، حجم خط، علامات، نسخ ومشاركة). الدخول من شاشة الصلاة. لخط مصحف أدق ضع KFGQPC في app/src/main/assets/fonts/quran.ttf.
