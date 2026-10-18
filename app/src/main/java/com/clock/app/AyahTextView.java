@@ -55,8 +55,8 @@ final class AyahTextView extends TextView {
                     int ls = Math.max(s, l.getLineStart(line));
                     int le = Math.min(e, l.getLineVisibleEnd(line));
                     if (le <= ls) continue;
-                    float x1 = l.getPrimaryHorizontal(ls);
-                    float x2 = l.getPrimaryHorizontal(le);
+                    float x1 = xAt(l, line, ls);
+                    float x2 = xAt(l, line, le);
                     float base = l.getLineBaseline(line);
                     float top = Math.max(base + fm.ascent * 0.86f, l.getLineTop(line));
                     float bottom = Math.min(base + fm.descent * 1.15f, l.getLineBottom(line));
@@ -67,6 +67,26 @@ final class AyahTextView extends TextView {
             cv.restore();
         }
         super.onDraw(cv);
+    }
+
+    /** Glyph position on a line, corrected for inter-word justification (Layout reports the unjustified position). */
+    private float xAt(Layout l, int line, int offset) {
+        float x = l.getPrimaryHorizontal(offset);
+        if (android.os.Build.VERSION.SDK_INT < 26 || getJustificationMode() == Layout.JUSTIFICATION_MODE_NONE) return x;
+        if (line >= l.getLineCount() - 1) return x;
+        int start = l.getLineStart(line), end = l.getLineVisibleEnd(line);
+        CharSequence t = getText();
+        int spaces = 0, before = 0;
+        for (int i = start; i < end; i++) {
+            if (t.charAt(i) == ' ') {
+                spaces++;
+                if (i < offset) before++;
+            }
+        }
+        if (spaces == 0) return x;
+        float extra = (l.getWidth() - l.getLineMax(line)) / spaces;
+        if (extra <= 0) return x;
+        return l.getParagraphDirection(line) == Layout.DIR_RIGHT_TO_LEFT ? x - extra * before : x + extra * before;
     }
 
     private void drawBubble(Canvas cv, RectF r, int tint, float d) {
