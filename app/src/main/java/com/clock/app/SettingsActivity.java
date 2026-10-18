@@ -75,6 +75,7 @@ public class SettingsActivity extends BaseActivity {
                     Dlg.choose(this, R.string.language, labels, cur, i -> {
                         Store.setLanguage(this, langs[i]);
                         Lang.apply(this);
+                        WBase.refreshAll(getApplicationContext());
                     });
                 }), true);
         Ui.addRow(g, Ui.switchRow(this, R.drawable.ic_vibrate, R.color.ok, getString(R.string.haptics), null,

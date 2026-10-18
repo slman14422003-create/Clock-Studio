@@ -107,7 +107,13 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".ClockWidget" android:exported="false">
+
+
+
+
+
+
+        <receiver android:name=".ClockWidget" android:exported="false" android:label="@string/widget_classic">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -146,6 +152,10 @@
         <receiver android:name=".WidgetDate" android:exported="false" android:label="@string/widget_date">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+                <action android:name="com.clock.app.WIDGET_REFRESH" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -155,8 +165,6 @@
         <receiver android:name=".WidgetPrayer" android:exported="false" android:label="@string/widget_prayer">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.intent.action.TIME_SET" />
-                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
                 <action android:name="com.clock.app.WIDGET_REFRESH" />
             </intent-filter>
             <meta-data
@@ -164,16 +172,31 @@
                 android:resource="@xml/widget_prayer_info" />
         </receiver>
 
+        <receiver android:name=".WidgetPrayers" android:exported="false" android:label="@string/widget_prayers">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_prayers_info" />
+        </receiver>
+
         <receiver android:name=".WidgetAlarm" android:exported="false" android:label="@string/widget_alarm">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.intent.action.TIME_SET" />
-                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
-                <action android:name="com.clock.app.WIDGET_REFRESH" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_alarm_info" />
         </receiver>
+
+        <activity
+            android:name=".WidgetConfigActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

@@ -1,36 +1,51 @@
 package com.clock.app;
 
 import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.widget.RemoteViews;
 
 import java.util.TimeZone;
 
-/** Home screen widget: big thin time, date and the next alarm. */
-public class ClockWidget extends AppWidgetProvider {
-    @Override
-    public void onUpdate(Context c, AppWidgetManager m, int[] ids) {
-        for (int id : ids) m.updateAppWidget(id, build(c));
-    }
-
+public class ClockWidget extends WBase {
     static void refresh(Context c) {
-        try {
-            AppWidgetManager m = AppWidgetManager.getInstance(c);
-            int[] ids = m.getAppWidgetIds(new ComponentName(c, ClockWidget.class));
-            if (ids == null || ids.length == 0) return;
-            RemoteViews rv = build(c);
-            for (int id : ids) m.updateAppWidget(id, rv);
-        } catch (Exception ignored) {
-        }
+        WBase.refresh(c, ClockWidget.class);
     }
 
-    private static RemoteViews build(Context c) {
-        RemoteViews rv = new RemoteViews(c.getPackageName(), R.layout.widget_clock);
+    @Override
+    int layout(boolean rtl, WCfg cfg) {
+        return rtl ? R.layout.wl_classic_rtl : R.layout.wl_classic_ltr;
+    }
+
+    @Override
+    int[] primary() {
+        return new int[]{R.id.wP1};
+    }
+
+    @Override
+    int[] secondary() {
+        return new int[]{R.id.wS2};
+    }
+
+    @Override
+    int[] accents() {
+        return new int[]{R.id.wA1};
+    }
+
+    @Override
+    int[][] sizes() {
+        return new int[][]{{R.id.wP1, 50}, {R.id.wA1, 14}, {R.id.wS2, 13}};
+    }
+
+    @Override
+    void tint(RemoteViews rv, int color) {
+        rv.setInt(R.id.wIcon, "setColorFilter", color);
+    }
+
+    @Override
+    void fill(Context c, RemoteViews rv, WCfg cfg) {
+        timeFormat(rv, R.id.wP1, cfg, c, "h:mm", "HH:mm");
+        rv.setViewVisibility(R.id.wA1, cfg.date ? android.view.View.VISIBLE : android.view.View.GONE);
+        rv.setTextViewText(R.id.wA1, Fmt.date(c, System.currentTimeMillis(), "EEEE d MMMM"));
         String next = c.getString(R.string.no_alarm);
         try {
             AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
@@ -41,10 +56,6 @@ public class ClockWidget extends AppWidgetProvider {
             }
         } catch (Exception ignored) {
         }
-        rv.setTextViewText(R.id.wNext, next);
-        PendingIntent open = PendingIntent.getActivity(c, 3, new Intent(c, MainActivity.class),
-                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.wRoot, open);
-        return rv;
+        rv.setTextViewText(R.id.wS2, next);
     }
 }

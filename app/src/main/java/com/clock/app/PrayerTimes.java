@@ -339,6 +339,7 @@ final class PrayerTimes {
 
     private static void finish(final Context app, final int res, final Done cb, final boolean force) {
         scheduleNext(app);
+        WBase.refreshAll(app);
         new Handler(Looper.getMainLooper()).post(() -> {
             if (res == 2 || force) Bus.changed();
             if (cb != null) cb.on(res > 0);
