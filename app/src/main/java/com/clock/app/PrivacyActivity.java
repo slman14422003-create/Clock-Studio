@@ -1,7 +1,5 @@
 package com.clock.app;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -9,9 +7,6 @@ import android.widget.TextView;
 
 /** Privacy policy: what the app stores, which services it contacts, why each permission exists, and how to delete everything. */
 public class PrivacyActivity extends BaseActivity {
-    static final String ISSUES = "https://github.com/" + Updater.REPO + "/issues";
-    static final String SOURCE = "https://github.com/" + Updater.REPO;
-
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -47,21 +42,6 @@ public class PrivacyActivity extends BaseActivity {
             g.addView(t, new LinearLayout.LayoutParams(-1, -2));
             col.addView(g);
             Anim.riseIn(g, 10, Math.min(i, 6) * 40L);
-        }
-
-        col.addView(Ui.sectionTitle(this, getString(R.string.privacy_contact)));
-        LinearLayout lg = Ui.group(this);
-        Ui.addRow(lg, Ui.row(this, R.drawable.ic_shield, R.color.ok, getString(R.string.privacy_issues), null, true,
-                v -> open(ISSUES)), true);
-        Ui.addRow(lg, Ui.row(this, R.drawable.ic_lock, R.color.info, getString(R.string.privacy_source), null, true,
-                v -> open(SOURCE)), true);
-        col.addView(lg);
-    }
-
-    private void open(String url) {
-        try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-        } catch (Exception ignored) {
         }
     }
 }

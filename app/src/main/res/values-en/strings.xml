@@ -496,9 +496,6 @@
     <string name="upd_new_msg">Version %s is available. Update the app now?</string>
     <string name="privacy_title">Privacy policy</string>
     <string name="privacy_updated">Last updated: October 2026</string>
-    <string name="privacy_contact">Contact &amp; transparency</string>
-    <string name="privacy_issues">Report a problem or ask a question</string>
-    <string name="privacy_source">Source code on GitHub</string>
     <string-array name="privacy_titles">
         <item>Summary</item>
         <item>What is stored on your device</item>
@@ -521,7 +518,7 @@
         <item>If Semo Calendar is installed, this app shows only the time of its next event and the number of today’s events (never titles or places). Semo Calendar can read from this app the time of the next alarm and the name and time of the next prayer, but not alarm labels, tasks or your location. When you choose “Add to Calendar”, the calendar opens a prefilled event that is saved only if you press Save. This exchange stays on your device.</item>
         <item>All connections use HTTPS. The only component that can be opened from outside the app is its main screen. Updates come only from the project\'s official releases page, their SHA-256 checksum is verified, and Android refuses to install them unless they are signed with the same key as the app.</item>
         <item>Because your data lives only on your device, clearing the app data in Android settings (Storage → Clear data) or uninstalling the app deletes everything. There is no copy on our side to delete.</item>
-        <item>If the way data is handled ever changes, this text and the “Last updated” line above will change. The app is open source, so you can review the code yourself.</item>
+        <item>If the way data is handled ever changes, this text and the “Last updated” line above will change.</item>
     </string-array>
     <string name="cfg_prayer">Prayer times display</string>
     <string name="cfg_pr_hl">Highlight the next prayer</string>
