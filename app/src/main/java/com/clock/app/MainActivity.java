@@ -101,6 +101,7 @@ public class MainActivity extends BaseActivity implements TabView.Host {
         root.setScaleX(1.05f);
         root.setScaleY(1.05f);
         ui.postDelayed(() -> reveal(0), 1600);
+        ui.postDelayed(() -> Updater.autoCheck(this), 5000);
 
         tabs[0] = new WorldClockView(this, this);
         tabs[1] = new AlarmsView(this, this);

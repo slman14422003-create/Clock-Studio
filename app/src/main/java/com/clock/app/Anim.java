@@ -1,5 +1,6 @@
 package com.clock.app;
 
+import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.view.View;
 import android.view.animation.PathInterpolator;
@@ -18,6 +19,54 @@ final class Anim {
 
     /** One duration scale for the whole app. */
     static final long D_TAP = 120, D_SHORT = 220, D_MED = 420, D_LONG = 600;
+
+    /** Tap effect of an icon, chosen by what the icon shows: refresh spins, bells wiggle, bookmarks pop, share lifts... */
+    static void icon(View v, int res) {
+        if (v == null || res == 0) return;
+        String n;
+        try {
+            n = v.getResources().getResourceEntryName(res);
+        } catch (Exception e) {
+            n = "";
+        }
+        final float d = Ui.dpf(v.getContext(), 1);
+        v.animate().cancel();
+        v.setRotation(0f);
+        v.setTranslationX(0f);
+        v.setTranslationY(0f);
+        if (n.contains("refresh") || n.contains("repeat") || n.contains("sync")) {
+            ObjectAnimator a = ObjectAnimator.ofFloat(v, View.ROTATION, 0f, 360f);
+            a.setDuration(D_LONG + 140);
+            a.setInterpolator(OUT);
+            a.start();
+        } else if (n.contains("bell") || n.contains("alarm") || n.contains("timer") || n.contains("clock") || n.contains("bedtime") || n.contains("moon")) {
+            ObjectAnimator a = ObjectAnimator.ofFloat(v, View.ROTATION, 0f, 16f, -14f, 10f, -6f, 0f);
+            a.setDuration(D_LONG + 100);
+            a.start();
+        } else if (n.contains("sliders") || n.contains("settings") || n.contains("gear") || n.contains("palette") || n.contains("more")) {
+            ObjectAnimator a = ObjectAnimator.ofFloat(v, View.ROTATION, 0f, 90f, 0f);
+            a.setDuration(D_LONG);
+            a.setInterpolator(OUT);
+            a.start();
+        } else if (n.contains("plus") || n.equals("ic_x") || n.contains("close") || n.contains("add")) {
+            ObjectAnimator a = ObjectAnimator.ofFloat(v, View.ROTATION, 0f, 90f);
+            a.setDuration(D_MED);
+            a.setInterpolator(OUT);
+            a.start();
+        } else if (n.contains("share") || n.contains("upload") || n.contains("download")) {
+            ObjectAnimator a = ObjectAnimator.ofFloat(v, View.TRANSLATION_Y, 0f, -5f * d, 0f);
+            a.setDuration(D_MED);
+            a.setInterpolator(SPRING);
+            a.start();
+        } else if (n.contains("play") || n.contains("sound") || n.contains("volume") || n.contains("mic") || n.contains("vibrate")) {
+            v.setScaleX(1f);
+            v.setScaleY(1f);
+            v.animate().scaleX(1.22f).scaleY(1.22f).setDuration(D_TAP).withEndAction(
+                    () -> v.animate().scaleX(1f).scaleY(1f).setDuration(D_MED).setInterpolator(SPRING).start()).start();
+        } else {
+            bounce(v);
+        }
+    }
 
     /** Quick scale pulse for a value that just changed (counters). */
     static void pulse(View v) {

@@ -2,7 +2,11 @@ package com.clock.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.View;
 import android.widget.RemoteViews;
+
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class WidgetPrayers extends WBase {
     private static final int[] NAMES = {R.id.wN0, R.id.wN1, R.id.wN2, R.id.wN3, R.id.wN4};
@@ -21,7 +25,7 @@ public class WidgetPrayers extends WBase {
 
     @Override
     int caps() {
-        return TEXT | ACCENT | SIZE | FMT;
+        return TEXT | ACCENT | SIZE | FMT | PRAYER;
     }
 
     @Override
@@ -76,6 +80,37 @@ public class WidgetPrayers extends WBase {
                 }
             }
             rv.setTextViewText(TIMES[i], t);
+            rv.setViewVisibility(NAMES[i], cfg.pNames ? View.VISIBLE : View.GONE);
+        }
+        if (cfg.pSub == 2) {
+            rv.setTextViewText(R.id.wS2, "");
+        } else if (cfg.pSub == 1) {
+            try {
+                PrayerTimes.Next nx = PrayerTimes.next(c);
+                if (nx != null) {
+                    rv.setTextViewText(R.id.wS2, c.getString(R.string.pw_next_fmt, names[nx.idx], clock(c, cfg, nx.at, g.zone)));
+                }
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private String clock(Context c, WCfg cfg, long at, String zone) {
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(zone));
+        cal.setTimeInMillis(at);
+        int h = cal.get(Calendar.HOUR_OF_DAY), m = cal.get(Calendar.MINUTE);
+        if (is24(c, cfg)) return Fmt.two(h) + ":" + Fmt.two(m);
+        return (h % 12 == 0 ? 12 : h % 12) + ":" + Fmt.two(m) + " " + c.getString(h < 12 ? R.string.am : R.string.pm);
+    }
+
+    private boolean passed(PrayerTimes.Cfg g, PrayerTimes.Day d, int idx) {
+        try {
+            if (d == null || d.hm[idx] == null) return false;
+            Calendar now = Calendar.getInstance(TimeZone.getTimeZone(g.zone));
+            int t = Integer.parseInt(d.hm[idx].substring(0, 2)) * 60 + Integer.parseInt(d.hm[idx].substring(3, 5));
+            return t <= now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -89,9 +124,20 @@ public class WidgetPrayers extends WBase {
         int ac = cfg.accentColor() != 0 ? cfg.accentColor() : defaultAccent(cfg);
         for (int i = 0; i < 5; i++) {
             boolean on = nx != null && PrayerTimes.PRAYERS[i] == nx.idx;
-            rv.setInt(CELLS[i], "setBackgroundResource", on ? R.drawable.wb_cell_on : R.drawable.wb_cell_off);
+            rv.setInt(CELLS[i], "setBackgroundResource", on && cfg.pHl == 0 ? R.drawable.wb_cell_on : R.drawable.wb_cell_off);
         }
-        if (nx != null) {
+        if (cfg.pDim) {
+            PrayerTimes.Cfg g = PrayerTimes.cfg(c);
+            PrayerTimes.Day d = null;
+            try {
+                if (g.configured) d = PrayerTimes.day(c, g, PrayerTimes.today(g));
+            } catch (Exception ignored) {
+            }
+            for (int i = 0; i < 5; i++) {
+                if (passed(g, d, PrayerTimes.PRAYERS[i])) rv.setFloat(CELLS[i], "setAlpha", 0.42f);
+            }
+        }
+        if (nx != null && cfg.pHl != 2) {
             for (int i = 0; i < 5; i++) {
                 if (PrayerTimes.PRAYERS[i] == nx.idx) {
                     rv.setTextColor(NAMES[i], ac);

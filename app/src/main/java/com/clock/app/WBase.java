@@ -18,7 +18,7 @@ import java.util.Locale;
 
 abstract class WBase extends AppWidgetProvider {
     static final String REFRESH = "com.clock.app.WIDGET_REFRESH";
-    static final int TEXT = 1, ACCENT = 2, SIZE = 4, FMT = 8, DATE = 16, FACE = 32, HIJRI = 64;
+    static final int TEXT = 1, ACCENT = 2, SIZE = 4, FMT = 8, DATE = 16, FACE = 32, HIJRI = 64, PRAYER = 128;
     static final Class<?>[] ALL = {ClockWidget.class, WidgetDigital.class, WidgetStack.class, WidgetAnalog.class,
             WidgetDate.class, WidgetPrayer.class, WidgetPrayers.class, WidgetAlarm.class, WidgetQuran.class,
             ClockWidgetL.class, WidgetAnalogL.class, WidgetDigitalL.class, WidgetDateL.class, WidgetQuranL.class, WidgetPrayerL.class, WidgetStackL.class, WidgetPrayersL.class, WidgetAlarmL.class};

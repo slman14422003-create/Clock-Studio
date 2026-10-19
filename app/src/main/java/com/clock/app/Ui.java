@@ -143,7 +143,10 @@ final class Ui {
         b.setScaleType(ImageView.ScaleType.CENTER);
         b.setBackgroundResource(R.drawable.bg_icon_btn);
         b.setContentDescription(c.getString(desc));
-        b.setOnClickListener(click);
+        b.setOnClickListener(x -> {
+            Anim.icon(b, icon);
+            if (click != null) click.onClick(x);
+        });
         press(c, b);
         return b;
     }
@@ -292,10 +295,11 @@ final class Ui {
         r.setGravity(Gravity.CENTER_VERTICAL);
         r.setMinimumHeight(dp(c, 52));
         r.setPaddingRelative(dp(c, 16), dp(c, 8), dp(c, 14), dp(c, 8));
-        if (icon != 0) {
+        final ImageView tileView = icon != 0 ? tile(c, icon, tileColor) : null;
+        if (tileView != null) {
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(c, 30), dp(c, 30));
             lp.setMarginEnd(dp(c, 12));
-            r.addView(tile(c, icon, tileColor), lp);
+            r.addView(tileView, lp);
         }
         TextView t = text(c, title, 17, R.color.text_primary);
         t.setId(R.id.row_title);
@@ -319,7 +323,10 @@ final class Ui {
             r.addView(ch, lp);
         }
         if (click != null) {
-            r.setOnClickListener(click);
+            r.setOnClickListener(x -> {
+                if (tileView != null) Anim.icon(tileView, icon);
+                click.onClick(x);
+            });
             ripple(c, r);
         }
         return r;

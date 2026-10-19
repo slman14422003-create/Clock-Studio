@@ -461,6 +461,89 @@
     <string name="quran_suggest_busy">Choosing a fitting verse…</string>
     <string name="quran_suggest_topic">A verse about: %s</string>
     <string name="quran_suggest_none">No fitting verse found, try other words</string>
+    <string name="sec_updates">Updates &amp; privacy</string>
+    <string name="upd_title">Updates</string>
+    <string name="upd_current">Current version: %s</string>
+    <string name="upd_check">Check for updates</string>
+    <string name="upd_checking">Checking…</string>
+    <string name="upd_latest">You are on the latest version</string>
+    <string name="upd_available">New version available: %s</string>
+    <string name="upd_download">Download &amp; install</string>
+    <string name="upd_downloading">Downloading…</string>
+    <string name="upd_progress">%d%%</string>
+    <string name="upd_size">Update size: %s</string>
+    <string name="upd_cancel">Cancel download</string>
+    <string name="upd_cancelled">Download cancelled</string>
+    <string name="upd_ready">Downloaded and verified</string>
+    <string name="upd_ready_sub">The file is intact; Android also checks the signature when installing</string>
+    <string name="upd_install">Install now</string>
+    <string name="upd_err_net">Could not reach GitHub. Check your connection and try again</string>
+    <string name="upd_err_none">No release has been published yet</string>
+    <string name="upd_err_verify">The file failed its integrity check, please try again</string>
+    <string name="upd_err_install">Could not open the package installer</string>
+    <string name="upd_no_apk">This release has no APK file yet</string>
+    <string name="upd_perm_title">Allow installing</string>
+    <string name="upd_perm_msg">To install the update from inside the app, allow Clock Studio to install apps on the next screen, then come back and tap Install.</string>
+    <string name="upd_perm_open">Open settings</string>
+    <string name="upd_open_page">Releases page on GitHub</string>
+    <string name="upd_notes">What\'s new</string>
+    <string name="upd_source">Source</string>
+    <string name="upd_footnote">Updates are downloaded only from the project\'s official releases page, and the SHA-256 checksum is verified before installing.</string>
+    <string name="upd_auto">Check for updates automatically</string>
+    <string name="upd_auto_sub">Once a day, contacting GitHub only</string>
+    <string name="upd_later">Later</string>
+    <string name="upd_now">Update</string>
+    <string name="upd_new_msg">Version %s is available. Update the app now?</string>
+    <string name="privacy_title">Privacy policy</string>
+    <string name="privacy_updated">Last updated: October 2026</string>
+    <string name="privacy_contact">Contact &amp; transparency</string>
+    <string name="privacy_issues">Report a problem or ask a question</string>
+    <string name="privacy_source">Source code on GitHub</string>
+    <string-array name="privacy_titles">
+        <item>Summary</item>
+        <item>What is stored on your device</item>
+        <item>Location</item>
+        <item>Internet access and third-party services</item>
+        <item>Permissions and why we ask for them</item>
+        <item>The smart assistant</item>
+        <item>Security</item>
+        <item>Deleting your data</item>
+        <item>Changes to this policy</item>
+    </string-array>
+    <string-array name="privacy_bodies">
+        <item>Clock Studio needs no account, shows no ads, uses no analytics or tracking tools, and never sells or shares your data. What you enter in the app stays on your device.</item>
+        <item>Stored locally only: alarms, timers, tasks, chosen cities, app and widget settings, the tasbih counter, Quran bookmarks and the prayer log. No server of ours receives this data, and cloud backup of the app data is disabled.</item>
+        <item>Location permission is optional and approximate only, used for prayer times and the qibla direction. Location is processed on your device; when prayer times are downloaded, coordinates rounded to two decimals (about one kilometre) are sent to the Aladhan service. You can pick your city manually instead, and then location is not used at all. We keep no history of your locations.</item>
+        <item>The app goes online only when needed, and only over HTTPS:\n• api.aladhan.com for prayer times.\n• api.alquran.cloud for the Quran text, tafsir and translation.\n• api.quran.com and cdn.jsdelivr.net for tafsir texts.\n• everyayah.com for audio recitations.\n• api.github.com and github.com to check for and download updates.\nThese services see your IP address and the technical details of the request, like any website, and are bound by their own policies. Your name and your app content are never sent to them.</item>
+        <item>• Notifications: alarm, task and prayer alerts.\n• Exact alarms, full-screen and wake-up: so alarms ring on time, over the lock screen.\n• Approximate location: prayer times and qibla (optional).\n• Display over other apps: for StandBy mode only (optional).\n• Foreground services: alarm sound and StandBy.\n• Run at start-up: to re-schedule alarms after a reboot.\n• Install apps: to install an app update when you choose to.\n• Internet: for the services listed above.</item>
+        <item>The assistant inside the app runs entirely on your device and never sends what you type to any server.</item>
+        <item>All connections use HTTPS. The only component that can be opened from outside the app is its main screen. Updates come only from the project\'s official releases page, their SHA-256 checksum is verified, and Android refuses to install them unless they are signed with the same key as the app.</item>
+        <item>Because your data lives only on your device, clearing the app data in Android settings (Storage → Clear data) or uninstalling the app deletes everything. There is no copy on our side to delete.</item>
+        <item>If the way data is handled ever changes, this text and the “Last updated” line above will change. The app is open source, so you can review the code yourself.</item>
+    </string-array>
+    <string name="cfg_prayer">Prayer times display</string>
+    <string name="cfg_pr_hl">Highlight the next prayer</string>
+    <string name="cfg_pr_hl0">Background and colour</string>
+    <string name="cfg_pr_hl1">Colour only</string>
+    <string name="cfg_pr_hl2">No highlight</string>
+    <string name="cfg_pr_sub">Line under the title</string>
+    <string name="cfg_pr_sub0">City and Hijri date</string>
+    <string name="cfg_pr_sub1">Next prayer</string>
+    <string name="cfg_pr_sub2">Hide it</string>
+    <string name="cfg_pr_names">Show prayer names</string>
+    <string name="cfg_pr_dim">Dim prayers that have passed</string>
+    <string name="pw_next_fmt">Next: %1$s %2$s</string>
+    <string name="tasbih_rounds">Rounds: %d</string>
+    <string name="tasbih_undo">Undo</string>
+    <string name="tasbih_opt_haptic">Haptics</string>
+    <string name="tasbih_opt_vol">Volume keys count</string>
+    <string name="tasbih_opt_keep">Keep screen on</string>
+    <string name="quran_bg">Reading background</string>
+    <string name="quran_bg_auto">Automatic (theme)</string>
+    <string name="quran_bg_paper">Warm paper</string>
+    <string name="quran_bg_deep">Deep black</string>
+    <string name="quran_goto">Go to page</string>
+    <string name="quran_keep_on">Keep screen on</string>
     <string name="card_whatsapp">Share as WhatsApp status</string>
     <string name="card_share_image">Share as image</string>
     <string name="card_share_text">Share as text</string>

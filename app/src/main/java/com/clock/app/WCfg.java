@@ -34,6 +34,9 @@ final class WCfg {
     int bg, alpha = 100, radius = DEF_RADIUS, text, accent, sizePct = 100, fmt, face;
     int customBg = 0xFF0A84FF, customText = 0xFFFFFFFF, customAccent = 0xFFFF9F0A;
     boolean date = true, hijri, border;
+    /** Prayer widget: show names, dim passed prayers, highlight style (0 cell, 1 accent text, 2 none), subtitle (0 place+hijri, 1 next prayer, 2 none). */
+    boolean pNames = true, pDim;
+    int pHl, pSub;
 
     static WCfg load(Context c, int id, int defBg) {
         WCfg g = new WCfg();
@@ -71,6 +74,10 @@ final class WCfg {
         date = o.optBoolean("d", true);
         hijri = o.optBoolean("h", false);
         border = o.optBoolean("bd", false);
+        pNames = o.optBoolean("pn", true);
+        pDim = o.optBoolean("pd", false);
+        pHl = Math.max(0, Math.min(2, o.optInt("ph", 0)));
+        pSub = Math.max(0, Math.min(2, o.optInt("ps", 0)));
         customBg = o.optInt("cb", customBg);
         customText = o.optInt("ct", customText);
         customAccent = o.optInt("ca", customAccent);
@@ -80,7 +87,7 @@ final class WCfg {
         try {
             JSONObject o = new JSONObject();
             o.put("v", 2).put("bg", bg).put("a", alpha).put("r", radius).put("t", text).put("ac", accent)
-                    .put("sz", sizePct).put("f", fmt).put("fc", face).put("d", date).put("h", hijri).put("bd", border)
+                    .put("sz", sizePct).put("f", fmt).put("fc", face).put("d", date).put("h", hijri).put("bd", border).put("pn", pNames).put("pd", pDim).put("ph", pHl).put("ps", pSub)
                     .put("cb", customBg).put("ct", customText).put("ca", customAccent);
             Store.putRaw(c, "wc_" + id, o.toString());
         } catch (Exception ignored) {

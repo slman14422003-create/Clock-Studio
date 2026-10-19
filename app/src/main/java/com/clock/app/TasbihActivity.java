@@ -14,6 +14,8 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
+import android.view.WindowManager;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.util.TypedValue;
@@ -31,7 +33,10 @@ public class TasbihActivity extends BaseActivity {
     private static final String KEY = "tasbih";
     private static final int[] TARGETS = {33, 99, 100, 0};
 
-    private int count, target = 33, phrase, total;
+    private int count, target = 33, phrase, total, rounds;
+    private boolean hapticOn = true, volKeys, keepOn;
+    private HorizontalScrollView optScroll;
+    private LinearLayout optRow;
     private String day = "";
     private Rosary rosary;
     private HorizontalScrollView phraseScroll;
@@ -45,6 +50,10 @@ public class TasbihActivity extends BaseActivity {
         useGroupedBackground();
         phrases = getResources().getStringArray(R.array.tasbih_phrases);
         load();
+        hapticOn = !"0".equals(Store.raw(this, "tb_haptic"));
+        volKeys = "1".equals(Store.raw(this, "tb_vol"));
+        keepOn = "1".equals(Store.raw(this, "tb_keep"));
+        applyKeepOn();
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -54,6 +63,7 @@ public class TasbihActivity extends BaseActivity {
         ((LinearLayout.LayoutParams) hd.getChildAt(0).getLayoutParams()).setMarginEnd(Ui.dp(this, 10));
         hd.addButton(R.drawable.ic_refresh, R.string.tasbih_reset, false, v -> {
             count = 0;
+            rounds = 0;
             save();
             sync(false, false);
         });
@@ -115,6 +125,16 @@ public class TasbihActivity extends BaseActivity {
         tl.topMargin = Ui.dp(this, 16);
         col.addView(totalText, tl);
 
+        optScroll = new HorizontalScrollView(this);
+        optScroll.setHorizontalScrollBarEnabled(false);
+        optRow = new LinearLayout(this);
+        optRow.setPadding(Ui.dp(this, 16), 0, Ui.dp(this, 16), 0);
+        optScroll.addView(optRow);
+        LinearLayout.LayoutParams ol = new LinearLayout.LayoutParams(-1, -2);
+        ol.topMargin = Ui.dp(this, 14);
+        col.addView(optScroll, ol);
+        buildOptions();
+
         sync(false, false);
         Anim.riseIn(card, 24, 0);
     }
@@ -132,6 +152,7 @@ public class TasbihActivity extends BaseActivity {
                 target = o.optInt("t", 33);
                 phrase = Math.max(0, Math.min(phrases.length - 1, o.optInt("p", 0)));
                 total = o.optInt("n", 0);
+                rounds = o.optInt("r", 0);
                 day = o.optString("d", "");
             }
         } catch (Exception ignored) {
@@ -139,13 +160,14 @@ public class TasbihActivity extends BaseActivity {
         if (!today().equals(day)) {
             day = today();
             total = 0;
+            rounds = 0;
         }
     }
 
     private void save() {
         try {
             JSONObject o = new JSONObject();
-            o.put("c", count).put("t", target).put("p", phrase).put("n", total).put("d", day);
+            o.put("c", count).put("t", target).put("p", phrase).put("n", total).put("r", rounds).put("d", day);
             Store.putRaw(this, KEY, o.toString());
         } catch (Exception ignored) {
         }
@@ -155,15 +177,80 @@ public class TasbihActivity extends BaseActivity {
         if (!today().equals(day)) {
             day = today();
             total = 0;
+            rounds = 0;
         }
         count++;
         total++;
         boolean done = target > 0 && count % target == 0;
-        if (done) phraseTv.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-        else Ui.tick(phraseTv);
+        if (done) rounds++;
+        if (hapticOn) {
+            if (done) phraseTv.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            else Ui.tick(phraseTv);
+        }
         save();
         sync(true, done);
         if (done) Anim.bounce(phraseTv);
+    }
+
+    private void undo() {
+        if (count <= 0) return;
+        boolean wasRoundEnd = target > 0 && count % target == 0;
+        count--;
+        total = Math.max(0, total - 1);
+        if (wasRoundEnd && rounds > 0) rounds--;
+        save();
+        sync(false, false);
+        Anim.pulse(phraseTv);
+    }
+
+    private void applyKeepOn() {
+        if (keepOn) getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    private TextView optChip(int label, boolean on, View.OnClickListener click) {
+        TextView t = Ui.chipView(this, getString(label), click);
+        if (on) {
+            t.setBackground(Ui.rect(Ui.color(this, R.color.accent), Ui.dpf(this, 100)));
+            t.setTextColor(0xFFFFFFFF);
+        }
+        return t;
+    }
+
+    private void buildOptions() {
+        optRow.removeAllViews();
+        optRow.addView(optChip(R.string.tasbih_undo, false, v -> undo()));
+        optRow.addView(optChip(R.string.tasbih_opt_haptic, hapticOn, v -> {
+            hapticOn = !hapticOn;
+            Store.putRaw(this, "tb_haptic", hapticOn ? "1" : "0");
+            buildOptions();
+        }));
+        optRow.addView(optChip(R.string.tasbih_opt_vol, volKeys, v -> {
+            volKeys = !volKeys;
+            Store.putRaw(this, "tb_vol", volKeys ? "1" : "0");
+            buildOptions();
+        }));
+        optRow.addView(optChip(R.string.tasbih_opt_keep, keepOn, v -> {
+            keepOn = !keepOn;
+            Store.putRaw(this, "tb_keep", keepOn ? "1" : "0");
+            applyKeepOn();
+            buildOptions();
+        }));
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent e) {
+        if (volKeys && (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
+            if (e.getRepeatCount() == 0) tap();
+            return true;
+        }
+        return super.onKeyDown(keyCode, e);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent e) {
+        if (volKeys && (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) return true;
+        return super.onKeyUp(keyCode, e);
     }
 
     private void sync(boolean animate, boolean done) {
@@ -173,7 +260,8 @@ public class TasbihActivity extends BaseActivity {
         boolean full = count > 0 && inRound == 0;
         String sub = target > 0 ? "\u200E" + (full ? eff : inRound) + " / " + target + "\u200E" : getString(R.string.tasbih_free);
         rosary.update(count, sub, full ? 1f : inRound / (float) eff, animate, done);
-        totalText.setText(getString(R.string.tasbih_total, total));
+        totalText.setText(getString(R.string.tasbih_total, total)
+                + (target > 0 ? "  \u00B7  " + getString(R.string.tasbih_rounds, rounds) : ""));
         phraseRow.removeAllViews();
         for (int i = 0; i < phrases.length; i++) {
             final int idx = i;
@@ -511,6 +599,13 @@ public class TasbihActivity extends BaseActivity {
                 }
             }
 
+            if (flash < 1f) {
+                line.setStrokeWidth(3f * d);
+                line.setColor(Ui.alpha(GOLD, (int) (210 * (1f - flash))));
+                cv.drawCircle(cx, cy, rad * (0.3f + 0.8f * flash), line);
+                line.setColor(Ui.alpha(accent, (int) (120 * (1f - flash))));
+                cv.drawCircle(cx, cy, rad * (0.2f + 0.65f * flash), line);
+            }
             big.setColor(Ui.color(c, R.color.text_primary));
             big.setTextSize(rad * 0.5f);
             Paint.FontMetrics fm = big.getFontMetrics();

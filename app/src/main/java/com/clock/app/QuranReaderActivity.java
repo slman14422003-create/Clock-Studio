@@ -48,6 +48,7 @@ public class QuranReaderActivity extends BaseActivity {
     private static final int MIN_FONT = 18, MAX_FONT = 44;
 
     private QuranData d;
+    private int readBg;
     private RecyclerView pager;
     private LinearLayoutManager lm;
     private PagerSnapHelper snap;
@@ -84,7 +85,11 @@ public class QuranReaderActivity extends BaseActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         useGroupedBackground();
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        applyKeepOn();
+        try {
+            readBg = Math.max(0, Math.min(2, Integer.parseInt(Store.raw(this, "quran_read_bg"))));
+        } catch (Exception ignored) {
+        }
         try {
             String f = Store.raw(this, "quran_font");
             if (f != null && !f.isEmpty()) fontSp = Math.max(MIN_FONT, Math.min(MAX_FONT, Integer.parseInt(f)));
@@ -405,20 +410,95 @@ public class QuranReaderActivity extends BaseActivity {
         return d.pageFirst[Math.max(0, Math.min(QuranData.PAGES - 1, curPos)) + 1];
     }
 
+    // ------------------------------------------------------------------ reading look
+
+    private boolean keepOn() {
+        return !"0".equals(Store.raw(this, "quran_keep_on"));
+    }
+
+    private void applyKeepOn() {
+        if (keepOn()) getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        else getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    private int pageBg() {
+        if (readBg == 1) return 0xFFF3E7CF;
+        if (readBg == 2) return 0xFF0B0B0D;
+        return Ui.color(this, R.color.surface);
+    }
+
+    private int pageText() {
+        if (readBg == 1) return 0xFF3B2A1A;
+        if (readBg == 2) return 0xFFE9E6DD;
+        return Ui.color(this, R.color.text_primary);
+    }
+
+    private int pageSub() {
+        if (readBg == 1) return 0xAA3B2A1A;
+        if (readBg == 2) return 0xAAE9E6DD;
+        return Ui.color(this, R.color.text_secondary);
+    }
+
+    private GradientDrawable pageBackground() {
+        GradientDrawable g = Ui.rect(pageBg(), Ui.dpf(this, 26));
+        g.setStroke(Ui.dp(this, 1), Ui.alpha(pageSub(), 0x22));
+        return g;
+    }
+
+    private void chooseReadBg() {
+        String[] labels = {getString(R.string.quran_bg_auto), getString(R.string.quran_bg_paper), getString(R.string.quran_bg_deep)};
+        Dlg.choose(this, R.string.quran_bg, labels, readBg, i -> {
+            readBg = i;
+            Store.putRaw(this, "quran_read_bg", String.valueOf(i));
+            if (pager != null && pager.getAdapter() != null) pager.getAdapter().notifyDataSetChanged();
+        });
+    }
+
+    private void askPage() {
+        final android.widget.EditText in = new android.widget.EditText(this);
+        in.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        in.setHint("1 - " + QuranData.PAGES);
+        in.setTextColor(Ui.color(this, R.color.text_primary));
+        in.setHintTextColor(Ui.color(this, R.color.text_secondary));
+        android.widget.FrameLayout box = new android.widget.FrameLayout(this);
+        box.setPadding(Ui.dp(this, 22), Ui.dp(this, 8), Ui.dp(this, 22), Ui.dp(this, 4));
+        box.addView(in, new android.widget.FrameLayout.LayoutParams(-1, -2));
+        new Dlg(this).setTitle(R.string.quran_goto).setView(box)
+                .setPositiveButton(R.string.quran_goto, (dlg, w) -> {
+                    try {
+                        int p = Integer.parseInt(in.getText().toString().trim());
+                        if (p < 1 || p > QuranData.PAGES || pager == null) return;
+                        select(-1);
+                        lm.scrollToPositionWithOffset(p - 1, 0);
+                        pager.post(() -> glide(pager));
+                    } catch (NumberFormatException ignored) {
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null).show();
+    }
+
     private void showMenu() {
         if (d == null) return;
         CharSequence[] items = {
                 getString(R.string.quran_reciter_now, QuranAudio.current(this).name()),
                 getString(R.string.quran_audio),
                 getString(R.string.quran_tafsir),
-                getString(R.string.quran_share)
+                getString(R.string.quran_share),
+                getString(R.string.quran_bg),
+                getString(R.string.quran_goto),
+                (keepOn() ? "\u2713 " : "") + getString(R.string.quran_keep_on)
         };
         new Dlg(this).setTitle(R.string.quran_more).setItems(items, (dlg, which) -> {
             if (which == 0) showReciters();
             else if (which == 1) startActivity(new Intent(this, QuranAudioActivity.class));
             else if (which == 2) startActivity(new Intent(this, QuranTafsirActivity.class)
                     .putExtra(QuranTafsirActivity.EXTRA_AYAH, targetAyah()));
-            else {
+            else if (which == 4) chooseReadBg();
+            else if (which == 5) askPage();
+            else if (which == 6) {
+                Store.putRaw(this, "quran_keep_on", keepOn() ? "0" : "1");
+                applyKeepOn();
+            } else {
                 int a = targetAyah();
                 ShareCard.show(this, d.surahShort(d.surahOf[a]), QuranData.num(d.num[a]), d.text[a], ayahShare(a));
             }
@@ -566,9 +646,7 @@ public class QuranReaderActivity extends BaseActivity {
             lp.setMargins(Ui.dp(QuranReaderActivity.this, 14), Ui.dp(QuranReaderActivity.this, 4),
                     Ui.dp(QuranReaderActivity.this, 14), Ui.dp(QuranReaderActivity.this, 4));
             card.setLayoutParams(lp);
-            GradientDrawable cbg = Ui.rect(Ui.color(QuranReaderActivity.this, R.color.surface), Ui.dpf(QuranReaderActivity.this, 26));
-            cbg.setStroke(Ui.dp(QuranReaderActivity.this, 1), Ui.alpha(Ui.color(QuranReaderActivity.this, R.color.text_secondary), 0x22));
-            card.setBackground(cbg);
+            card.setBackground(pageBackground());
             card.setClipToOutline(true);
             ScrollView sv = new ScrollView(QuranReaderActivity.this);
             sv.setVerticalScrollBarEnabled(false);
@@ -586,6 +664,7 @@ public class QuranReaderActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(@NonNull PageVH h, int pos) {
+            h.itemView.setBackground(pageBackground());
             bindPage(h, pos + 1);
             h.itemView.setAlpha(1f);
             h.itemView.setScaleX(1f);
@@ -603,6 +682,8 @@ public class QuranReaderActivity extends BaseActivity {
         TextView juz = Ui.text(this, getString(R.string.quran_juz_n, QuranData.num(d.juz[from])), 12, R.color.text_secondary);
         TextView sur = Ui.text(this, d.surahShort(d.surahOf[from]), 12, R.color.text_secondary);
         sur.setGravity(Gravity.END);
+        juz.setTextColor(pageSub());
+        sur.setTextColor(pageSub());
         strip.addView(juz, new LinearLayout.LayoutParams(0, -2, 1f));
         strip.addView(sur, new LinearLayout.LayoutParams(0, -2, 1f));
         c.addView(strip, new LinearLayout.LayoutParams(-1, -2));
@@ -622,6 +703,7 @@ public class QuranReaderActivity extends BaseActivity {
 
         TextView foot = Ui.text(this, QuranData.ar(p), 14, R.color.text_secondary);
         foot.setGravity(Gravity.CENTER);
+        foot.setTextColor(pageSub());
         foot.setTypeface(Ui.medium());
         LinearLayout.LayoutParams fl = new LinearLayout.LayoutParams(-1, -2);
         fl.topMargin = Ui.dp(this, 14);
@@ -661,7 +743,7 @@ public class QuranReaderActivity extends BaseActivity {
         t.setText("\u0628\u0650\u0633\u0652\u0645\u0650 \u0671\u0644\u0644\u0651\u064E\u0647\u0650 \u0671\u0644\u0631\u0651\u064E\u062D\u0652\u0645\u064E\u0670\u0646\u0650 \u0671\u0644\u0631\u0651\u064E\u062D\u0650\u064A\u0645\u0650");
         t.setTypeface(face);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSp);
-        t.setTextColor(Ui.color(this, R.color.text_primary));
+        t.setTextColor(pageText());
         t.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
         lp.topMargin = Ui.dp(this, 4);
@@ -707,12 +789,12 @@ public class QuranReaderActivity extends BaseActivity {
         for (int q = 0; q < hl.size(); q++) {
             rr[q * 2] = hl.get(q)[0];
             rr[q * 2 + 1] = hl.get(q)[1];
-            cc[q] = Ui.alpha(Ui.color(this, R.color.text_primary), 0xFF);
+            cc[q] = Ui.alpha(pageText(), 0xFF);
         }
         t.setHighlights(rr, cc);
         t.setTypeface(face);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSp);
-        t.setTextColor(Ui.color(this, R.color.text_primary));
+        t.setTextColor(pageText());
         t.setLineSpacing(0f, 1.6f);
         t.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         t.setTextDirection(View.TEXT_DIRECTION_RTL);

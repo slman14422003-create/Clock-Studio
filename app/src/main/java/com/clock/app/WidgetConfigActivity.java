@@ -233,6 +233,17 @@ public class WidgetConfigActivity extends BaseActivity {
             g = card(R.string.cfg_fmt);
             chips(g, new int[]{R.string.cfg_f0, R.string.cfg_f1, R.string.cfg_f2}, () -> cfg.fmt, i -> cfg.fmt = i);
         }
+        if ((caps & WBase.PRAYER) != 0) {
+            col.addView(Ui.sectionTitle(this, getString(R.string.cfg_prayer)));
+            g = card(R.string.cfg_pr_hl);
+            chips(g, new int[]{R.string.cfg_pr_hl0, R.string.cfg_pr_hl1, R.string.cfg_pr_hl2}, () -> cfg.pHl, i -> cfg.pHl = i);
+            g = card(R.string.cfg_pr_sub);
+            chips(g, new int[]{R.string.cfg_pr_sub0, R.string.cfg_pr_sub1, R.string.cfg_pr_sub2}, () -> cfg.pSub, i -> cfg.pSub = i);
+            LinearLayout pg = Ui.group(this);
+            addSwitch(pg, R.string.cfg_pr_names, () -> cfg.pNames, on -> cfg.pNames = on);
+            addSwitch(pg, R.string.cfg_pr_dim, () -> cfg.pDim, on -> cfg.pDim = on);
+            col.addView(pg);
+        }
         if ((caps & WBase.FACE) != 0) {
             g = card(R.string.cfg_face);
             chips(g, new int[]{R.string.cfg_fc0, R.string.cfg_fc1, R.string.cfg_fc2}, () -> cfg.face, i -> cfg.face = i);

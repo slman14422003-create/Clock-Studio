@@ -461,6 +461,89 @@
     <string name="quran_suggest_busy">جارٍ اختيار آية مناسبة…</string>
     <string name="quran_suggest_topic">آية عن: %s</string>
     <string name="quran_suggest_none">لم أجد آية مناسبة، جرّب كلمات أخرى</string>
+    <string name="sec_updates">التحديثات والخصوصية</string>
+    <string name="upd_title">التحديثات</string>
+    <string name="upd_current">الإصدار الحالي: %s</string>
+    <string name="upd_check">التحقق من التحديثات</string>
+    <string name="upd_checking">جارٍ التحقق…</string>
+    <string name="upd_latest">أنت تستخدم أحدث إصدار</string>
+    <string name="upd_available">يتوفر إصدار جديد: %s</string>
+    <string name="upd_download">تنزيل وتثبيت</string>
+    <string name="upd_downloading">جارٍ التنزيل…</string>
+    <string name="upd_progress">%d٪</string>
+    <string name="upd_size">حجم التحديث: %s</string>
+    <string name="upd_cancel">إلغاء التنزيل</string>
+    <string name="upd_cancelled">أُلغي التنزيل</string>
+    <string name="upd_ready">اكتمل التنزيل والتحقق</string>
+    <string name="upd_ready_sub">تم التأكد من سلامة الملف، وسيتحقق أندرويد من التوقيع عند التثبيت</string>
+    <string name="upd_install">تثبيت الآن</string>
+    <string name="upd_err_net">تعذّر الاتصال بـ GitHub، تحقق من الإنترنت وأعد المحاولة</string>
+    <string name="upd_err_none">لا يوجد إصدار منشور بعد</string>
+    <string name="upd_err_verify">فشل التحقق من سلامة الملف، أعد المحاولة</string>
+    <string name="upd_err_install">تعذّر فتح مثبّت التطبيقات</string>
+    <string name="upd_no_apk">الإصدار لا يحتوي ملف APK بعد</string>
+    <string name="upd_perm_title">السماح بالتثبيت</string>
+    <string name="upd_perm_msg">لتثبيت التحديث من داخل التطبيق اسمح لـ Clock Studio بتثبيت التطبيقات في الشاشة التالية، ثم ارجع واضغط تثبيت.</string>
+    <string name="upd_perm_open">فتح الإعدادات</string>
+    <string name="upd_open_page">صفحة الإصدارات على GitHub</string>
+    <string name="upd_notes">ما الجديد</string>
+    <string name="upd_source">المصدر</string>
+    <string name="upd_footnote">التحديثات تُنزَّل من صفحة الإصدارات الرسمية للمشروع فقط، ويُتحقق من البصمة SHA-256 قبل التثبيت.</string>
+    <string name="upd_auto">التحقق التلقائي من التحديثات</string>
+    <string name="upd_auto_sub">مرة كل يوم، بالاتصال بـ GitHub فقط</string>
+    <string name="upd_later">لاحقًا</string>
+    <string name="upd_now">تحديث</string>
+    <string name="upd_new_msg">يتوفر الإصدار %s. هل تريد تحديث التطبيق الآن؟</string>
+    <string name="privacy_title">سياسة الخصوصية</string>
+    <string name="privacy_updated">آخر تحديث: أكتوبر 2026</string>
+    <string name="privacy_contact">التواصل والشفافية</string>
+    <string name="privacy_issues">الإبلاغ عن مشكلة أو استفسار</string>
+    <string name="privacy_source">الشيفرة المصدرية على GitHub</string>
+    <string-array name="privacy_titles">
+        <item>الخلاصة</item>
+        <item>ما يُخزَّن على جهازك</item>
+        <item>الموقع الجغرافي</item>
+        <item>الاتصال بالإنترنت والخدمات الخارجية</item>
+        <item>الأذونات ولماذا نطلبها</item>
+        <item>المساعد الذكي</item>
+        <item>الأمان</item>
+        <item>حذف بياناتك</item>
+        <item>التغييرات على هذه السياسة</item>
+    </string-array>
+    <string-array name="privacy_bodies">
+        <item>Clock Studio لا يطلب حسابًا، ولا يعرض إعلانات، ولا يستخدم أدوات تحليل أو تتبّع، ولا يبيع بياناتك ولا يشاركها مع أحد. ما تدخله في التطبيق يبقى على جهازك.</item>
+        <item>يُحفظ محليًا فقط: المنبّهات والمؤقتات والمهام والمدن المختارة وإعدادات التطبيق والويدجت وعدّاد المسبحة وعلامات القرآن وسجل الصلاة. لا يوجد خادم لدينا يستقبل هذه البيانات، والنسخ الاحتياطي السحابي لبيانات التطبيق معطّل.</item>
+        <item>إذن الموقع اختياري ومن النوع التقريبي فقط، ويُستخدم لأوقات الصلاة واتجاه القبلة. تتم معالجة الموقع على جهازك، وعند تنزيل أوقات الصلاة تُرسل إحداثيات مقرَّبة إلى منزلتين عشريتين (نحو كيلومتر واحد) إلى خدمة Aladhan. يمكنك بدل ذلك اختيار مدينتك يدويًا فلا يُستخدم الموقع إطلاقًا. لا نحتفظ بسجل لمواقعك.</item>
+        <item>التطبيق يتصل بالإنترنت فقط عند الحاجة، وبعناوين HTTPS فقط:\n• api.aladhan.com لأوقات الصلاة.\n• api.alquran.cloud لنص القرآن والتفسير والترجمة.\n• api.quran.com و cdn.jsdelivr.net لنصوص التفسير.\n• everyayah.com للتلاوات الصوتية.\n• api.github.com و github.com للتحقق من التحديثات وتنزيلها.\nهذه الجهات ترى عنوان IP وتفاصيل الطلب التقنية كأي موقع، وتخضع لسياساتها الخاصة. لا يُرسل لها اسمك ولا محتوى تطبيقك.</item>
+        <item>• الإشعارات: لتنبيهات المنبّهات والمهام والصلاة.\n• المنبّهات الدقيقة وشاشة كاملة وإيقاظ الجهاز: لتعمل المنبّهات في وقتها وفوق شاشة القفل.\n• الموقع التقريبي: لأوقات الصلاة والقبلة (اختياري).\n• العرض فوق التطبيقات: لوضع StandBy فقط (اختياري).\n• الخدمات في المقدمة: لتشغيل صوت المنبّه ووضع StandBy.\n• بدء التشغيل: لإعادة جدولة المنبّهات بعد إعادة تشغيل الجهاز.\n• تثبيت التطبيقات: لتثبيت تحديث التطبيق عندما تختار ذلك.\n• الإنترنت: للخدمات المذكورة أعلاه.</item>
+        <item>المساعد الذكي في التطبيق يعمل بالكامل على جهازك، ولا يرسل ما تكتبه إلى أي خادم.</item>
+        <item>جميع الاتصالات مشفّرة بـ HTTPS. المكوّن الوحيد القابل للفتح من خارج التطبيق هو شاشته الرئيسية. تُنزَّل التحديثات من صفحة إصدارات المشروع الرسمية فقط، ويُتحقق من بصمتها SHA-256، ويرفض أندرويد تثبيتها إن لم تكن موقّعة بنفس مفتاح التطبيق.</item>
+        <item>لأن بياناتك على جهازك فقط، يكفي مسح بيانات التطبيق من إعدادات أندرويد (التخزين ← مسح البيانات) أو إلغاء تثبيته لحذف كل شيء. لا توجد نسخة لدينا لنحذفها.</item>
+        <item>إن تغيّرت طريقة التعامل مع البيانات، سيُعدَّل هذا النص وتتغير عبارة «آخر تحديث» في أعلاه. التطبيق مفتوح المصدر، ويمكنك مراجعة الشيفرة بنفسك.</item>
+    </string-array>
+    <string name="cfg_prayer">عرض أوقات الصلاة</string>
+    <string name="cfg_pr_hl">تمييز الصلاة القادمة</string>
+    <string name="cfg_pr_hl0">خلفية ولون</string>
+    <string name="cfg_pr_hl1">لون فقط</string>
+    <string name="cfg_pr_hl2">بدون تمييز</string>
+    <string name="cfg_pr_sub">السطر تحت العنوان</string>
+    <string name="cfg_pr_sub0">المدينة والتاريخ الهجري</string>
+    <string name="cfg_pr_sub1">الصلاة القادمة</string>
+    <string name="cfg_pr_sub2">إخفاؤه</string>
+    <string name="cfg_pr_names">إظهار أسماء الصلوات</string>
+    <string name="cfg_pr_dim">تخفيت الصلوات التي مضت</string>
+    <string name="pw_next_fmt">القادمة: %1$s %2$s</string>
+    <string name="tasbih_rounds">الجولات: %d</string>
+    <string name="tasbih_undo">تراجع</string>
+    <string name="tasbih_opt_haptic">الاهتزاز</string>
+    <string name="tasbih_opt_vol">أزرار الصوت للعدّ</string>
+    <string name="tasbih_opt_keep">إبقاء الشاشة مضاءة</string>
+    <string name="quran_bg">خلفية القراءة</string>
+    <string name="quran_bg_auto">تلقائي حسب الثيم</string>
+    <string name="quran_bg_paper">ورقي دافئ</string>
+    <string name="quran_bg_deep">أسود عميق</string>
+    <string name="quran_goto">الانتقال إلى صفحة</string>
+    <string name="quran_keep_on">إبقاء الشاشة مضاءة</string>
     <string name="card_whatsapp">مشاركة كحالة واتساب</string>
     <string name="card_share_image">مشاركة كصورة</string>
     <string name="card_share_text">مشاركة كنص</string>

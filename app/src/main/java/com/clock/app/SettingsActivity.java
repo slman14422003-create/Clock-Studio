@@ -20,6 +20,7 @@ import java.util.List;
 /** Inset-grouped iOS settings: appearance, language, time format, alarm defaults, permissions, Semo apps, about. */
 public class SettingsActivity extends BaseActivity {
     private LinearLayout col;
+    private boolean entered;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -198,6 +199,22 @@ public class SettingsActivity extends BaseActivity {
             col.addView(gs);
         }
 
+        col.addView(Ui.sectionTitle(this, getString(R.string.sec_updates)));
+        LinearLayout gu = Ui.group(this);
+        String curVer = "";
+        try {
+            PackageInfo vi = getPackageManager().getPackageInfo(getPackageName(), 0);
+            curVer = vi.versionName == null ? "" : vi.versionName;
+        } catch (Exception ignored) {
+        }
+        Ui.addRow(gu, Ui.row(this, R.drawable.ic_refresh, R.color.accent, getString(R.string.upd_title), curVer, true,
+                v -> startActivity(new Intent(this, UpdateActivity.class))), true);
+        Ui.addRow(gu, Ui.switchRow(this, R.drawable.ic_bell, R.color.warn, getString(R.string.upd_auto), getString(R.string.upd_auto_sub),
+                !"0".equals(Store.raw(this, "upd_auto")), (v, on) -> Store.putRaw(this, "upd_auto", on ? "1" : "0")), true);
+        Ui.addRow(gu, Ui.row(this, R.drawable.ic_shield, R.color.ok, getString(R.string.privacy_title), null, true,
+                v -> startActivity(new Intent(this, PrivacyActivity.class))), true);
+        col.addView(gu);
+
         col.addView(Ui.sectionTitle(this, getString(R.string.sec_about)));
         LinearLayout g5 = Ui.group(this);
         String ver = "";
@@ -216,6 +233,10 @@ public class SettingsActivity extends BaseActivity {
         about.setGravity(Gravity.CENTER_VERTICAL);
         Ui.addRow(g5, about, true);
         col.addView(g5);
+        if (!entered) {
+            entered = true;
+            for (int i = 0; i < Math.min(col.getChildCount(), 16); i++) Anim.riseIn(col.getChildAt(i), 12, i * 28L);
+        }
     }
 
     private String langName(String v) {
