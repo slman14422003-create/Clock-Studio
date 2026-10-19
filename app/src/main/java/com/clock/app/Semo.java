@@ -23,6 +23,9 @@ final class Semo {
     static final String ACTION_ECO = "app.semo.ECOSYSTEM";
     static final String META_ROLE = "app.semo.ROLE";
 
+    static final String ROLE_CALENDAR = "calendar";
+    static final String ACTION_ADD_EVENT = "app.semo.calendar.ADD_EVENT";
+
     static final class Sibling {
         String pkg = "";
         String role = "";
@@ -63,6 +66,62 @@ final class Semo {
             c.startActivity(i);
             return true;
         } catch (Exception e) {
+            return false;
+        }
+    }
+
+    static Sibling byRole(Context c, String role) {
+        for (Sibling s : siblings(c)) if (role.equals(s.role)) return s;
+        return null;
+    }
+
+    static boolean hasCalendar(Context c) {
+        return byRole(c, ROLE_CALENDAR) != null;
+    }
+
+    static final class CalSummary {
+        long nextEvent;
+        int today;
+    }
+
+    /** The calendar's read-only summary (time of the next event, number of today's events); null when unavailable. */
+    static CalSummary calendarSummary(Context c) {
+        Sibling s = byRole(c, ROLE_CALENDAR);
+        if (s == null) return null;
+        android.database.Cursor cur = null;
+        try {
+            cur = c.getContentResolver().query(android.net.Uri.parse("content://" + s.pkg + ".semo/summary"), null, null, null, null);
+            if (cur == null) return null;
+            CalSummary out = new CalSummary();
+            while (cur.moveToNext()) {
+                String k = cur.getString(0), v = cur.getString(1);
+                if (k == null || v == null) continue;
+                try {
+                    if (k.equals("next_event")) out.nextEvent = Long.parseLong(v);
+                    else if (k.equals("events_today")) out.today = Integer.parseInt(v);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            return out;
+        } catch (Throwable e) {
+            return null;
+        } finally {
+            if (cur != null) cur.close();
+        }
+    }
+
+    /** Opens the calendar's new-event editor prefilled; nothing is saved until the person presses Save there. */
+    static boolean addToCalendar(Context c, String title, String notes, long start, long end, boolean allDay) {
+        Sibling s = byRole(c, ROLE_CALENDAR);
+        if (s == null) return false;
+        try {
+            Intent i = new Intent(ACTION_ADD_EVENT).setPackage(s.pkg).putExtra("title", title == null ? "" : title)
+                    .putExtra("start", start).putExtra("end", end).putExtra("allday", allDay)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (notes != null && !notes.isEmpty()) i.putExtra("notes", notes);
+            c.startActivity(i);
+            return true;
+        } catch (Throwable e) {
             return false;
         }
     }

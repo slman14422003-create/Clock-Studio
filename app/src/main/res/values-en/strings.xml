@@ -506,6 +506,7 @@
         <item>Internet access and third-party services</item>
         <item>Permissions and why we ask for them</item>
         <item>The smart assistant</item>
+        <item>Link with other Semo apps</item>
         <item>Security</item>
         <item>Deleting your data</item>
         <item>Changes to this policy</item>
@@ -517,6 +518,7 @@
         <item>The app goes online only when needed, and only over HTTPS:\n• api.aladhan.com for prayer times.\n• api.alquran.cloud for the Quran text, tafsir and translation.\n• api.quran.com and cdn.jsdelivr.net for tafsir texts.\n• everyayah.com for audio recitations.\n• api.github.com and github.com to check for and download updates.\nThese services see your IP address and the technical details of the request, like any website, and are bound by their own policies. Your name and your app content are never sent to them.</item>
         <item>• Notifications: alarm, task and prayer alerts.\n• Exact alarms, full-screen and wake-up: so alarms ring on time, over the lock screen.\n• Approximate location: prayer times and qibla (optional).\n• Display over other apps: for StandBy mode only (optional).\n• Foreground services: alarm sound and StandBy.\n• Run at start-up: to re-schedule alarms after a reboot.\n• Install apps: to install an app update when you choose to.\n• Internet: for the services listed above.</item>
         <item>The assistant inside the app runs entirely on your device and never sends what you type to any server.</item>
+        <item>If Semo Calendar is installed, this app shows only the time of its next event and the number of today’s events (never titles or places). Semo Calendar can read from this app the time of the next alarm and the name and time of the next prayer, but not alarm labels, tasks or your location. When you choose “Add to Calendar”, the calendar opens a prefilled event that is saved only if you press Save. This exchange stays on your device.</item>
         <item>All connections use HTTPS. The only component that can be opened from outside the app is its main screen. Updates come only from the project\'s official releases page, their SHA-256 checksum is verified, and Android refuses to install them unless they are signed with the same key as the app.</item>
         <item>Because your data lives only on your device, clearing the app data in Android settings (Storage → Clear data) or uninstalling the app deletes everything. There is no copy on our side to delete.</item>
         <item>If the way data is handled ever changes, this text and the “Last updated” line above will change. The app is open source, so you can review the code yourself.</item>
@@ -578,4 +580,10 @@
     <string name="widget_stack_l">Stacked clock · Large</string>
     <string name="widget_prayers_l">Prayer times · Large</string>
     <string name="widget_alarm_l">Alarm · Large</string>
+
+    <!-- Link with Semo Calendar -->
+    <string name="next_event">Next event in Calendar</string>
+    <string name="events_today_fmt">Events today: %1$d</string>
+    <string name="add_to_calendar">Add to Calendar</string>
+    <string name="calendar_missing">Could not open Semo Calendar</string>
 </resources>

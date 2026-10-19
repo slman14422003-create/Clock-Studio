@@ -130,6 +130,19 @@ public class TaskEditActivity extends BaseActivity {
         Ui.addRow(remindGroup, Ui.switchRow(this, R.drawable.ic_bell, R.color.warn, getString(R.string.remind_me), getString(R.string.remind_sub), task.remind, (v, on) -> task.remind = on), true);
         col.addView(remindGroup);
 
+        if (existing != null && existing.due > 0 && Semo.hasCalendar(this)) {
+            LinearLayout gc = Ui.group(this);
+            Ui.addRow(gc, Ui.row(this, R.drawable.ic_calendar, R.color.bad, getString(R.string.add_to_calendar), null, true, v -> {
+                long start = existing.due;
+                boolean timed = existing.hasTime;
+                if (!Semo.addToCalendar(this, existing.title, existing.notes, start,
+                        timed ? start + 3600_000L : start, !timed)) {
+                    Ui.toast(this, getString(R.string.calendar_missing));
+                }
+            }), true);
+            col.addView(gc);
+        }
+
         if (existing != null) {
             LinearLayout g4 = Ui.group(this);
             LinearLayout del = Ui.row(this, 0, 0, getString(R.string.delete_task), null, false, v -> {

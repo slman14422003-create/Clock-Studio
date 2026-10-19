@@ -59,6 +59,13 @@ public class AlarmEditActivity extends BaseActivity {
             alarm.minute = 0;
             alarm.vibrate = Store.defaultVibrate(this);
             alarm.ramp = Store.defaultRamp(this);
+            Intent pre = getIntent();
+            if (pre.hasExtra("pre_h")) {
+                alarm.hour = Math.max(0, Math.min(23, pre.getIntExtra("pre_h", alarm.hour)));
+                alarm.minute = Math.max(0, Math.min(59, pre.getIntExtra("pre_m", 0)));
+                String pl = pre.getStringExtra("pre_label");
+                if (pl != null) alarm.label = pl;
+            }
         }
 
         LinearLayout root = new LinearLayout(this);

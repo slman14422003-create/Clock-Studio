@@ -31,6 +31,8 @@ final class AlarmsView extends TabView {
     private final View empty;
     private final LinearLayout bedCard;
     private final TextView bedSub;
+    private final LinearLayout calCard;
+    private final TextView calSub;
     private final SwitchCompat bedSwitch;
     private final ImageView bedChevron;
     private final List<Alarm> list = new ArrayList<>();
@@ -71,6 +73,34 @@ final class AlarmsView extends TabView {
         LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(-1, -2);
         bp.setMargins(Ui.dp(c, 16), Ui.dp(c, 4), Ui.dp(c, 16), Ui.dp(c, 8));
         addView(bedCard, bp);
+
+        // Semo Calendar link: the next event (time only), shown when that app is installed and has one
+        calCard = new LinearLayout(c);
+        calCard.setOrientation(LinearLayout.HORIZONTAL);
+        calCard.setGravity(Gravity.CENTER_VERTICAL);
+        calCard.setBackground(Ui.rect(Ui.color(c, R.color.field), Ui.dpf(c, 16)));
+        calCard.setPaddingRelative(Ui.dp(c, 14), Ui.dp(c, 10), Ui.dp(c, 14), Ui.dp(c, 10));
+        LinearLayout.LayoutParams cl = new LinearLayout.LayoutParams(Ui.dp(c, 36), Ui.dp(c, 36));
+        cl.setMarginEnd(Ui.dp(c, 12));
+        calCard.addView(Ui.tile(c, R.drawable.ic_calendar, R.color.bad), cl);
+        LinearLayout ccol = new LinearLayout(c);
+        ccol.setOrientation(LinearLayout.VERTICAL);
+        TextView calTitle = Ui.text(c, c.getString(R.string.next_event), 17, R.color.text_primary);
+        calTitle.setTypeface(Ui.medium());
+        ccol.addView(calTitle);
+        calSub = Ui.text(c, "", 13, R.color.text_secondary);
+        calSub.setSingleLine(true);
+        ccol.addView(calSub);
+        calCard.addView(ccol, new LinearLayout.LayoutParams(0, -2, 1f));
+        Ui.press(c, calCard);
+        calCard.setOnClickListener(v -> {
+            Semo.Sibling cs = Semo.byRole(c, Semo.ROLE_CALENDAR);
+            if (cs != null) Semo.open(c, cs.pkg);
+        });
+        calCard.setVisibility(GONE);
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(-1, -2);
+        cp.setMargins(Ui.dp(c, 16), 0, Ui.dp(c, 16), Ui.dp(c, 8));
+        addView(calCard, cp);
 
         FrameLayout stage = new FrameLayout(c);
         rv = new RecyclerView(c);
@@ -158,6 +188,19 @@ final class AlarmsView extends TabView {
         empty.setVisibility(list.isEmpty() ? VISIBLE : GONE);
         updateSubtitle();
         updateBedtime();
+        updateCalendar();
+    }
+
+    private void updateCalendar() {
+        Context c = getContext();
+        Semo.CalSummary k = Semo.hasCalendar(c) ? Semo.calendarSummary(c) : null;
+        if (k == null || k.nextEvent <= System.currentTimeMillis()) {
+            calCard.setVisibility(GONE);
+            return;
+        }
+        calSub.setText(Fmt.dayLabel(c, k.nextEvent) + " \u00b7 " + Fmt.time(c, k.nextEvent, java.util.TimeZone.getDefault(), false)
+                + (k.today > 0 ? " \u00b7 " + c.getString(R.string.events_today_fmt, k.today) : ""));
+        calCard.setVisibility(VISIBLE);
     }
 
     private void updateSubtitle() {

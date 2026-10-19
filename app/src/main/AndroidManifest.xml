@@ -67,8 +67,19 @@
                 <action android:name="app.semo.ECOSYSTEM" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <!-- from the Semo Calendar: "set alarm" opens the new-alarm sheet prefilled -->
+            <intent-filter>
+                <action android:name="app.semo.clock.NEW_ALARM" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity>
+
+        <!-- Semo ecosystem: read-only summary for the calendar (times only, never labels or tasks) -->
+        <provider
+            android:name=".SemoProvider"
+            android:authorities="${applicationId}.semo"
+            android:exported="true" />
 
         <activity
             android:name=".AlarmEditActivity"

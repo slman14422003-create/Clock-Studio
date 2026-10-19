@@ -23,6 +23,8 @@ public class MainActivity extends BaseActivity implements TabView.Host {
     static final String A_NEW_ALARM = "app.clock.action.NEW_ALARM";
     static final String A_NEW_TIMER = "app.clock.action.NEW_TIMER";
     static final String A_NEW_TASK = "app.clock.action.NEW_TASK";
+    /** From the Semo Calendar: opens the new-alarm sheet prefilled (hour, minute, label); the person presses Save. */
+    static final String A_SEMO_ALARM = "app.semo.clock.NEW_ALARM";
 
     private final TabView[] tabs = new TabView[4];
     private NavBar nav;
@@ -185,6 +187,16 @@ public class MainActivity extends BaseActivity implements TabView.Host {
         if (A_NEW_ALARM.equals(a)) {
             showTab(NavBar.ALARMS);
             editAlarm(0);
+        } else if (A_SEMO_ALARM.equals(a)) {
+            showTab(NavBar.ALARMS);
+            int h = in.getIntExtra("hour", -1), m = in.getIntExtra("minute", 0);
+            String label = in.getStringExtra("label");
+            Intent ed = new Intent(this, AlarmEditActivity.class).putExtra("id", 0);
+            if (h >= 0 && h < 24 && m >= 0 && m < 60) {
+                ed.putExtra("pre_h", h).putExtra("pre_m", m);
+                if (label != null) ed.putExtra("pre_label", label.length() > 60 ? label.substring(0, 60) : label);
+            }
+            Ui.openSheet(this, ed);
         } else if (A_NEW_TIMER.equals(a)) {
             showTab(NavBar.TIMERS);
         } else if (A_NEW_TASK.equals(a)) {
