@@ -298,7 +298,7 @@ final class TimersView extends TabView {
             public void run() {
                 if (!running || !isAttachedToWindow()) return;
                 paint();
-                h.postDelayed(this, 40);
+                StopwatchPane.this.postOnAnimation(this);
             }
         };
 
@@ -461,17 +461,30 @@ final class TimersView extends TabView {
             Ui.setCircleColor(lapBtn, Ui.color(c, canLap ? R.color.text_primary : R.color.text_hint));
         }
 
+        private String lastBig = "", lastLive = "";
+
         private void paint() {
             long e = elapsed();
-            big.setText(Fmt.stopwatch(e));
+            String b = Fmt.stopwatch(e);
+            if (!b.equals(lastBig)) {
+                lastBig = b;
+                big.setText(b);
+            }
             dial.setElapsed(e);
-            if (liveTime != null) liveTime.setText(Fmt.stopwatch(e - (laps.isEmpty() ? 0 : laps.get(laps.size() - 1))));
+            if (liveTime != null) {
+                String l = Fmt.stopwatch(e - (laps.isEmpty() ? 0 : laps.get(laps.size() - 1)));
+                if (!l.equals(lastLive)) {
+                    lastLive = l;
+                    liveTime.setText(l);
+                }
+            }
         }
 
         private void rebuildLaps() {
             Context c = getContext();
             lapBox.removeAllViews();
             liveTime = null;
+            lastLive = "";
             int n = laps.size();
             long best = Long.MAX_VALUE, worst = 0;
             for (int i = 0; i < n; i++) {
@@ -482,6 +495,7 @@ final class TimersView extends TabView {
             if (running || elapsed() > 0) {
                 LinearLayout live = lapRow(c, c.getString(R.string.lap_n, n + 1), "", R.color.text_primary);
                 liveTime = (TextView) live.getChildAt(1);
+                lastLive = "";
                 lapBox.addView(live);
                 lapBox.addView(Ui.hairline(c, 20));
             }

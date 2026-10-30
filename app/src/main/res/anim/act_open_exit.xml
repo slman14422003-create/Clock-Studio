@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- iOS push: old screen drifts back (parallax) -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:shareInterpolator="false">
     <translate
-        android:duration="420"
+        android:duration="400"
         android:fromXDelta="0"
         android:interpolator="@interpolator/ios_out"
-        android:toXDelta="-30%" />
+        android:toXDelta="-24%" />
+    <alpha
+        android:duration="400"
+        android:fromAlpha="1"
+        android:interpolator="@interpolator/ios_out"
+        android:toAlpha="0.82" />
 </set>

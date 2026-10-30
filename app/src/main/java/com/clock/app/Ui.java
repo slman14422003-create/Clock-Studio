@@ -37,7 +37,22 @@ final class Ui {
 
     static void press(Context c, View v) {
         if (v == null || v.getStateListAnimator() != null) return;
-        v.setStateListAnimator(android.animation.AnimatorInflater.loadStateListAnimator(c, R.animator.press_scale));
+        android.animation.StateListAnimator sla = new android.animation.StateListAnimator();
+        android.animation.ObjectAnimator dx = android.animation.ObjectAnimator.ofFloat(v, View.SCALE_X, 0.96f);
+        android.animation.ObjectAnimator dy = android.animation.ObjectAnimator.ofFloat(v, View.SCALE_Y, 0.96f);
+        android.animation.AnimatorSet down = new android.animation.AnimatorSet();
+        down.playTogether(dx, dy);
+        down.setDuration(110);
+        down.setInterpolator(Anim.OUT);
+        android.animation.ObjectAnimator ux = android.animation.ObjectAnimator.ofFloat(v, View.SCALE_X, 1f);
+        android.animation.ObjectAnimator uy = android.animation.ObjectAnimator.ofFloat(v, View.SCALE_Y, 1f);
+        android.animation.AnimatorSet up = new android.animation.AnimatorSet();
+        up.playTogether(ux, uy);
+        up.setDuration(380);
+        up.setInterpolator(Anim.SPRING);
+        sla.addState(new int[]{android.R.attr.state_pressed}, down);
+        sla.addState(new int[]{}, up);
+        v.setStateListAnimator(sla);
     }
 
     static int dp(Context c, int v) {
@@ -53,8 +68,18 @@ final class Ui {
     }
 
     /** Colour by resource id; the theme attributes make day / night and the grouped backgrounds resolve correctly. */
-    static int color(Context c, int res) {
-        int attr = 0;
+    private static final ThreadLocal<TypedValue> TV = new ThreadLocal<TypedValue>() {
+        @Override
+        protected TypedValue initialValue() {
+            return new TypedValue();
+        }
+    };
+    private static final android.util.SparseIntArray ATTRS = new android.util.SparseIntArray();
+
+    private static int attrFor(int res) {
+        int attr = ATTRS.get(res, -1);
+        if (attr != -1) return attr;
+        attr = 0;
         if (res == R.color.accent) attr = R.attr.cAccent;
         else if (res == R.color.accent_text) attr = R.attr.cAccentText;
         else if (res == R.color.accent_soft) attr = R.attr.cAccentSoft;
@@ -69,8 +94,17 @@ final class Ui {
         else if (res == R.color.text_secondary) attr = R.attr.cTextSecondary;
         else if (res == R.color.text_hint) attr = R.attr.cTextHint;
         else if (res == R.color.neutral_soft) attr = R.attr.cNeutralSoft;
+        synchronized (ATTRS) {
+            ATTRS.put(res, attr);
+        }
+        return attr;
+    }
+
+    /** Colour by resource id; the theme attributes make day / night and the grouped backgrounds resolve correctly. */
+    static int color(Context c, int res) {
+        int attr = attrFor(res);
         if (attr != 0) {
-            TypedValue tv = new TypedValue();
+            TypedValue tv = TV.get();
             if (c.getTheme().resolveAttribute(attr, tv, true)
                     && tv.type >= TypedValue.TYPE_FIRST_COLOR_INT && tv.type <= TypedValue.TYPE_LAST_COLOR_INT) {
                 return tv.data;
