@@ -342,10 +342,10 @@ final class ShareCard {
             diamond(cv, d, 66f, y, 5f);
             diamond(cv, d, W - 66f, y, 5f);
         }
-        cornerOrn(cv, 84f, 84f, 1f, 1f, 150f);
-        cornerOrn(cv, W - 84f, 84f, -1f, 1f, 150f);
-        cornerOrn(cv, 84f, H - 84f, 1f, -1f, 150f);
-        cornerOrn(cv, W - 84f, H - 84f, -1f, -1f, 150f);
+        cornerOrn(cv, t, 84f, 84f, 1f, 1f, 150f);
+        cornerOrn(cv, t, W - 84f, 84f, -1f, 1f, 150f);
+        cornerOrn(cv, t, 84f, H - 84f, 1f, -1f, 150f);
+        cornerOrn(cv, t, W - 84f, H - 84f, -1f, -1f, 150f);
         medallion(cv, t, W / 2f, 54f, 66f);
         medallion(cv, t, W / 2f, H - 54f, 66f);
         RectF area = new RectF(170f, 260f, W - 170f, H - 260f);
