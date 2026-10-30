@@ -165,6 +165,30 @@ final class QuranAudio {
         });
     }
 
+    interface AyahCb {
+        void done(boolean ok);
+    }
+
+    private static final ExecutorService ONE = Executors.newFixedThreadPool(2);
+
+    static boolean haveAyah(Context c, Reciter r, int s, int a) {
+        return file(c, r, s, a).length() > 0;
+    }
+
+    /** Saves a single ayah of the given reciter so it plays without internet; the callback runs on the main thread. */
+    static void downloadAyah(Context c, Reciter r, int s, int a, AyahCb cb) {
+        final Context app = c.getApplicationContext();
+        final File f = file(app, r, s, a);
+        if (f.length() > 0) {
+            MAIN.post(() -> cb.done(true));
+            return;
+        }
+        ONE.execute(() -> {
+            final boolean ok = f.length() > 0 || fetch(url(r, s, a), f);
+            MAIN.post(() -> cb.done(ok));
+        });
+    }
+
     private static boolean fetch(String u, File out) {
         for (int attempt = 0; attempt < 3; attempt++) {
             HttpURLConnection con = null;

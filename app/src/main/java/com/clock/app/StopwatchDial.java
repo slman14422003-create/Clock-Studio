@@ -5,14 +5,19 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.View;
 
-/** iPhone style analog stopwatch: a 60 second sweep hand and a small 30 minute dial. */
+/** iPhone style analog stopwatch: a 60 second sweep hand and a small 30 minute dial (static face cached). */
 final class StopwatchDial extends View {
     private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint bmp = new Paint(Paint.FILTER_BITMAP_FLAG);
     private long elapsed;
+    private android.graphics.Bitmap face;
+    private int orange, bgc;
 
     StopwatchDial(Context c) {
         super(c);
         p.setStrokeCap(Paint.Cap.ROUND);
+        orange = Ui.color(c, R.color.warn);
+        bgc = Ui.color(c, R.color.bg);
     }
 
     void setElapsed(long ms) {
@@ -21,18 +26,36 @@ final class StopwatchDial extends View {
     }
 
     @Override
-    protected void onDraw(Canvas cv) {
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        face = null;
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        face = null;
+        super.onDetachedFromWindow();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int ow, int oh) {
+        super.onSizeChanged(w, h, ow, oh);
+        face = null;
+    }
+
+    private void buildFace() {
+        int w = getWidth(), h = getHeight();
+        if (w <= 0 || h <= 0) return;
         Context c = getContext();
-        float cx = getWidth() / 2f, cy = getHeight() / 2f;
+        face = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
+        Canvas cv = new Canvas(face);
+        float cx = w / 2f, cy = h / 2f;
         float r = Math.min(cx, cy) - Ui.dpf(c, 3);
         int primary = Ui.color(c, R.color.text_primary);
         int hint = Ui.color(c, R.color.text_hint);
-        int orange = Ui.color(c, R.color.warn);
-
         p.setStyle(Paint.Style.FILL);
         p.setColor(Ui.color(c, R.color.field));
         cv.drawCircle(cx, cy, r, p);
-
         for (int i = 0; i < 60; i++) {
             boolean major = i % 5 == 0;
             double a = Math.toRadians(i * 6);
@@ -56,8 +79,7 @@ final class StopwatchDial extends View {
             float y = cy - (float) Math.cos(a) * rr - (p.ascent() + p.descent()) / 2f;
             cv.drawText(String.valueOf(n), x, y, p);
         }
-
-        // minutes sub dial (30 min per turn)
+        p.setTypeface(null);
         float sx = cx, sy = cy - r * 0.34f, sr = r * 0.24f;
         p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(Ui.hairPx(c));
@@ -70,18 +92,26 @@ final class StopwatchDial extends View {
             cv.drawLine(sx + (float) Math.sin(a) * (sr - len), sy - (float) Math.cos(a) * (sr - len),
                     sx + (float) Math.sin(a) * sr, sy - (float) Math.cos(a) * sr, p);
         }
+    }
+
+    @Override
+    protected void onDraw(Canvas cv) {
+        if (face == null) buildFace();
+        if (face == null) return;
+        Context c = getContext();
+        float cx = getWidth() / 2f, cy = getHeight() / 2f;
+        float r = Math.min(cx, cy) - Ui.dpf(c, 3);
+        cv.drawBitmap(face, 0, 0, bmp);
+        float sx = cx, sy = cy - r * 0.34f, sr = r * 0.24f;
         float minDeg = (elapsed % 1800000L) / 1800000f * 360f;
         hand(cv, sx, sy, minDeg, sr * 0.86f, Ui.dpf(c, 1.6f), orange, 0);
-
-        // seconds sweep
         float secDeg = (elapsed % 60000L) / 60000f * 360f;
         hand(cv, cx, cy, secDeg, r * 0.86f, Ui.dpf(c, 1.8f), orange, r * 0.14f);
         p.setStyle(Paint.Style.FILL);
         p.setColor(orange);
         cv.drawCircle(cx, cy, Ui.dpf(c, 4), p);
-        p.setColor(Ui.color(c, R.color.bg));
+        p.setColor(bgc);
         cv.drawCircle(cx, cy, Ui.dpf(c, 1.5f), p);
-        p.setTypeface(null);
     }
 
     private void hand(Canvas cv, float cx, float cy, float deg, float len, float w, int color, float tail) {

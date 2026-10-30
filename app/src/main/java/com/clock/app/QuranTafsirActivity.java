@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -33,6 +34,9 @@ public class QuranTafsirActivity extends BaseActivity {
     private String[] names;
     private Typeface face = Typeface.SERIF;
     private String loaded;
+    private TextView modeAuto, modeOff, dlInfo, dlSurah, dlBook, dlDelete;
+    private ProgressBar dlBar;
+    private boolean wasRunning;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -71,6 +75,7 @@ public class QuranTafsirActivity extends BaseActivity {
         col.setPadding(Ui.dp(this, 16), Ui.dp(this, 4), Ui.dp(this, 16), Ui.dp(this, 20));
         col.addView(verseCard());
         col.addView(chipRow(), margins(0, 14, 0, 0));
+        col.addView(downloadCard(), margins(0, 12, 0, 0));
         col.addView(bodyCard(), margins(0, 12, 0, 0));
         TextView hint = Ui.footnote(this, getString(R.string.quran_tafsir_hint));
         hint.setPaddingRelative(Ui.dp(this, 6), Ui.dp(this, 10), Ui.dp(this, 6), 0);
@@ -136,6 +141,7 @@ public class QuranTafsirActivity extends BaseActivity {
                 getSharedPreferences(PREF, MODE_PRIVATE).edit().putInt(KEY_ED, k).apply();
                 styleChips();
                 loadBody();
+                refreshDl();
             });
             chipViews[i] = t;
             chips.addView(t);
@@ -151,6 +157,140 @@ public class QuranTafsirActivity extends BaseActivity {
             chipViews[i].setBackground(Ui.rect(Ui.color(this, on ? R.color.accent : R.color.neutral_soft), Ui.dpf(this, 100)));
             chipViews[i].setTextColor(Ui.color(this, on ? R.color.on_accent : R.color.text_primary));
         }
+    }
+
+    private View downloadCard() {
+        LinearLayout c = new LinearLayout(this);
+        c.setOrientation(LinearLayout.VERTICAL);
+        c.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 18)));
+        c.setPadding(Ui.dp(this, 16), Ui.dp(this, 14), Ui.dp(this, 16), Ui.dp(this, 14));
+
+        LinearLayout modes = new LinearLayout(this);
+        modeAuto = Ui.chipView(this, getString(R.string.tafsir_mode_auto), v -> setMode(false));
+        modeOff = Ui.chipView(this, getString(R.string.tafsir_mode_offline), v -> setMode(true));
+        modes.addView(modeAuto);
+        modes.addView(modeOff);
+        HorizontalScrollView hs = new HorizontalScrollView(this);
+        hs.setHorizontalScrollBarEnabled(false);
+        hs.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        hs.addView(modes, new HorizontalScrollView.LayoutParams(-2, -2));
+        c.addView(hs, new LinearLayout.LayoutParams(-1, -2));
+
+        dlInfo = Ui.text(this, "", 13, R.color.text_secondary);
+        dlInfo.setPadding(Ui.dp(this, 2), Ui.dp(this, 12), 0, Ui.dp(this, 6));
+        c.addView(dlInfo, new LinearLayout.LayoutParams(-1, -2));
+
+        dlBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        dlBar.setMax(1000);
+        dlBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Ui.color(this, R.color.accent)));
+        dlBar.setVisibility(View.GONE);
+        c.addView(dlBar, new LinearLayout.LayoutParams(-1, Ui.dp(this, 6)));
+
+        LinearLayout row = new LinearLayout(this);
+        row.setPadding(0, Ui.dp(this, 8), 0, 0);
+        dlSurah = pill(R.string.tafsir_dl_surah, R.drawable.btn_primary, R.color.on_accent);
+        dlSurah.setTextSize(14);
+        dlSurah.setOnClickListener(v -> onDownload(false));
+        dlBook = pill(R.string.tafsir_dl_book, R.drawable.btn_secondary, R.color.text_primary);
+        dlBook.setTextSize(14);
+        dlBook.setOnClickListener(v -> onDownload(true));
+        LinearLayout.LayoutParams a = new LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f);
+        a.setMarginEnd(Ui.dp(this, 8));
+        row.addView(dlSurah, a);
+        row.addView(dlBook, new LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f));
+        c.addView(row, new LinearLayout.LayoutParams(-1, -2));
+
+        dlDelete = Ui.text(this, getString(R.string.tafsir_dl_delete), 14, R.color.bad);
+        dlDelete.setTypeface(Ui.medium());
+        dlDelete.setGravity(Gravity.CENTER);
+        dlDelete.setPadding(0, Ui.dp(this, 12), 0, Ui.dp(this, 2));
+        dlDelete.setOnClickListener(v -> {
+            int s = d.surahOf[ayah];
+            QuranTafsir.deleteSurah(this, QuranTafsir.IDS[edition], s, d.surahs[s].ayahs);
+            Ui.toast(this, getString(R.string.tafsir_dl_deleted));
+            refreshDl();
+        });
+        c.addView(dlDelete, new LinearLayout.LayoutParams(-1, -2));
+        styleModes();
+        return c;
+    }
+
+    private void styleModes() {
+        boolean off = QuranTafsir.offlineOnly(this);
+        modeAuto.setBackground(Ui.rect(Ui.color(this, !off ? R.color.accent : R.color.neutral_soft), Ui.dpf(this, 100)));
+        modeAuto.setTextColor(Ui.color(this, !off ? R.color.on_accent : R.color.text_primary));
+        modeOff.setBackground(Ui.rect(Ui.color(this, off ? R.color.accent : R.color.neutral_soft), Ui.dpf(this, 100)));
+        modeOff.setTextColor(Ui.color(this, off ? R.color.on_accent : R.color.text_primary));
+    }
+
+    private void setMode(boolean offline) {
+        if (QuranTafsir.offlineOnly(this) == offline) return;
+        Ui.tick(offline ? modeOff : modeAuto);
+        QuranTafsir.setOfflineOnly(this, offline);
+        styleModes();
+        loadBody();
+    }
+
+    private void onDownload(boolean book) {
+        String ed = QuranTafsir.IDS[edition];
+        int s = d.surahOf[ayah];
+        int key = book ? 0 : s;
+        if (QuranTafsir.running(ed, key)) {
+            QuranTafsir.cancel(ed, key);
+            return;
+        }
+        QuranTafsir.failed = false;
+        QuranTafsir.download(this, ed, d, key);
+    }
+
+    private void refreshDl() {
+        if (dlInfo == null || d == null) return;
+        String ed = QuranTafsir.IDS[edition];
+        int s = d.surahOf[ayah], n = d.surahs[s].ayahs;
+        int[] ps = QuranTafsir.progress(ed, s), pb = QuranTafsir.progress(ed, 0);
+        int[] pr = pb != null ? pb : ps;
+        boolean running = pr != null;
+        if (running) {
+            dlInfo.setText(getString(R.string.tafsir_dl_progress, QuranData.num(pr[0]), QuranData.num(pr[1])));
+            dlBar.setVisibility(View.VISIBLE);
+            dlBar.setProgress(pr[1] == 0 ? 0 : (int) (1000L * pr[0] / pr[1]), true);
+            dlSurah.setText(R.string.tafsir_dl_stop);
+            dlBook.setVisibility(View.GONE);
+            dlDelete.setVisibility(View.GONE);
+            dlSurah.setOnClickListener(v -> onDownload(pb != null));
+        } else {
+            int have = QuranTafsir.cachedCount(this, ed, s, n);
+            dlInfo.setText(getString(R.string.tafsir_dl_saved, QuranData.num(have), QuranData.num(n)));
+            dlBar.setVisibility(View.GONE);
+            dlSurah.setText(R.string.tafsir_dl_surah);
+            dlSurah.setVisibility(have >= n ? View.GONE : View.VISIBLE);
+            dlSurah.setOnClickListener(v -> onDownload(false));
+            dlBook.setVisibility(View.VISIBLE);
+            dlDelete.setVisibility(have > 0 ? View.VISIBLE : View.GONE);
+            if (wasRunning) {
+                if (QuranTafsir.failed) {
+                    QuranTafsir.failed = false;
+                    Ui.toast(this, getString(R.string.tafsir_dl_fail));
+                } else if (have >= n) {
+                    Ui.toast(this, getString(R.string.tafsir_dl_done));
+                }
+                if (loaded == null) loadBody();
+            }
+        }
+        wasRunning = running;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        QuranTafsir.onChange = this::refreshDl;
+        refreshDl();
+    }
+
+    @Override
+    protected void onPause() {
+        if (QuranTafsir.onChange != null) QuranTafsir.onChange = null;
+        super.onPause();
     }
 
     private View bodyCard() {
@@ -218,6 +358,7 @@ public class QuranTafsirActivity extends BaseActivity {
         ref.setText(d.surahTitle(s) + " \u00B7 " + QuranData.num(d.num[ayah]));
         QuranData.saveLast(this, d.page[ayah], d.surahTitle(s));
         loadBody();
+        refreshDl();
     }
 
     private void loadBody() {
@@ -231,7 +372,7 @@ public class QuranTafsirActivity extends BaseActivity {
         QuranTafsir.load(this, QuranTafsir.IDS[edition], s, n, text -> {
             if (mine != token || isFinishing() || isDestroyed()) return;
             if (text == null) {
-                body.setText(R.string.quran_tafsir_fail);
+                body.setText(QuranTafsir.offlineMiss ? R.string.tafsir_offline_missing : R.string.quran_tafsir_fail);
                 body.setTextColor(Ui.color(this, R.color.bad));
                 body.setOnClickListener(v -> loadBody());
                 return;
@@ -242,6 +383,9 @@ public class QuranTafsirActivity extends BaseActivity {
             body.setTextDirection(en ? View.TEXT_DIRECTION_LTR : View.TEXT_DIRECTION_RTL);
             body.setText(text);
             body.setTextColor(Ui.color(this, R.color.text_primary));
+            body.setAlpha(0f);
+            body.animate().alpha(1f).setDuration(Anim.D_SHORT).start();
+            if (ayah + 1 < QuranData.AYAHS) QuranTafsir.prefetch(this, QuranTafsir.IDS[edition], d.surahOf[ayah + 1], d.num[ayah + 1]);
         });
     }
 

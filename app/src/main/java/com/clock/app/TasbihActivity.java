@@ -253,6 +253,8 @@ public class TasbihActivity extends BaseActivity {
         return super.onKeyUp(keyCode, e);
     }
 
+    private int shownPhrase = -1, shownTarget = -2;
+
     private void sync(boolean animate, boolean done) {
         phraseTv.setText(phrases[phrase]);
         int eff = target > 0 ? target : 33;
@@ -262,6 +264,17 @@ public class TasbihActivity extends BaseActivity {
         rosary.update(count, sub, full ? 1f : inRound / (float) eff, animate, done);
         totalText.setText(getString(R.string.tasbih_total, total)
                 + (target > 0 ? "  \u00B7  " + getString(R.string.tasbih_rounds, rounds) : ""));
+        if (shownPhrase != phrase) {
+            shownPhrase = phrase;
+            buildPhraseChips();
+        }
+        if (shownTarget != target) {
+            shownTarget = target;
+            buildTargetChips();
+        }
+    }
+
+    private void buildPhraseChips() {
         phraseRow.removeAllViews();
         for (int i = 0; i < phrases.length; i++) {
             final int idx = i;
@@ -286,6 +299,9 @@ public class TasbihActivity extends BaseActivity {
             int x = ch.getLeft() - (phraseScroll.getWidth() - ch.getWidth()) / 2;
             phraseScroll.smoothScrollTo(Math.max(0, x), 0);
         });
+    }
+
+    private void buildTargetChips() {
         targetRow.removeAllViews();
         for (final int tg : TARGETS) {
             String label = tg == 0 ? getString(R.string.tasbih_free) : String.valueOf(tg);
@@ -321,6 +337,7 @@ public class TasbihActivity extends BaseActivity {
         private final RectF rect = new RectF();
         private Shader shLit, shDim, glow, spacerSh, shieldSh, capSh;
         private float cx, cy, rad, rb, thick;
+        private int accentC, primC, secC, hintC, surfC;
         private final float d;
 
         Rosary(Context c) {
@@ -361,8 +378,13 @@ public class TasbihActivity extends BaseActivity {
             rb = half * 0.93f;
             thick = half * 0.9f;
             int accent = Ui.color(c, R.color.accent);
-            int base = ColorUtils.blendARGB(accent, 0xFF16B8B0, 0.3f);
-            int dim = ColorUtils.blendARGB(base, Ui.color(c, R.color.surface), 0.8f);
+            accentC = accent;
+            primC = Ui.color(c, R.color.text_primary);
+            secC = Ui.color(c, R.color.text_secondary);
+            hintC = Ui.color(c, R.color.text_hint);
+            surfC = Ui.color(c, R.color.surface);
+            int base = ColorUtils.blendARGB(accent, 0xFF16B8B0, 0.22f);
+            int dim = ColorUtils.blendARGB(base, surfC, Appearance.isNight(c) ? 0.74f : 0.8f);
             shLit = new RadialGradient(-rb * 0.35f, -rb * 0.4f, rb * 1.45f,
                     new int[]{ColorUtils.blendARGB(base, Color.WHITE, 0.65f), base, ColorUtils.blendARGB(base, Color.BLACK, 0.55f)},
                     new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
@@ -551,16 +573,25 @@ public class TasbihActivity extends BaseActivity {
         @Override
         protected void onDraw(Canvas cv) {
             if (shLit == null) return;
-            Context c = getContext();
-            int accent = Ui.color(c, R.color.accent);
+            int accent = accentC;
             fill.setShader(glow);
             fill.setAlpha(255);
             cv.drawCircle(cx, cy, rad * 0.95f, fill);
             fill.setShader(null);
 
             line.setStrokeWidth(1.8f * d);
-            line.setColor(Ui.alpha(Ui.color(c, R.color.text_hint), 170));
+            line.setColor(Ui.alpha(hintC, 150));
             cv.drawCircle(cx, cy, rad, line);
+            if (lit > 0) {
+                int kk = lit - 1;
+                int jLast = kk < 11 ? kk + 1 : kk < 22 ? kk + 2 : kk + 3;
+                rect.set(cx - rad, cy - rad, cx + rad, cy + rad);
+                line.setStrokeWidth(2.6f * d);
+                line.setStrokeCap(Paint.Cap.ROUND);
+                line.setColor(Ui.alpha(accent, 200));
+                cv.drawArc(rect, 90f, jLast * 10f, false, line);
+                line.setStrokeCap(Paint.Cap.BUTT);
+            }
 
             tassel(cv);
 
@@ -606,7 +637,7 @@ public class TasbihActivity extends BaseActivity {
                 line.setColor(Ui.alpha(accent, (int) (120 * (1f - flash))));
                 cv.drawCircle(cx, cy, rad * (0.2f + 0.65f * flash), line);
             }
-            big.setColor(Ui.color(c, R.color.text_primary));
+            big.setColor(primC);
             big.setTextSize(rad * 0.5f);
             Paint.FontMetrics fm = big.getFontMetrics();
             float by = cy - rad * 0.06f - (fm.ascent + fm.descent) / 2f;
@@ -614,7 +645,7 @@ public class TasbihActivity extends BaseActivity {
             cv.scale(num, num, cx, cy - rad * 0.06f);
             cv.drawText(String.valueOf(count), cx, by, big);
             cv.restore();
-            small.setColor(Ui.color(c, R.color.text_secondary));
+            small.setColor(secC);
             small.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16, getResources().getDisplayMetrics()));
             cv.drawText(sub, cx, cy + rad * 0.42f, small);
         }

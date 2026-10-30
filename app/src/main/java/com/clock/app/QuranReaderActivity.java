@@ -28,20 +28,19 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.SeekBar;
+import android.os.SystemClock;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
- * Mushaf reader: one screen per page of the 604-page Madinah Mushaf. Swipe to turn pages; the pages glide and fade
- * as they pass, and the reader always runs right-to-left like a printed Quran.
+ * Mushaf reader: the 604 pages of the Madinah Mushaf run edge to edge as one smooth vertical scroll, each page
+ * filling at least a screen, with the text always right-to-left like a printed Quran.
  */
 public class QuranReaderActivity extends BaseActivity {
     static final String EXTRA_PAGE = "page", EXTRA_AYAH = "ayah", EXTRA_HIGHLIGHT = "hl", EXTRA_PLAY = "play";
@@ -51,7 +50,12 @@ public class QuranReaderActivity extends BaseActivity {
     private int readBg;
     private RecyclerView pager;
     private LinearLayoutManager lm;
-    private PagerSnapHelper snap;
+    private LinearLayout main;
+    private View bottomRef;
+    private TextView badge;
+    private ImageButton selDl;
+    private int viewportH;
+    private long userScrollAt;
     private TextView title, subtitle, loading;
     private SeekBar seek;
     private LinearLayout selBar;
@@ -71,6 +75,12 @@ public class QuranReaderActivity extends BaseActivity {
     private WaveView wave;
     private ImageButton pillPlay;
     private FrameLayout.LayoutParams selLp;
+    private final Runnable hideBadge = new Runnable() {
+        @Override
+        public void run() {
+            if (badge != null) badge.animate().alpha(0f).setDuration(Anim.D_MED).start();
+        }
+    };
     private final Runnable tick = new Runnable() {
         @Override
         public void run() {
@@ -108,44 +118,53 @@ public class QuranReaderActivity extends BaseActivity {
         if (getIntent().getBooleanExtra(EXTRA_HIGHLIGHT, false)) selected = getIntent().getIntExtra(EXTRA_AYAH, -1);
 
         root = new FrameLayout(this);
-        LinearLayout main = new LinearLayout(this);
+        main = new LinearLayout(this);
         main.setOrientation(LinearLayout.VERTICAL);
         root.addView(main, new FrameLayout.LayoutParams(-1, -1));
 
         main.addView(topBar());
 
         pager = new RecyclerView(this);
-        pager.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        lm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         pager.setLayoutManager(lm);
         pager.setItemAnimator(null);
-        pager.setHasFixedSize(true);
-        pager.setItemViewCacheSize(3);
+        pager.setItemViewCacheSize(4);
+        pager.setVerticalScrollBarEnabled(false);
         pager.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        snap = new PagerSnapHelper();
-        snap.attachToRecyclerView(pager);
+        pager.addOnLayoutChangeListener((view, left, top, right, bottom, oLeft, oTop, oRight, oBottom) -> {
+            int h = bottom - top;
+            if (h > 0 && h != viewportH) {
+                viewportH = h;
+                if (pager.getAdapter() != null) pager.post(this::rebindAll);
+            }
+        });
         pager.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
-                glide(rv);
                 int p = centerPos(rv);
-                if (p >= 0 && p != curPos) setCurrent(p);
+                if (p >= 0 && p != curPos) {
+                    setCurrent(p);
+                    flashBadge();
+                }
             }
 
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView rv, int state) {
+                if (state == RecyclerView.SCROLL_STATE_DRAGGING) userScrollAt = SystemClock.uptimeMillis();
                 if (state == RecyclerView.SCROLL_STATE_IDLE) saveProgress();
             }
         });
         main.addView(pager, new LinearLayout.LayoutParams(-1, 0, 1f));
         main.addView(playerPill());
-        main.addView(bottomBar());
+        bottomRef = bottomBar();
+        main.addView(bottomRef);
 
         loading = Ui.text(this, getString(R.string.quran_loading), 16, R.color.text_secondary);
         loading.setGravity(Gravity.CENTER);
         root.addView(loading, new FrameLayout.LayoutParams(-1, -1));
 
         buildSelectionBar();
+        buildBadge();
         setContentView(root);
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
             androidx.core.graphics.Insets s = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -166,8 +185,10 @@ public class QuranReaderActivity extends BaseActivity {
             lm.scrollToPositionWithOffset(startPos, 0);
             pager.post(() -> {
                 setCurrent(startPos);
-                glide(pager);
-                if (selected >= 0) showSelection();
+                if (selected >= 0) {
+                    showSelection();
+                    scrollAyahIntoViewLater(selected);
+                }
                 player.listener = audioListener;
                 audioListener.onState(player.isPlaying());
                 if (getIntent().getBooleanExtra(EXTRA_PLAY, false)) {
@@ -196,6 +217,8 @@ public class QuranReaderActivity extends BaseActivity {
         subtitle.setSingleLine(true);
         mid.addView(title);
         mid.addView(subtitle);
+        mid.setOnClickListener(v -> askPage());
+        Ui.press(this, mid);
         bar.addView(mid, new LinearLayout.LayoutParams(0, -2, 1f));
         TextView minus = Ui.chipView(this, "A\u2212", v -> changeFont(-2));
         TextView plus = Ui.chipView(this, "A+", v -> changeFont(2));
@@ -231,7 +254,6 @@ public class QuranReaderActivity extends BaseActivity {
             public void onProgressChanged(SeekBar s, int p, boolean fromUser) {
                 if (!fromUser || d == null) return;
                 lm.scrollToPositionWithOffset(p, 0);
-                pager.post(() -> glide(pager));
             }
 
             @Override
@@ -310,10 +332,10 @@ public class QuranReaderActivity extends BaseActivity {
         selBar = new LinearLayout(this);
         selBar.setOrientation(LinearLayout.VERTICAL);
         selBar.setPadding(Ui.dp(this, 14), Ui.dp(this, 6), Ui.dp(this, 14), Ui.dp(this, 12));
-        GradientDrawable bg = Ui.rect(Ui.alpha(Ui.color(this, R.color.surface_high), 0xF2), Ui.dpf(this, 28));
-        bg.setStroke(Ui.dp(this, 1), Ui.alpha(Ui.color(this, R.color.text_secondary), 0x30));
+        GradientDrawable bg = Ui.rect(Ui.color(this, R.color.surface_high), Ui.dpf(this, 28));
+        bg.setStroke(Ui.dp(this, 1), Ui.alpha(Ui.color(this, R.color.text_secondary), 0x38));
         selBar.setBackground(bg);
-        selBar.setElevation(Ui.dpf(this, 12));
+        selBar.setElevation(Ui.dpf(this, 16));
         selBar.setVisibility(View.GONE);
 
         LinearLayout head = new LinearLayout(this);
@@ -323,8 +345,10 @@ public class QuranReaderActivity extends BaseActivity {
         selText.setTypeface(Ui.medium());
         selText.setSingleLine(true);
         head.addView(selText, new LinearLayout.LayoutParams(0, -2, 1f));
+        selDl = Ui.iconButton(this, R.drawable.ic_download, R.string.ayah_dl, false, v -> downloadSelected());
         selMark = Ui.iconButton(this, R.drawable.ic_bookmark, R.string.quran_marks, false, v -> toggleMark());
         ImageButton close = Ui.iconButton(this, R.drawable.ic_x, R.string.cancel, false, v -> select(-1));
+        head.addView(selDl, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
         head.addView(selMark, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
         head.addView(close, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40)));
         selBar.addView(head);
@@ -380,6 +404,52 @@ public class QuranReaderActivity extends BaseActivity {
         return b;
     }
 
+    private void buildBadge() {
+        badge = Ui.text(this, "", 15, R.color.text_primary);
+        badge.setTypeface(Ui.medium());
+        badge.setGravity(Gravity.CENTER);
+        GradientDrawable g = Ui.rect(Ui.color(this, R.color.surface_high), Ui.dpf(this, 100));
+        g.setStroke(Ui.dp(this, 1), Ui.alpha(Ui.color(this, R.color.text_secondary), 0x38));
+        badge.setBackground(g);
+        badge.setPadding(Ui.dp(this, 16), Ui.dp(this, 6), Ui.dp(this, 16), Ui.dp(this, 6));
+        badge.setElevation(Ui.dpf(this, 8));
+        badge.setAlpha(0f);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+        lp.topMargin = Ui.dp(this, 64);
+        root.addView(badge, lp);
+    }
+
+    private void flashBadge() {
+        if (badge == null || curPos < 0) return;
+        badge.setText(QuranData.ar(curPos + 1));
+        badge.removeCallbacks(hideBadge);
+        badge.animate().cancel();
+        badge.animate().alpha(1f).setDuration(Anim.D_TAP).start();
+        badge.postDelayed(hideBadge, 900);
+    }
+
+    private void updateDlIcon() {
+        if (selDl == null || d == null || selected < 0) return;
+        boolean have = QuranAudio.haveAyah(this, QuranAudio.current(this), d.surahOf[selected], d.num[selected]);
+        selDl.setImageResource(have ? R.drawable.ic_check_circle : R.drawable.ic_download);
+        selDl.setImageTintList(ColorStateList.valueOf(Ui.color(this, have ? R.color.ok : R.color.text_primary)));
+    }
+
+    private void downloadSelected() {
+        if (d == null || selected < 0) return;
+        final int a = selected;
+        final QuranAudio.Reciter r = QuranAudio.current(this);
+        if (QuranAudio.haveAyah(this, r, d.surahOf[a], d.num[a])) {
+            Ui.toast(this, getString(R.string.ayah_dl_have));
+            return;
+        }
+        QuranAudio.downloadAyah(this, r, d.surahOf[a], d.num[a], ok -> {
+            if (isFinishing() || isDestroyed()) return;
+            Ui.toast(this, getString(ok ? R.string.ayah_dl_done : R.string.ayah_dl_fail));
+            if (selected == a) updateDlIcon();
+        });
+    }
+
     private void playSelected() {
         if (d == null || selected < 0 || selected >= QuranData.AYAHS) return;
         player.listener = audioListener;
@@ -397,6 +467,7 @@ public class QuranReaderActivity extends BaseActivity {
             QuranAudio.Reciter r = QuranAudio.RECITERS[which];
             QuranAudio.setCurrent(this, r);
             Ui.toast(this, getString(R.string.quran_reciter_now, r.name()));
+            updateDlIcon();
             if (d != null && player.isPlaying() && playing >= 0) {
                 player.listener = audioListener;
                 player.play(this, d, r, playing);
@@ -440,8 +511,8 @@ public class QuranReaderActivity extends BaseActivity {
     }
 
     private GradientDrawable pageBackground() {
-        GradientDrawable g = Ui.rect(pageBg(), Ui.dpf(this, 26));
-        g.setStroke(Ui.dp(this, 1), Ui.alpha(pageSub(), 0x22));
+        GradientDrawable g = Ui.rect(pageBg(), Ui.dpf(this, 22));
+        g.setStroke(Ui.hairPx(this), Ui.alpha(pageSub(), 0x28));
         return g;
     }
 
@@ -450,7 +521,7 @@ public class QuranReaderActivity extends BaseActivity {
         Dlg.choose(this, R.string.quran_bg, labels, readBg, i -> {
             readBg = i;
             Store.putRaw(this, "quran_read_bg", String.valueOf(i));
-            if (pager != null && pager.getAdapter() != null) pager.getAdapter().notifyDataSetChanged();
+            rebindAll();
         });
     }
 
@@ -470,7 +541,6 @@ public class QuranReaderActivity extends BaseActivity {
                         if (p < 1 || p > QuranData.PAGES || pager == null) return;
                         select(-1);
                         lm.scrollToPositionWithOffset(p - 1, 0);
-                        pager.post(() -> glide(pager));
                     } catch (NumberFormatException ignored) {
                     }
                 })
@@ -508,31 +578,71 @@ public class QuranReaderActivity extends BaseActivity {
     // ------------------------------------------------------------------ paging
 
     private int centerPos(RecyclerView rv) {
+        float probe = rv.getHeight() * 0.4f;
         int best = -1;
-        float bestD = Float.MAX_VALUE;
-        float c = rv.getWidth() / 2f;
         for (int i = 0; i < rv.getChildCount(); i++) {
             View v = rv.getChildAt(i);
-            float dist = Math.abs((v.getLeft() + v.getRight()) / 2f - c);
-            if (dist < bestD) {
-                bestD = dist;
-                best = rv.getChildAdapterPosition(v);
-            }
+            if (v.getTop() <= probe && v.getBottom() > probe) return rv.getChildAdapterPosition(v);
+            if (best < 0) best = rv.getChildAdapterPosition(v);
         }
         return best;
     }
 
-    /** Pages shrink and fade a little as they leave the centre, which makes the turn feel physical. */
-    private void glide(RecyclerView rv) {
-        float w = Math.max(1f, rv.getWidth());
-        for (int i = 0; i < rv.getChildCount(); i++) {
-            View v = rv.getChildAt(i);
-            float off = Math.min(1f, Math.abs(((v.getLeft() + v.getRight()) / 2f - w / 2f) / w));
-            float e = off * off * (3f - 2f * off);
-            v.setAlpha(1f - 0.55f * e);
-            float sc = 1f - 0.07f * e;
-            v.setScaleX(sc);
-            v.setScaleY(sc);
+    private void rebindAll() {
+        if (pager.getAdapter() == null) return;
+        View first = lm.findViewByPosition(Math.max(0, curPos));
+        int off = first != null ? first.getTop() : 0;
+        pager.getAdapter().notifyDataSetChanged();
+        lm.scrollToPositionWithOffset(Math.max(0, curPos), off);
+    }
+
+    /** Pager-relative top and bottom of an ayah when its page is on screen, otherwise null. */
+    private float[] ayahBounds(int ayah) {
+        RecyclerView.ViewHolder vh = pager.findViewHolderForAdapterPosition(d.page[ayah] - 1);
+        if (!(vh instanceof PageVH)) return null;
+        LinearLayout c = ((PageVH) vh).content;
+        for (int i = 0; i < c.getChildCount(); i++) {
+            View v = c.getChildAt(i);
+            if (!(v instanceof AyahTextView) || !(v.getTag() instanceof Seg)) continue;
+            Seg sg = (Seg) v.getTag();
+            if (ayah < sg.from || ayah >= sg.to) continue;
+            Layout l = ((AyahTextView) v).getLayout();
+            if (l == null) return null;
+            int a = ayah - sg.from;
+            float base = vh.itemView.getTop() + c.getTop() + v.getTop() + ((AyahTextView) v).getTotalPaddingTop();
+            float top = base + l.getLineTop(l.getLineForOffset(sg.st[a]));
+            float bottom = base + l.getLineBottom(l.getLineForOffset(Math.max(sg.st[a], sg.en[a] - 1)));
+            return new float[]{top, bottom};
+        }
+        return null;
+    }
+
+    private void scrollAyahIntoView(int ayah) {
+        if (d == null || ayah < 0) return;
+        float[] y = ayahBounds(ayah);
+        if (y == null) return;
+        float safeTop = Ui.dp(this, 12);
+        float safeBottom = pager.getHeight() - Ui.dp(this, selBar != null && selBar.getVisibility() == View.VISIBLE ? 156 : 24);
+        float delta = 0f;
+        if (y[1] - y[0] > safeBottom - safeTop || y[0] < safeTop) delta = y[0] - safeTop - Ui.dp(this, 28);
+        else if (y[1] > safeBottom) delta = y[1] - safeBottom + Ui.dp(this, 20);
+        if (Math.abs(delta) > 2f) pager.smoothScrollBy(0, (int) delta, Anim.OUT, 420);
+    }
+
+    private void scrollAyahIntoViewLater(final int ayah) {
+        pager.postDelayed(() -> scrollAyahIntoView(ayah), 90);
+    }
+
+    /** Keeps the recited ayah in view unless the reader just scrolled by hand. */
+    private void follow(int ayah) {
+        if (SystemClock.uptimeMillis() - userScrollAt < 4000 || pager.getScrollState() != RecyclerView.SCROLL_STATE_IDLE) return;
+        int pg = d.page[ayah] - 1;
+        if (lm.findViewByPosition(pg) == null) {
+            if (Math.abs(pg - curPos) > 2) lm.scrollToPositionWithOffset(pg, 0);
+            else pager.smoothScrollToPosition(pg);
+            scrollAyahIntoViewLater(ayah);
+        } else {
+            scrollAyahIntoView(ayah);
         }
     }
 
@@ -558,7 +668,7 @@ public class QuranReaderActivity extends BaseActivity {
         if (n == fontSp) return;
         fontSp = n;
         Store.putRaw(this, "quran_font", String.valueOf(n));
-        if (pager.getAdapter() != null) pager.getAdapter().notifyDataSetChanged();
+        rebindAll();
     }
 
     // ------------------------------------------------------------------ selection
@@ -566,28 +676,34 @@ public class QuranReaderActivity extends BaseActivity {
     private void select(int ayah) {
         int old = selected;
         selected = ayah == old ? -1 : ayah;
-        if (selected < 0) hideSelection(); else showSelection();
-        if (pager.getAdapter() != null) {
-            if (old >= 0) pager.getAdapter().notifyItemChanged(d.page[old] - 1);
-            if (selected >= 0 && (old < 0 || d.page[selected] != d.page[old])) pager.getAdapter().notifyItemChanged(d.page[selected] - 1);
+        if (selected < 0) hideSelection();
+        else {
+            showSelection();
+            scrollAyahIntoViewLater(selected);
         }
+        refreshHighlights();
     }
 
     private void showSelection() {
         if (d == null || selected < 0) return;
         selText.setText(d.surahShort(d.surahOf[selected]) + " \u00B7 " + QuranData.num(d.num[selected]));
         selMark.setImageResource(QuranData.isMarked(this, selected) ? R.drawable.ic_bookmark_fill : R.drawable.ic_bookmark);
+        updateDlIcon();
+        selBar.animate().cancel();
         if (selBar.getVisibility() != View.VISIBLE) {
             selBar.setVisibility(View.VISIBLE);
             selBar.setAlpha(0f);
-            selBar.setTranslationY(Ui.dpf(this, 30));
-            selBar.animate().alpha(1f).translationY(0).setDuration(Anim.D_MED).setInterpolator(Anim.OUT).start();
+            selBar.setTranslationY(Ui.dpf(this, 36));
         }
+        selBar.animate().alpha(1f).translationY(0f).setDuration(Anim.D_LONG).setInterpolator(Anim.SPRING).start();
     }
 
     private void hideSelection() {
+        selBar.animate().cancel();
         selBar.animate().alpha(0f).translationY(Ui.dpf(this, 30)).setDuration(Anim.D_SHORT).setInterpolator(Anim.IN)
-                .withEndAction(() -> selBar.setVisibility(View.GONE)).start();
+                .withEndAction(() -> {
+                    if (selected < 0) selBar.setVisibility(View.GONE);
+                }).start();
     }
 
     private String ayahShare(int a) {
@@ -600,6 +716,7 @@ public class QuranReaderActivity extends BaseActivity {
         selMark.setImageResource(on ? R.drawable.ic_bookmark_fill : R.drawable.ic_bookmark);
         Ui.toast(this, getString(on ? R.string.quran_bookmarked : R.string.quran_unbookmarked));
         if (pager.getAdapter() != null) pager.getAdapter().notifyItemChanged(d.page[selected] - 1);
+        pager.post(this::refreshHighlights);
     }
 
     private void openTafsir() {
@@ -621,13 +738,23 @@ public class QuranReaderActivity extends BaseActivity {
 
     // ------------------------------------------------------------------ pages
 
+    private static final class Seg {
+        final int from, to;
+        final int[] st, en;
+
+        Seg(int from, int to, int[] st, int[] en) {
+            this.from = from;
+            this.to = to;
+            this.st = st;
+            this.en = en;
+        }
+    }
+
     private final class PageVH extends RecyclerView.ViewHolder {
-        final ScrollView sv;
         final LinearLayout content;
 
-        PageVH(FrameLayout card, ScrollView sv, LinearLayout content) {
+        PageVH(FrameLayout card, LinearLayout content) {
             super(card);
-            this.sv = sv;
             this.content = content;
         }
     }
@@ -642,41 +769,33 @@ public class QuranReaderActivity extends BaseActivity {
         @Override
         public PageVH onCreateViewHolder(@NonNull ViewGroup parent, int type) {
             FrameLayout card = new FrameLayout(QuranReaderActivity.this);
-            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(-1, -1);
-            lp.setMargins(Ui.dp(QuranReaderActivity.this, 14), Ui.dp(QuranReaderActivity.this, 4),
-                    Ui.dp(QuranReaderActivity.this, 14), Ui.dp(QuranReaderActivity.this, 4));
+            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(-1, -2);
+            lp.setMargins(0, Ui.dp(QuranReaderActivity.this, 3), 0, Ui.dp(QuranReaderActivity.this, 3));
             card.setLayoutParams(lp);
             card.setBackground(pageBackground());
             card.setClipToOutline(true);
-            ScrollView sv = new ScrollView(QuranReaderActivity.this);
-            sv.setVerticalScrollBarEnabled(false);
-            sv.setOverScrollMode(View.OVER_SCROLL_NEVER);
-            sv.setFillViewport(true);
             LinearLayout content = new LinearLayout(QuranReaderActivity.this);
             content.setOrientation(LinearLayout.VERTICAL);
             content.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-            content.setPadding(Ui.dp(QuranReaderActivity.this, 20), Ui.dp(QuranReaderActivity.this, 14),
-                    Ui.dp(QuranReaderActivity.this, 20), Ui.dp(QuranReaderActivity.this, 18));
-            sv.addView(content, new ScrollView.LayoutParams(-1, -2));
-            card.addView(sv, new FrameLayout.LayoutParams(-1, -1));
-            return new PageVH(card, sv, content);
+            content.setPadding(Ui.dp(QuranReaderActivity.this, 14), Ui.dp(QuranReaderActivity.this, 12),
+                    Ui.dp(QuranReaderActivity.this, 14), Ui.dp(QuranReaderActivity.this, 14));
+            card.addView(content, new FrameLayout.LayoutParams(-1, -2));
+            return new PageVH(card, content);
         }
 
         @Override
         public void onBindViewHolder(@NonNull PageVH h, int pos) {
             h.itemView.setBackground(pageBackground());
             bindPage(h, pos + 1);
-            h.itemView.setAlpha(1f);
-            h.itemView.setScaleX(1f);
-            h.itemView.setScaleY(1f);
         }
     }
 
     private void bindPage(PageVH h, int p) {
         LinearLayout c = h.content;
         c.removeAllViews();
-        h.sv.scrollTo(0, 0);
+        c.setMinimumHeight(Math.max(0, viewportH - Ui.dp(this, 6)));
         int from = d.pageFirst[p], to = d.pageFirst[p + 1];
+        java.util.HashSet<Integer> marks = new java.util.HashSet<>(QuranData.marks(this));
 
         LinearLayout strip = new LinearLayout(this);
         TextView juz = Ui.text(this, getString(R.string.quran_juz_n, QuranData.num(d.juz[from])), 12, R.color.text_secondary);
@@ -697,10 +816,12 @@ public class QuranReaderActivity extends BaseActivity {
             }
             int j = i + 1;
             while (j < to && d.num[j] != 1) j++;
-            c.addView(ayahText(i, j));
+            c.addView(ayahText(i, j, marks));
             i = j;
         }
 
+        View spacer = new View(this);
+        c.addView(spacer, new LinearLayout.LayoutParams(-1, 0, 1f));
         TextView foot = Ui.text(this, QuranData.ar(p), 14, R.color.text_secondary);
         foot.setGravity(Gravity.CENTER);
         foot.setTextColor(pageSub());
@@ -752,12 +873,11 @@ public class QuranReaderActivity extends BaseActivity {
         return t;
     }
 
-    private View ayahText(int from, int to) {
+    private View ayahText(int from, int to, java.util.Set<Integer> marks) {
         final int accent = Ui.color(this, R.color.accent_text);
         final int warn = Ui.color(this, R.color.warn);
         SpannableStringBuilder sb = new SpannableStringBuilder();
-        final java.util.ArrayList<int[]> hl = new java.util.ArrayList<>();
-        java.util.List<Integer> marks = QuranData.marks(this);
+        final int[] sts = new int[to - from], ens = new int[to - from];
         for (int k = from; k < to; k++) {
             final int ayah = k;
             int st = sb.length();
@@ -768,9 +888,8 @@ public class QuranReaderActivity extends BaseActivity {
             sb.append(' ');
             sb.setSpan(new ForegroundColorSpan(marks.contains(k) ? warn : accent), mk, en, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new RelativeSizeSpan(0.8f), mk, en, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            if (k == selected || k == playing) {
-                hl.add(new int[]{st, en});
-            }
+            sts[k - from] = st;
+            ens[k - from] = en;
             sb.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
@@ -785,13 +904,7 @@ public class QuranReaderActivity extends BaseActivity {
         }
         AyahTextView t = new AyahTextView(this);
         t.setText(sb);
-        int[] rr = new int[hl.size() * 2], cc = new int[hl.size()];
-        for (int q = 0; q < hl.size(); q++) {
-            rr[q * 2] = hl.get(q)[0];
-            rr[q * 2 + 1] = hl.get(q)[1];
-            cc[q] = Ui.alpha(pageText(), 0xFF);
-        }
-        t.setHighlights(rr, cc);
+        t.setTag(new Seg(from, to, sts, ens));
         t.setTypeface(face);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSp);
         t.setTextColor(pageText());
@@ -804,27 +917,50 @@ public class QuranReaderActivity extends BaseActivity {
         if (Build.VERSION.SDK_INT >= 26) t.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
         t.setMovementMethod(LinkMovementMethod.getInstance());
         t.setHighlightColor(Color.TRANSPARENT);
-        t.setPadding(Ui.dp(this, 6), 0, Ui.dp(this, 6), 0);
+        t.setPadding(Ui.dp(this, 4), 0, Ui.dp(this, 4), 0);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
         lp.topMargin = Ui.dp(this, 6);
         t.setLayoutParams(lp);
+        applyHighlights(t);
         return t;
+    }
+
+    /** Paints the bubble behind the selected and the recited ayah without rebuilding the page. */
+    private void applyHighlights(AyahTextView t) {
+        if (!(t.getTag() instanceof Seg)) return;
+        Seg sg = (Seg) t.getTag();
+        int[] rr = new int[4], cc = new int[2];
+        int cnt = 0;
+        for (int k = sg.from; k < sg.to && cnt < 2; k++) {
+            if (k != selected && k != playing) continue;
+            rr[cnt * 2] = sg.st[k - sg.from];
+            rr[cnt * 2 + 1] = sg.en[k - sg.from];
+            cc[cnt] = Ui.alpha(pageText(), 0xFF);
+            cnt++;
+        }
+        t.setHighlights(java.util.Arrays.copyOf(rr, cnt * 2), java.util.Arrays.copyOf(cc, cnt));
+    }
+
+    private void refreshHighlights() {
+        for (int i = 0; i < pager.getChildCount(); i++) {
+            RecyclerView.ViewHolder vh = pager.getChildViewHolder(pager.getChildAt(i));
+            if (!(vh instanceof PageVH)) continue;
+            LinearLayout c = ((PageVH) vh).content;
+            for (int k = 0; k < c.getChildCount(); k++) {
+                View v = c.getChildAt(k);
+                if (v instanceof AyahTextView) applyHighlights((AyahTextView) v);
+            }
+        }
     }
 
     private final QuranPlayer.Listener audioListener = new QuranPlayer.Listener() {
         @Override
         public void onAyah(int ayah) {
-            int old = playing;
             playing = ayah;
-            RecyclerView.Adapter<?> ad = pager.getAdapter();
-            if (ad != null) {
-                if (old >= 0 && d.page[old] != d.page[ayah]) ad.notifyItemChanged(d.page[old] - 1);
-                ad.notifyItemChanged(d.page[ayah] - 1);
-            }
+            refreshHighlights();
             wave.setAyah(ayah, QuranData.ar(d.num[ayah]));
             updatePill();
-            int pg = d.page[ayah] - 1;
-            if (pg != curPos && pager.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) pager.smoothScrollToPosition(pg);
+            follow(ayah);
         }
 
         @Override
@@ -832,9 +968,8 @@ public class QuranReaderActivity extends BaseActivity {
             playBtn.setImageResource(on ? R.drawable.ic_pause_fill : R.drawable.ic_play_fill);
             updatePill();
             if (!on && !player.canResume() && playing >= 0) {
-                int old = playing;
                 playing = -1;
-                if (pager.getAdapter() != null) pager.getAdapter().notifyItemChanged(d.page[old] - 1);
+                refreshHighlights();
             }
         }
 
@@ -860,6 +995,7 @@ public class QuranReaderActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         if (pill != null) pill.removeCallbacks(tick);
+        if (badge != null) badge.removeCallbacks(hideBadge);
         if (player.listener == audioListener) {
             player.listener = null;
             player.stop();

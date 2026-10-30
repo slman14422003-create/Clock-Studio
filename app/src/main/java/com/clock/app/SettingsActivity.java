@@ -79,6 +79,9 @@ public class SettingsActivity extends BaseActivity {
                         WBase.refreshAll(getApplicationContext());
                     });
                 }), true);
+        Ui.addRow(g, Ui.row(this, R.drawable.ic_palette, R.color.warn, getString(R.string.app_icon),
+                getString(IconSwitcher.NAMES[IconSwitcher.current(this)]), true,
+                v -> startActivity(new Intent(this, IconPickerActivity.class))), true);
         Ui.addRow(g, Ui.switchRow(this, R.drawable.ic_vibrate, R.color.ok, getString(R.string.haptics), null,
                 Store.haptics(this), (v, on) -> Store.setHaptics(this, on)), true);
         col.addView(g);

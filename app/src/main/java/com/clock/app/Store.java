@@ -134,6 +134,14 @@ final class Store {
         p(c).edit().putInt("share_theme", v).apply();
     }
 
+    static int shareTpl(Context c) {
+        return Math.max(0, p(c).getInt("share_tpl", 0));
+    }
+
+    static void setShareTpl(Context c, int v) {
+        p(c).edit().putInt("share_tpl", v).apply();
+    }
+
     static boolean standbyAuto(Context c) {
         return p(c).getBoolean("standby_auto", false);
     }
