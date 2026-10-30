@@ -3,57 +3,96 @@ package com.clock.app;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 
 import java.util.Calendar;
 import java.util.TimeZone;
 
-/** Analog face in the iOS Clock style: numerals, minute ticks, white hands and an orange second hand. */
+/** Analog face in the iOS Clock style: numerals, minute ticks, white hands and an orange second hand that sweeps smoothly. */
 final class AnalogClockView extends View {
     private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint bmp = new Paint(Paint.FILTER_BITMAP_FLAG);
     private TimeZone zone = TimeZone.getDefault();
-    private final Handler h = new Handler(Looper.getMainLooper());
-    private final Runnable tick = new Runnable() {
+    private Calendar cal = Calendar.getInstance(zone);
+    private android.graphics.Bitmap face;
+    private int primary, orange, accent;
+    private boolean running;
+    private final Runnable frame = new Runnable() {
         @Override
         public void run() {
+            if (!running) return;
             invalidate();
-            h.postDelayed(this, 1000 - System.currentTimeMillis() % 1000);
+            postOnAnimation(this);
         }
     };
 
     AnalogClockView(Context c) {
         super(c);
         p.setStrokeCap(Paint.Cap.ROUND);
+        loadColors();
+    }
+
+    private void loadColors() {
+        Context c = getContext();
+        primary = Ui.color(c, R.color.text_primary);
+        orange = Ui.color(c, R.color.warn);
+        accent = Ui.color(c, R.color.accent);
     }
 
     void setZone(TimeZone z) {
         zone = z;
+        cal = Calendar.getInstance(z);
         invalidate();
+    }
+
+    private void start() {
+        if (running || !isAttachedToWindow() || getWindowVisibility() != VISIBLE) return;
+        running = true;
+        postOnAnimation(frame);
+    }
+
+    private void stop() {
+        running = false;
+        removeCallbacks(frame);
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        h.post(tick);
+        loadColors();
+        face = null;
+        start();
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        h.removeCallbacks(tick);
+        stop();
+        face = null;
         super.onDetachedFromWindow();
     }
 
     @Override
-    protected void onDraw(Canvas cv) {
-        Context c = getContext();
-        float cx = getWidth() / 2f, cy = getHeight() / 2f;
-        float r = Math.min(cx, cy) - Ui.dpf(c, 4);
-        int primary = Ui.color(c, R.color.text_primary);
-        int hint = Ui.color(c, R.color.text_hint);
-        int accent = Ui.color(c, R.color.accent);
+    protected void onWindowVisibilityChanged(int v) {
+        super.onWindowVisibilityChanged(v);
+        if (v == VISIBLE) start();
+        else stop();
+    }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int ow, int oh) {
+        super.onSizeChanged(w, h, ow, oh);
+        face = null;
+    }
+
+    private void buildFace() {
+        int w = getWidth(), h = getHeight();
+        if (w <= 0 || h <= 0) return;
+        Context c = getContext();
+        face = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
+        Canvas cv = new Canvas(face);
+        float cx = w / 2f, cy = h / 2f;
+        float r = Math.min(cx, cy) - Ui.dpf(c, 4);
+        int hint = Ui.color(c, R.color.text_hint);
         p.setStyle(Paint.Style.FILL);
         p.setColor(Ui.color(c, R.color.surface));
         cv.drawCircle(cx, cy, r, p);
@@ -61,7 +100,6 @@ final class AnalogClockView extends View {
         p.setStrokeWidth(Ui.hairPx(c));
         p.setColor(Ui.color(c, R.color.stroke));
         cv.drawCircle(cx, cy, r, p);
-
         for (int i = 0; i < 60; i++) {
             boolean major = i % 5 == 0;
             double a = Math.toRadians(i * 6);
@@ -84,23 +122,31 @@ final class AnalogClockView extends View {
             float y = cy - (float) Math.cos(a) * rr - (p.ascent() + p.descent()) / 2f;
             cv.drawText(String.valueOf(n), x, y, p);
         }
+        p.setTypeface(null);
+    }
 
-        Calendar t = Calendar.getInstance(zone);
-        t.setTimeInMillis(System.currentTimeMillis());
-        float sec = t.get(Calendar.SECOND);
-        float min = t.get(Calendar.MINUTE) + sec / 60f;
-        float hour = (t.get(Calendar.HOUR_OF_DAY) % 12) + min / 60f;
+    @Override
+    protected void onDraw(Canvas cv) {
+        if (face == null) buildFace();
+        if (face == null) return;
+        Context c = getContext();
+        float cx = getWidth() / 2f, cy = getHeight() / 2f;
+        float r = Math.min(cx, cy) - Ui.dpf(c, 4);
+        cv.drawBitmap(face, 0, 0, bmp);
+        long now = System.currentTimeMillis();
+        cal.setTimeInMillis(now);
+        float sec = cal.get(Calendar.SECOND) + cal.get(Calendar.MILLISECOND) / 1000f;
+        float min = cal.get(Calendar.MINUTE) + sec / 60f;
+        float hour = (cal.get(Calendar.HOUR_OF_DAY) % 12) + min / 60f;
         p.setStyle(Paint.Style.STROKE);
         hand(cv, cx, cy, hour * 30, r * 0.46f, Ui.dpf(c, 4.5f), primary, 0);
         hand(cv, cx, cy, min * 6, r * 0.72f, Ui.dpf(c, 3f), primary, 0);
-        int orange = Ui.color(c, R.color.warn);
         hand(cv, cx, cy, sec * 6, r * 0.8f, Ui.dpf(c, 1.5f), orange, r * 0.16f);
         p.setStyle(Paint.Style.FILL);
         p.setColor(orange);
         cv.drawCircle(cx, cy, Ui.dpf(c, 4), p);
         p.setColor(accent);
         cv.drawCircle(cx, cy, Ui.dpf(c, 1.6f), p);
-        p.setTypeface(null);
     }
 
     private void hand(Canvas cv, float cx, float cy, float deg, float len, float w, int color, float tail) {

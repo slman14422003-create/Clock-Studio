@@ -234,7 +234,7 @@ public class MainActivity extends BaseActivity implements TabView.Host {
     }
 
     private void refreshAll() {
-        for (TabView t : tabs) t.refresh();
+        if (tabs[tab] != null) tabs[tab].refresh();
     }
 
     @Override

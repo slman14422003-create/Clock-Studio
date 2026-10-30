@@ -14,8 +14,14 @@ final class Anim {
     static final PathInterpolator OUT = new PathInterpolator(0.32f, 0.72f, 0f, 1f);
     /** Leaving curve. */
     static final PathInterpolator IN = new PathInterpolator(0.42f, 0f, 1f, 1f);
-    /** Damped spring: 1 - e^(-7.5t) * cos(9t). */
-    static final TimeInterpolator SPRING = t -> t >= 1f ? 1f : (float) (1.0 - Math.exp(-7.5 * t) * Math.cos(9.0 * t));
+    /** Damped spring, zeta 0.86: starts at rest, tiny overshoot, settles softly. */
+    private static final double ZETA = 0.86, OMEGA = 12.5;
+    private static final double WD = OMEGA * Math.sqrt(1 - ZETA * ZETA);
+    static final TimeInterpolator SPRING = t -> {
+        if (t >= 1f) return 1f;
+        double e = Math.exp(-ZETA * OMEGA * t);
+        return (float) (1.0 - e * (Math.cos(WD * t) + (ZETA * OMEGA / WD) * Math.sin(WD * t)));
+    };
 
     /** One duration scale for the whole app. */
     static final long D_TAP = 120, D_SHORT = 220, D_MED = 420, D_LONG = 600;

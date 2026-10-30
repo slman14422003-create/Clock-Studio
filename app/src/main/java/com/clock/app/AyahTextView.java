@@ -14,6 +14,8 @@ final class AyahTextView extends TextView {
     private final RectF rect = new RectF();
     private int[] ranges = new int[0];
     private int[] colors = new int[0];
+    private float hlAlpha = 1f;
+    private android.animation.ValueAnimator anim;
 
     AyahTextView(Context c) {
         super(c);
@@ -22,9 +24,30 @@ final class AyahTextView extends TextView {
     }
 
     void setHighlights(int[] r, int[] col) {
+        boolean changed = !java.util.Arrays.equals(r, ranges);
         ranges = r;
         colors = col;
-        invalidate();
+        if (anim != null) anim.cancel();
+        if (changed && col.length > 0) {
+            hlAlpha = 0f;
+            anim = android.animation.ValueAnimator.ofFloat(0f, 1f);
+            anim.setDuration(Anim.D_SHORT + 100);
+            anim.setInterpolator(Anim.OUT);
+            anim.addUpdateListener(a -> {
+                hlAlpha = (float) a.getAnimatedValue();
+                invalidate();
+            });
+            anim.start();
+        } else {
+            hlAlpha = 1f;
+            invalidate();
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if (anim != null) anim.cancel();
+        super.onDetachedFromWindow();
     }
 
     @Override
@@ -87,10 +110,10 @@ final class AyahTextView extends TextView {
 
     private void drawBubble(Canvas cv, RectF r, int tint, float d) {
         float radius = Math.min(r.height() / 2f, 14 * d);
-        fill.setColor(tint | (0x22 << 24));
+        fill.setColor(tint | (((int) (0x2A * hlAlpha)) << 24));
         cv.drawRoundRect(r, radius, radius, fill);
         edge.setStrokeWidth(1f * d);
-        edge.setColor(tint | (0x40 << 24));
+        edge.setColor(tint | (((int) (0x4A * hlAlpha)) << 24));
         r.inset(0.5f * d, 0.5f * d);
         cv.drawRoundRect(r, radius, radius, edge);
     }
