@@ -99,8 +99,52 @@ final class Alarms {
         Sched.cancel(c, Sched.KIND_ALARM, a.id);
         Sched.cancel(c, Sched.KIND_SNOOZE, a.id);
         if (!a.enabled) return;
-        long t = a.next(System.currentTimeMillis());
+        long t = nextOf(c, a, System.currentTimeMillis());
         if (t > 0) Sched.alarmClock(c, t, Sched.KIND_ALARM, a.id);
+    }
+
+    /** Next ring of an alarm, honouring the global pause. */
+    static long nextOf(Context c, Alarm a, long now) {
+        return a.next(now, Store.pauseUntil(c));
+    }
+
+    static boolean paused(Context c) {
+        return Store.pauseUntil(c) > System.currentTimeMillis();
+    }
+
+    /** Pauses every alarm until {@code until}; 0 resumes them. */
+    static void setPause(Context c, long until) {
+        Store.setPauseUntil(c, until);
+        for (Alarm a : all(c)) reschedule(c, a);
+        changed(c);
+    }
+
+    static void setAllEnabled(Context c, boolean on) {
+        List<Alarm> list = all(c);
+        for (Alarm a : list) {
+            a.enabled = on;
+            if (on) a.skipUntil = 0;
+        }
+        write(c, list);
+        for (Alarm a : list) reschedule(c, a);
+        changed(c);
+    }
+
+    static Alarm duplicate(Context c, int id) {
+        Alarm a = get(c, id);
+        if (a == null) return null;
+        Alarm d = a.copy();
+        d.id = 0;
+        d.enabled = true;
+        d.skipUntil = 0;
+        save(c, d);
+        return d;
+    }
+
+    /** One-time alarms flagged "delete after ringing" disappear once they have rung (and are not snoozed). */
+    static void cleanupAfterRing(Context c, int id) {
+        Alarm a = get(c, id);
+        if (a != null && a.days == 0 && a.deleteAfter && !a.enabled) delete(c, id);
     }
 
     static void rescheduleAll(Context c) {
@@ -114,7 +158,7 @@ final class Alarms {
             a.enabled = false;
             upsert(c, a);
         } else {
-            long t = a.next(System.currentTimeMillis());
+            long t = nextOf(c, a, System.currentTimeMillis());
             if (t > 0) Sched.alarmClock(c, t, Sched.KIND_ALARM, a.id);
         }
         changed(c);
@@ -131,7 +175,7 @@ final class Alarms {
         long best = 0;
         for (Alarm a : all(c)) {
             if (!a.enabled) continue;
-            long t = a.next(now);
+            long t = nextOf(c, a, now);
             if (t > 0 && (best == 0 || t < best)) best = t;
         }
         return best;
