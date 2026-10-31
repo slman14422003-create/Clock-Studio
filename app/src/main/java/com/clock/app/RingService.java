@@ -40,6 +40,9 @@ public class RingService extends Service {
     private Vibrator vibrator;
     private PowerManager.WakeLock wakeLock;
     private float vol = 1f;
+    private float maxVol = 1f;
+    private float rampInc = 0.06f;
+    private boolean snoozed;
 
     private String kind = Ring.KIND_ALARM;
     private int id;
@@ -50,9 +53,9 @@ public class RingService extends Service {
     private final Runnable rampStep = new Runnable() {
         @Override
         public void run() {
-            vol = Math.min(1f, vol + 0.06f);
+            vol = Math.min(maxVol, vol + rampInc);
             applyVolume();
-            if (vol < 1f) h.postDelayed(this, 1000);
+            if (vol < maxVol) h.postDelayed(this, 1000);
         }
     };
 
@@ -81,7 +84,11 @@ public class RingService extends Service {
                 onStop();
                 break;
             case A_SNOOZE:
-                if (active && Ring.KIND_ALARM.equals(kind)) Alarms.snooze(this, id, Store.snoozeMin(this));
+                if (active && Ring.KIND_ALARM.equals(kind)) {
+                    Alarm sa = Alarms.get(this, id);
+                    Alarms.snooze(this, id, sa != null && sa.snoozeMin > 0 ? sa.snoozeMin : Store.snoozeMin(this));
+                    snoozed = true;
+                }
                 end();
                 break;
             case A_PLUS:
@@ -102,6 +109,7 @@ public class RingService extends Service {
         chain = i.getLongExtra("chain", 0);
         chainLabel = i.getStringExtra("chainLabel") == null ? "" : i.getStringExtra("chainLabel");
         active = true;
+        snoozed = false;
 
         Alarm al = Ring.KIND_ALARM.equals(kind) ? Alarms.get(this, id) : null;
         boolean vibrate = al != null ? al.vibrate : Store.defaultVibrate(this);
@@ -120,11 +128,14 @@ public class RingService extends Service {
         } catch (Exception ignored) {
         }
 
-        vol = ramp ? 0.1f : 1f;
+        maxVol = al != null ? al.volume / 100f : 1f;
+        rampInc = al != null ? maxVol * 0.9f / Math.max(5, al.rampSec) : 0.06f;
+        vol = ramp ? Math.min(0.1f, maxVol) : maxVol;
         startSound(sound);
         if (ramp) h.postDelayed(rampStep, 1000);
         if (vibrate) startVibration();
-        h.postDelayed(autoStop, Store.silenceMin(this) * 60000L);
+        int stopMin = al != null && al.silenceMin > 0 ? al.silenceMin : Store.silenceMin(this);
+        h.postDelayed(autoStop, stopMin * 60000L);
         try {
             startActivity(activityIntent());
         } catch (Exception ignored) {
@@ -263,7 +274,14 @@ public class RingService extends Service {
 
     private void end() {
         stopEffects();
+        boolean wasAlarm = active && Ring.KIND_ALARM.equals(kind);
         active = false;
+        if (wasAlarm && !snoozed) {
+            try {
+                Alarms.cleanupAfterRing(this, id);
+            } catch (Throwable ignored) {
+            }
+        }
         try {
             stopForeground(STOP_FOREGROUND_REMOVE);
         } catch (Exception ignored) {

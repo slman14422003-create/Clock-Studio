@@ -57,6 +57,15 @@ final class Store {
         p(c).edit().putInt("snooze", v).apply();
     }
 
+    /** All alarms are paused until this instant (0 = not paused). */
+    static long pauseUntil(Context c) {
+        return p(c).getLong("alarm_pause", 0L);
+    }
+
+    static void setPauseUntil(Context c, long v) {
+        p(c).edit().putLong("alarm_pause", v).apply();
+    }
+
     static int silenceMin(Context c) {
         return p(c).getInt("silence", 10);
     }
