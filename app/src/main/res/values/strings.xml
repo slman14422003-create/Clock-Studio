@@ -668,4 +668,8 @@
     <string name="al_rings_at">يرن %1$s · %2$s</string>
     <string name="al_sound_section">الصوت والاهتزاز</string>
     <string name="al_wake_section">الاستيقاظ</string>
+    <string name="ring_slide">اسحب للإيقاف</string>
+    <string name="ring_for">يرن منذ %1$s</string>
+    <string name="ring_snooze_fmt">غفوة · %1$d د</string>
+    <string name="ring_solve">حل المسألة لإيقاف المنبه</string>
 </resources>

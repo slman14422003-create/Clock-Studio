@@ -668,4 +668,8 @@
     <string name="al_rings_at">Rings %1$s · %2$s</string>
     <string name="al_sound_section">Sound and haptics</string>
     <string name="al_wake_section">Wake-up</string>
+    <string name="ring_slide">Slide to stop</string>
+    <string name="ring_for">Ringing for %1$s</string>
+    <string name="ring_snooze_fmt">Snooze · %1$d min</string>
+    <string name="ring_solve">Solve to stop the alarm</string>
 </resources>
