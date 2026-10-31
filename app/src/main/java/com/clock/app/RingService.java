@@ -6,7 +6,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
+import android.database.ContentObserver;
 import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -18,6 +20,7 @@ import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
+import android.provider.Settings;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.ServiceCompat;
@@ -43,6 +46,9 @@ public class RingService extends Service {
     private float maxVol = 1f;
     private float rampInc = 0.06f;
     private boolean snoozed;
+    private AudioManager audio;
+    private ContentObserver volumeGuard;
+    private int guardVolume = -1;
 
     private String kind = Ring.KIND_ALARM;
     private int id;
@@ -110,6 +116,7 @@ public class RingService extends Service {
         chainLabel = i.getStringExtra("chainLabel") == null ? "" : i.getStringExtra("chainLabel");
         active = true;
         snoozed = false;
+        startVolumeGuard();
 
         Alarm al = Ring.KIND_ALARM.equals(kind) ? Alarms.get(this, id) : null;
         boolean vibrate = al != null ? al.vibrate : Store.defaultVibrate(this);
@@ -247,7 +254,42 @@ public class RingService extends Service {
         end();
     }
 
+    /** While it rings the alarm volume cannot be turned down: any drop is put straight back. */
+    private void startVolumeGuard() {
+        stopVolumeGuard();
+        try {
+            audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (audio == null) return;
+            guardVolume = audio.getStreamVolume(AudioManager.STREAM_ALARM);
+            volumeGuard = new ContentObserver(h) {
+                @Override
+                public void onChange(boolean selfChange) {
+                    if (!active || audio == null) return;
+                    try {
+                        if (audio.getStreamVolume(AudioManager.STREAM_ALARM) < guardVolume) {
+                            audio.setStreamVolume(AudioManager.STREAM_ALARM, guardVolume, 0);
+                        }
+                    } catch (Throwable ignored) {
+                    }
+                }
+            };
+            getContentResolver().registerContentObserver(Settings.System.CONTENT_URI, true, volumeGuard);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private void stopVolumeGuard() {
+        if (volumeGuard != null) {
+            try {
+                getContentResolver().unregisterContentObserver(volumeGuard);
+            } catch (Throwable ignored) {
+            }
+            volumeGuard = null;
+        }
+    }
+
     private void stopEffects() {
+        stopVolumeGuard();
         h.removeCallbacks(rampStep);
         h.removeCallbacks(autoStop);
         if (player != null) {
