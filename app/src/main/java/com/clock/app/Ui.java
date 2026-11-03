@@ -175,7 +175,7 @@ final class Ui {
         b.setImageResource(icon);
         b.setImageTintList(ColorStateList.valueOf(color(c, accent ? R.color.accent : R.color.text_primary)));
         b.setScaleType(ImageView.ScaleType.CENTER);
-        b.setBackgroundResource(R.drawable.bg_icon_btn);
+        b.setBackground(Glass.circle(c));
         b.setContentDescription(c.getString(desc));
         b.setOnClickListener(x -> {
             Anim.icon(b, icon);
@@ -298,7 +298,7 @@ final class Ui {
     static LinearLayout group(Context c) {
         LinearLayout g = new LinearLayout(c);
         g.setOrientation(LinearLayout.VERTICAL);
-        g.setBackground(rect(color(c, R.color.surface), dpf(c, 12)));
+        g.setBackground(Glass.card(c, 20));
         g.setClipToOutline(true);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.setMargins(dp(c, 16), 0, dp(c, 16), dp(c, 6));
@@ -487,7 +487,7 @@ final class Ui {
     }
 
     static void toast(Context c, CharSequence t) {
-        Toast.makeText(c, t, Toast.LENGTH_SHORT).show();
+        Glass.toast(c, t);
     }
 
     static GradientDrawable groupShape(Context c, boolean first, boolean last, int fillRes) {

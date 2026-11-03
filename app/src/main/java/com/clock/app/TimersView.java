@@ -232,7 +232,7 @@ final class TimersView extends TabView {
             id = timerId;
             setOrientation(HORIZONTAL);
             setGravity(Gravity.CENTER_VERTICAL);
-            setBackground(Ui.rect(Ui.color(c, R.color.surface), Ui.dpf(c, 14)));
+            setBackground(Glass.card(c, 14));
             setPaddingRelative(Ui.dp(c, 14), Ui.dp(c, 12), Ui.dp(c, 12), Ui.dp(c, 12));
             LayoutParams lp = new LayoutParams(-1, -2);
             lp.setMargins(Ui.dp(c, 16), 0, Ui.dp(c, 16), Ui.dp(c, 8));

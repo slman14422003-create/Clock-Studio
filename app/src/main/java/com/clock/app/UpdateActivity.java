@@ -71,7 +71,7 @@ public class UpdateActivity extends BaseActivity {
         box.setOrientation(LinearLayout.VERTICAL);
         box.setGravity(Gravity.CENTER_HORIZONTAL);
         box.setPadding(Ui.dp(this, 20), Ui.dp(this, 22), Ui.dp(this, 20), Ui.dp(this, 20));
-        box.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 22)));
+        box.setBackground(Glass.card(this, 22));
         status = Ui.text(this, "", 19, R.color.text_primary);
         status.setTypeface(Ui.medium());
         status.setGravity(Gravity.CENTER);

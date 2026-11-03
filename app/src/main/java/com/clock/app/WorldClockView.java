@@ -255,7 +255,6 @@ final class WorldClockView extends TabView {
             super(new LinearLayout(c));
             LinearLayout l = (LinearLayout) itemView;
             l.setOrientation(LinearLayout.VERTICAL);
-            l.setBackgroundColor(Ui.color(c, R.color.bg));
             l.setLayoutParams(new RecyclerView.LayoutParams(-1, -2));
             LinearLayout row = new LinearLayout(c);
             row.setOrientation(LinearLayout.HORIZONTAL);

@@ -38,7 +38,6 @@ final class TasksView extends TabView {
 
     TasksView(Context c, Host h) {
         super(c, h);
-        setBackgroundColor(Ui.color(c, R.color.bg_group));
         hd = new Header(c, c.getString(R.string.nav_tasks));
         hd.addButton(R.drawable.ic_brain, R.string.assistant, false, v -> AssistantActivity.open(c, false));
         hd.addButton(R.drawable.ic_add, R.string.new_task, true, v -> host.editTask(0));
@@ -166,7 +165,7 @@ final class TasksView extends TabView {
             LinearLayout cap = new LinearLayout(c);
             cap.setGravity(Gravity.CENTER_VERTICAL);
             cap.setPaddingRelative(Ui.dp(c, 14), Ui.dp(c, 12), Ui.dp(c, 14), Ui.dp(c, 12));
-            cap.setBackground(Ui.rect(Ui.color(c, R.color.surface), Ui.dpf(c, 18)));
+            cap.setBackground(Glass.card(c, 18));
             ImageView spark = new ImageView(c);
             spark.setImageResource(R.drawable.ic_brain);
             spark.setImageTintList(ColorStateList.valueOf(Color.WHITE));
