@@ -75,11 +75,15 @@ final class GlassMenu {
 
         final FrameLayout layer = new FrameLayout(act);
         final View scrim = new View(act);
-        scrim.setBackgroundColor(night ? 0x66000000 : 0x2E000000);
+        scrim.setBackgroundColor(night ? 0x99000000 : 0x40000000);
         scrim.setAlpha(0f);
         layer.addView(scrim, new FrameLayout.LayoutParams(-1, -1));
 
-        final BlurView menu = Glass.panel(act, 24, Glass.panelFill(act));
+        final BlurView menu = Glass.panel(act, 24, night ? 0x992C2C2E : 0xB3FFFFFF);
+        try {
+            menu.setBlurRadius(20f);
+        } catch (Throwable ignored) {
+        }
         menu.setElevation(Ui.dpf(act, 12));
         LinearLayout col = new LinearLayout(act);
         col.setOrientation(LinearLayout.VERTICAL);

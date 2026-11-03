@@ -175,25 +175,11 @@ final class Glass {
     /** Glass dialog: the whole app behind it is blurred (Android 12+) and the panel is a translucent glass card. */
     static void styleDialog(Context c, Window w) {
         if (w == null) return;
-        if (!enabled(c)) return;
         boolean night = Appearance.isNight(c);
-        boolean blur = false;
-        if (Build.VERSION.SDK_INT >= 31) {
-            try {
-                WindowManager wm = (WindowManager) c.getSystemService(Context.WINDOW_SERVICE);
-                if (wm.isCrossWindowBlurEnabled()) {
-                    w.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-                    WindowManager.LayoutParams lp = w.getAttributes();
-                    lp.setBlurBehindRadius(Math.round(Ui.dpf(c, 14f + 6f * Store.glassLevel(c))));
-                    w.setAttributes(lp);
-                    w.setDimAmount(0.12f);
-                    blur = true;
-                }
-            } catch (Throwable ignored) {
-            }
-        }
-        int fill = blur ? (night ? 0xB32C2C2E : 0xB8FFFFFF) : (night ? 0xF22C2C2E : 0xF5FFFFFF);
-        w.setBackgroundDrawable(new InsetDrawable(new GlassDrawable(c, Ui.dpf(c, 28), fill, 1f), Ui.dp(c, 4)));
+        int fill = night ? 0xFF1C1C1E : 0xFFF2F2F7;
+        w.setDimAmount(night ? 0.6f : 0.35f);
+        w.setBackgroundDrawable(new InsetDrawable(new GlassDrawable(c, Ui.dpf(c, 28), fill, 0.6f), Ui.dp(c, 4)));
+        w.setWindowAnimations(R.style.DialogAnim);
     }
 
     // ------------------------------------------------------------------ tilt light

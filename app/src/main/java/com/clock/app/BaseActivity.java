@@ -120,7 +120,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         getWindow().setBackgroundDrawable(new ColorDrawable(Ui.color(this, R.color.bg_group)));
         FrameLayout host = new FrameLayout(this);
         target = new BlurTarget(this);
-        if (Glass.enabled(this)) target.addView(new AuroraView(this), new FrameLayout.LayoutParams(-1, -1));
         final FrameLayout holder = new FrameLayout(this);
         holder.addView(view, new FrameLayout.LayoutParams(-1, -1));
         target.addView(holder, new FrameLayout.LayoutParams(-1, -1));
