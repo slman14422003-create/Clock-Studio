@@ -4,4 +4,5 @@
     <item name="row_title" type="id" />
     <item name="row_value" type="id" />
     <item name="row_switch" type="id" />
+    <item name="tag_pad_base" type="id" />
 </resources>

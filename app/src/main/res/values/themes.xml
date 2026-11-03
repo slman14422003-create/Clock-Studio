@@ -10,21 +10,22 @@
         <item name="cBrandEnd">@color/brand_end</item>
         <item name="cBg">@color/bg</item>
         <item name="cGroupBg">@color/bg_group</item>
-        <item name="cSurface">@color/surface</item>
+        <item name="cSurface">@color/glass_surface</item>
         <item name="cSurfaceHigh">@color/surface_high</item>
-        <item name="cField">@color/field</item>
+        <item name="cField">@color/glass_field</item>
         <item name="cStroke">@color/stroke</item>
         <item name="cStrokeSoft">@color/stroke_soft</item>
         <item name="cTextPrimary">@color/text_primary</item>
         <item name="cTextSecondary">@color/text_secondary</item>
         <item name="cTextHint">@color/text_hint</item>
-        <item name="cNeutralSoft">@color/neutral_soft</item>
+        <item name="cNeutralSoft">@color/glass_neutral</item>
         <item name="colorPrimary">?attr/cAccent</item>
         <item name="colorPrimaryDark">?attr/cBg</item>
         <item name="colorAccent">?attr/cAccentText</item>
         <item name="android:windowBackground">?attr/cBg</item>
-        <item name="android:statusBarColor">?attr/cBg</item>
-        <item name="android:navigationBarColor">?attr/cBg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
         <item name="android:windowLightStatusBar">@bool/light_bars</item>
         <item name="android:textColorPrimary">?attr/cTextPrimary</item>
         <item name="android:textColorSecondary">?attr/cTextSecondary</item>
@@ -39,8 +40,17 @@
         <item name="seekBarStyle">@style/IosSeekBar</item>
     </style>
 
+    <!-- Liquid Glass switched off in Settings: the same screens with the opaque iOS surfaces -->
+    <style name="AppTheme.Solid" parent="AppTheme">
+        <item name="cSurface">@color/surface</item>
+        <item name="cField">@color/field</item>
+        <item name="cNeutralSoft">@color/neutral_soft</item>
+        <item name="android:statusBarColor">?attr/cBg</item>
+        <item name="android:navigationBarColor">?attr/cBg</item>
+    </style>
+
     <!-- the ring screen is always pure black, like the iOS alarm screen, in day and night -->
-    <style name="AppTheme.Ring" parent="AppTheme">
+    <style name="AppTheme.Ring" parent="AppTheme.Solid">
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>

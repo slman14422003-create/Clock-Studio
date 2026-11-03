@@ -29,4 +29,11 @@
     <color name="lime">#65C466</color>
     <color name="ic_launcher_bg">#F7FAFF</color>
     <color name="indigo">#5856D6</color>
+    <!-- Liquid Glass (day) -->
+    <color name="glass_surface">#B3FFFFFF</color>
+    <color name="glass_field">#99FFFFFF</color>
+    <color name="glass_neutral">#2E767680</color>
+    <color name="glass_tint">#59FFFFFF</color>
+    <color name="glass_rim">#FFFFFFFF</color>
+    <color name="glass_base">#F2F2F7</color>
 </resources>
