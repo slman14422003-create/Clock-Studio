@@ -89,7 +89,7 @@ public class TasbihActivity extends BaseActivity {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setGravity(Gravity.CENTER_HORIZONTAL);
-        card.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 28)));
+        card.setBackground(Glass.card(this, 28));
         card.setPadding(Ui.dp(this, 12), Ui.dp(this, 20), Ui.dp(this, 12), Ui.dp(this, 12));
         phraseTv = Ui.text(this, "", 28, R.color.text_primary);
         phraseTv.setTypeface(Ui.medium());
@@ -119,7 +119,7 @@ public class TasbihActivity extends BaseActivity {
         totalText.setGravity(Gravity.CENTER);
         totalText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         totalText.setPadding(Ui.dp(this, 18), Ui.dp(this, 9), Ui.dp(this, 18), Ui.dp(this, 9));
-        totalText.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 100)));
+        totalText.setBackground(Glass.card(this, 100));
         LinearLayout.LayoutParams tl = new LinearLayout.LayoutParams(-2, -2);
         tl.gravity = Gravity.CENTER_HORIZONTAL;
         tl.topMargin = Ui.dp(this, 16);

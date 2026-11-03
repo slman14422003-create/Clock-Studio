@@ -24,6 +24,16 @@ import java.lang.ref.WeakReference;
  * Started by hand or automatically by StandByService while charging.
  */
 public class StandByActivity extends BaseActivity implements SensorEventListener {
+    @Override
+    protected boolean glassScreen() {
+        return false;
+    }
+
+    @Override
+    protected int themeOverride() {
+        return 0;
+    }
+
     private static WeakReference<StandByActivity> current = new WeakReference<>(null);
     private StandByView view;
     private boolean auto;

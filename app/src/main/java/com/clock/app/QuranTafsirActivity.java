@@ -162,7 +162,7 @@ public class QuranTafsirActivity extends BaseActivity {
     private View downloadCard() {
         LinearLayout c = new LinearLayout(this);
         c.setOrientation(LinearLayout.VERTICAL);
-        c.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 18)));
+        c.setBackground(Glass.card(this, 18));
         c.setPadding(Ui.dp(this, 16), Ui.dp(this, 14), Ui.dp(this, 16), Ui.dp(this, 14));
 
         LinearLayout modes = new LinearLayout(this);
@@ -296,7 +296,7 @@ public class QuranTafsirActivity extends BaseActivity {
     private View bodyCard() {
         LinearLayout c = new LinearLayout(this);
         c.setOrientation(LinearLayout.VERTICAL);
-        c.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 18)));
+        c.setBackground(Glass.card(this, 18));
         c.setPadding(Ui.dp(this, 18), Ui.dp(this, 16), Ui.dp(this, 18), Ui.dp(this, 18));
         label = Ui.text(this, "", 13, R.color.accent_text);
         label.setTypeface(Ui.medium());

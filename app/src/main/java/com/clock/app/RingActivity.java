@@ -38,6 +38,16 @@ import java.util.TimeZone;
 
 /** Full-screen ring screen over the lock screen: big time, pulsing bell, Snooze / Stop and the optional math challenge. */
 public class RingActivity extends BaseActivity {
+    @Override
+    protected boolean glassScreen() {
+        return false;
+    }
+
+    @Override
+    protected int themeOverride() {
+        return 0;
+    }
+
     private String kind = Ring.KIND_ALARM;
     private int id;
     private String label = "";

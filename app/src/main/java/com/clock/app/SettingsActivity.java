@@ -84,6 +84,20 @@ public class SettingsActivity extends BaseActivity {
                 v -> startActivity(new Intent(this, IconPickerActivity.class))), true);
         Ui.addRow(g, Ui.switchRow(this, R.drawable.ic_vibrate, R.color.ok, getString(R.string.haptics), null,
                 Store.haptics(this), (v, on) -> Store.setHaptics(this, on)), true);
+        Ui.addRow(g, Ui.switchRow(this, R.drawable.ic_palette, R.color.info, getString(R.string.glass), getString(R.string.glass_sub),
+                Store.glass(this), (v, on) -> {
+                    Store.setGlass(this, on);
+                    Appearance.recreateAll();
+                }), true);
+        if (Store.glass(this)) {
+            final String[] lv = {getString(R.string.glass_soft), getString(R.string.glass_normal), getString(R.string.glass_strong)};
+            Ui.addRow(g, Ui.row(this, R.drawable.ic_sliders, R.color.violet, getString(R.string.glass_level),
+                    lv[Math.max(0, Math.min(2, Store.glassLevel(this)))], true, v ->
+                            Dlg.choose(this, R.string.glass_level, lv, Store.glassLevel(this), i -> {
+                                Store.setGlassLevel(this, i);
+                                Appearance.recreateAll();
+                            })), true);
+        }
         col.addView(g);
 
         LinearLayout gai = Ui.group(this);

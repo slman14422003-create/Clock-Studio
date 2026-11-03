@@ -343,7 +343,7 @@ public class PrayerActivity extends BaseActivity {
     private LinearLayout logCard(String ymd) {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 14)));
+        card.setBackground(Glass.card(this, 14));
         card.setPadding(Ui.dp(this, 16), Ui.dp(this, 14), Ui.dp(this, 16), Ui.dp(this, 14));
         logTitle = Ui.text(this, "", 18, R.color.text_primary);
         logTitle.setTypeface(Ui.medium());

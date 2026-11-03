@@ -121,7 +121,7 @@ public class QuranActivity extends BaseActivity {
     private View searchBox() {
         LinearLayout box = new LinearLayout(this);
         box.setGravity(Gravity.CENTER_VERTICAL);
-        box.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 12)));
+        box.setBackground(Glass.card(this, 12));
         box.setPaddingRelative(Ui.dp(this, 12), 0, Ui.dp(this, 12), 0);
         ImageView ic = new ImageView(this);
         ic.setImageResource(R.drawable.ic_search);
@@ -680,7 +680,7 @@ public class QuranActivity extends BaseActivity {
         LinearLayout c = new LinearLayout(this);
         c.setOrientation(LinearLayout.VERTICAL);
         c.setGravity(Gravity.CENTER_HORIZONTAL);
-        c.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 18)));
+        c.setBackground(Glass.card(this, 18));
         c.setPadding(Ui.dp(this, 22), Ui.dp(this, 28), Ui.dp(this, 22), Ui.dp(this, 24));
         ImageView ic = new ImageView(this);
         ic.setImageResource(R.drawable.ic_quran);

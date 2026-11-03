@@ -43,6 +43,11 @@ import androidx.recyclerview.widget.RecyclerView;
  * filling at least a screen, with the text always right-to-left like a printed Quran.
  */
 public class QuranReaderActivity extends BaseActivity {
+    @Override
+    protected boolean glassScreen() {
+        return false;
+    }
+
     static final String EXTRA_PAGE = "page", EXTRA_AYAH = "ayah", EXTRA_HIGHLIGHT = "hl", EXTRA_PLAY = "play";
     private static final int MIN_FONT = 18, MAX_FONT = 44;
 

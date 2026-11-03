@@ -134,6 +134,24 @@ final class Store {
         p(c).edit().putBoolean("haptics", v).apply();
     }
 
+    /** Liquid Glass look (blur, translucent surfaces, live backdrop). */
+    static boolean glass(Context c) {
+        return p(c).getBoolean("glass", true);
+    }
+
+    static void setGlass(Context c, boolean v) {
+        p(c).edit().putBoolean("glass", v).apply();
+    }
+
+    /** Blur strength: 0 soft, 1 normal, 2 strong. */
+    static int glassLevel(Context c) {
+        return p(c).getInt("glass_level", 1);
+    }
+
+    static void setGlassLevel(Context c, int v) {
+        p(c).edit().putInt("glass_level", v).apply();
+    }
+
     /** 0 = digital, 1 = analog, 2 = night. */
     static int shareTheme(Context c) {
         return Math.max(0, p(c).getInt("share_theme", 0));

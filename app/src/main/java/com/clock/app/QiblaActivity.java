@@ -93,7 +93,7 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setGravity(Gravity.CENTER_HORIZONTAL);
-        card.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 28)));
+        card.setBackground(Glass.card(this, 28));
         card.setPadding(Ui.dp(this, 10), Ui.dp(this, 14), Ui.dp(this, 10), Ui.dp(this, 16));
         compass = new CompassView(this, qibla);
         card.addView(compass, new LinearLayout.LayoutParams(-1, -2));

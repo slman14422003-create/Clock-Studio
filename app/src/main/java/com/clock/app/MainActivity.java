@@ -13,6 +13,8 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import eightbitlab.com.blurview.BlurView;
+
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -33,7 +35,7 @@ public class MainActivity extends BaseActivity implements TabView.Host {
     private int tab = NavBar.CLOCK;
     private final Handler ui = new Handler(Looper.getMainLooper());
     private OnBackPressedCallback backCb;
-    private LinearLayout pill;
+    private View pill;
     private TextView pillMsg;
     private Runnable undoAction;
     private final Runnable hideUndo = this::hidePill;
@@ -94,7 +96,6 @@ public class MainActivity extends BaseActivity implements TabView.Host {
         LinearLayout root = new LinearLayout(this);
         rootView = root;
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Ui.color(this, R.color.bg));
         FrameLayout stage = new FrameLayout(this);
         root.addView(stage, new LinearLayout.LayoutParams(-1, 0, 1f));
         setContentView(root);
@@ -111,17 +112,16 @@ public class MainActivity extends BaseActivity implements TabView.Host {
         tabs[3] = new TasksView(this, this);
         for (TabView t : tabs) stage.addView(t, new FrameLayout.LayoutParams(-1, -1));
 
-        pill = new LinearLayout(this);
-        pill.setOrientation(LinearLayout.HORIZONTAL);
-        pill.setGravity(Gravity.CENTER_VERTICAL);
-        pill.setBackground(Ui.rect(0xF0262628, Ui.dpf(this, 100)));
-        pill.setPadding(Ui.dp(this, 18), Ui.dp(this, 11), Ui.dp(this, 18), Ui.dp(this, 11));
-        pill.setElevation(Ui.dp(this, 6));
+        final BlurView pillPanel = Glass.panel(this, 100, Glass.panelFill(this));
+        pill = pillPanel;
+        LinearLayout pillRow = new LinearLayout(this);
+        pillRow.setOrientation(LinearLayout.HORIZONTAL);
+        pillRow.setGravity(Gravity.CENTER_VERTICAL);
+        pillRow.setPadding(Ui.dp(this, 20), Ui.dp(this, 11), Ui.dp(this, 18), Ui.dp(this, 11));
         pillMsg = Ui.text(this, "", 15, R.color.text_primary);
-        pillMsg.setTextColor(0xFFFFFFFF);
-        pill.addView(pillMsg);
-        TextView act = Ui.text(this, getString(R.string.undo), 15, R.color.text_primary);
-        act.setTextColor(0xFF5CC0FF);
+        pillMsg.setTypeface(Ui.medium());
+        pillRow.addView(pillMsg);
+        TextView act = Ui.text(this, getString(R.string.undo), 15, R.color.accent);
         act.setTypeface(Ui.medium());
         act.setPadding(Ui.dp(this, 16), 0, 0, 0);
         act.setOnClickListener(v -> {
@@ -129,19 +129,25 @@ public class MainActivity extends BaseActivity implements TabView.Host {
             hidePill();
             if (r != null) r.run();
         });
-        pill.addView(act);
+        pillRow.addView(act);
+        pillPanel.addView(pillRow, new FrameLayout.LayoutParams(-2, -2));
         pill.setVisibility(View.GONE);
         FrameLayout.LayoutParams pl = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-        pl.bottomMargin = Ui.dp(this, 10);
-        stage.addView(pill, pl);
+        glassOverlay().addView(pill, pl);
 
-        nav = NavBar.attach(this, root, NavBar.CLOCK, idx -> {
+        nav = NavBar.attach(this, NavBar.CLOCK, idx -> {
             if (idx == NavBar.SETTINGS) startActivity(new Intent(this, SettingsActivity.class));
             else showTab(idx);
         });
         nav.setOnReselect(idx -> {
             if (idx < 4) tabs[idx].scrollToTop();
         });
+        // the bar floats over the tabs: their lists scroll underneath it and the undo pill rides above it
+        setOnGlassInsets(this::layoutAboveBar);
+        nav.view().addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+            if (b - t != ob - ot) layoutAboveBar();
+        });
+        nav.view().post(this::layoutAboveBar);
 
         backCb = new OnBackPressedCallback(false) {
             @Override
@@ -158,6 +164,24 @@ public class MainActivity extends BaseActivity implements TabView.Host {
                 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             Store.setAskedNotifications(this);
             notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+        }
+    }
+
+    private void layoutAboveBar() {
+        if (nav == null || pill == null) return;
+        nav.setBottomInset(glassInsetBottom());
+        int h = nav.height();
+        if (h <= 0) return;
+        int room = h + Ui.dp(this, 10) + glassInsetBottom();
+        setGlassReserved(h + Ui.dp(this, 10));
+        for (TabView t : tabs) {
+            if (t != null) Glass.padBottom(t, h + Ui.dp(this, 22));
+        }
+        FrameLayout.LayoutParams pl = (FrameLayout.LayoutParams) pill.getLayoutParams();
+        int want = room + Ui.dp(this, 12);
+        if (pl.bottomMargin != want) {
+            pl.bottomMargin = want;
+            pill.setLayoutParams(pl);
         }
     }
 
