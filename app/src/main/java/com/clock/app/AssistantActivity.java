@@ -102,7 +102,7 @@ public class AssistantActivity extends BaseActivity {
         input.setHintTextColor(Ui.color(this, R.color.text_hint));
         input.setTextColor(Ui.color(this, R.color.text_primary));
         input.setTextSize(16);
-        input.setBackground(Ui.rect(Ui.color(this, R.color.surface), Ui.dpf(this, 22)));
+        input.setBackground(Glass.card(this, 22));
         input.setPaddingRelative(Ui.dp(this, 16), Ui.dp(this, 10), Ui.dp(this, 16), Ui.dp(this, 10));
         input.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE);

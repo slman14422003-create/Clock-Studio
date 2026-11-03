@@ -31,6 +31,7 @@ public class Dlg extends AlertDialog.Builder {
     public AlertDialog create() {
         final AlertDialog d = super.create();
         dlg = d;
+        Glass.styleDialog(getContext(), d.getWindow());
         return d;
     }
 

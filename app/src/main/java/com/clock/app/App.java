@@ -40,6 +40,7 @@ public class App extends Application {
             @Override
             public void onActivityStarted(Activity a) {
                 if (Build.VERSION.SDK_INT < 35) return;
+                if (a instanceof BaseActivity && ((BaseActivity) a).glassHosted()) return;
                 View content = a.findViewById(android.R.id.content);
                 if (content == null || content.getTag(R.id.tag_insets) != null) return;
                 content.setTag(R.id.tag_insets, Boolean.TRUE);

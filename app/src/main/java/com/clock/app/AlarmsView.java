@@ -295,34 +295,28 @@ final class AlarmsView extends TabView {
         });
     }
 
-    private void menu(final Alarm a) {
+    private void menu(final Alarm a, final View anchor) {
         final Context c = getContext();
         final boolean canSkip = a.enabled && a.days != 0;
         final boolean skipping = a.skipUntil > System.currentTimeMillis();
-        List<String> labels = new ArrayList<>();
-        labels.add(c.getString(R.string.edit_alarm));
-        labels.add(c.getString(R.string.al_duplicate));
-        if (canSkip) labels.add(c.getString(skipping ? R.string.skip_cancel : R.string.skip_next));
-        labels.add(c.getString(R.string.delete_alarm));
-        final int skipIdx = canSkip ? 2 : -1;
-        final int delIdx = labels.size() - 1;
-        Dlg.choose(c, R.string.alarm, labels.toArray(new String[0]), -1, i -> {
-            if (i == 0) {
-                host.editAlarm(a.id);
-            } else if (i == 1) {
-                Alarms.duplicate(c, a.id);
-                Ui.toast(c, c.getString(R.string.al_duplicated));
-            } else if (i == skipIdx) {
+        GlassMenu.Builder mb = GlassMenu.builder();
+        mb.add(c.getString(R.string.edit_alarm), R.drawable.ic_edit, () -> host.editAlarm(a.id));
+        mb.add(c.getString(R.string.al_duplicate), R.drawable.ic_copy, () -> {
+            Alarms.duplicate(c, a.id);
+            Ui.toast(c, c.getString(R.string.al_duplicated));
+        });
+        if (canSkip) {
+            mb.add(c.getString(skipping ? R.string.skip_cancel : R.string.skip_next), R.drawable.ic_bell, () -> {
                 if (skipping) {
                     Alarms.clearSkip(c, a.id);
                 } else {
                     Alarms.skipNext(c, a.id);
                     Ui.toast(c, c.getString(R.string.skip_done));
                 }
-            } else if (i == delIdx) {
-                removeWithUndo(a);
-            }
-        });
+            });
+        }
+        mb.destructive(c.getString(R.string.delete_alarm), R.drawable.ic_delete, () -> removeWithUndo(a));
+        mb.show(anchor);
     }
 
     private void openBedtime() {
@@ -507,10 +501,9 @@ final class AlarmsView extends TabView {
             LinearLayout outer = (LinearLayout) itemView;
             outer.setOrientation(LinearLayout.VERTICAL);
             outer.setLayoutParams(new RecyclerView.LayoutParams(-1, -2));
-            outer.setBackgroundColor(Ui.color(c, R.color.bg));
             card = new LinearLayout(c);
             card.setOrientation(LinearLayout.VERTICAL);
-            card.setBackground(Ui.rect(Ui.color(c, R.color.field), Ui.dpf(c, 24)));
+            card.setBackground(Glass.card(c, 24, Ui.color(c, R.color.field)));
             card.setClipToOutline(true);
             card.setPaddingRelative(Ui.dp(c, 20), Ui.dp(c, 14), Ui.dp(c, 16), Ui.dp(c, 16));
             LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(-1, -2);
@@ -664,7 +657,7 @@ final class AlarmsView extends TabView {
             card.setOnClickListener(v -> host.editAlarm(a.id));
             card.setOnLongClickListener(v -> {
                 Ui.tick(v);
-                menu(a);
+                menu(a, v);
                 return true;
             });
         }
