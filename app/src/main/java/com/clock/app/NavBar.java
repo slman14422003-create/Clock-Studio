@@ -81,7 +81,8 @@ final class NavBar {
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if (!dragging && Math.abs(e.getX() - downX) > slop) {
-                        startDrag(e.getX());
+                        // Explicit qualifier to call NavBar's own startDrag, not View.startDrag(ClipData, ...)
+                        NavBar.this.startDrag(e.getX());
                         return true;
                     }
                     break;
@@ -96,13 +97,13 @@ final class NavBar {
             if (!dragging) return false;
             switch (e.getActionMasked()) {
                 case MotionEvent.ACTION_MOVE:
-                    drag(e.getX());
+                    NavBar.this.drag(e.getX());
                     return true;
                 case MotionEvent.ACTION_UP:
-                    endDrag(e.getX(), true);
+                    NavBar.this.endDrag(e.getX(), true);
                     return true;
                 case MotionEvent.ACTION_CANCEL:
-                    endDrag(e.getX(), false);
+                    NavBar.this.endDrag(e.getX(), false);
                     return true;
                 default:
                     return true;
