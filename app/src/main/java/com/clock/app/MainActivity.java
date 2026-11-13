@@ -69,13 +69,13 @@ public class MainActivity extends BaseActivity implements TabView.Host {
                 long wait = 0;
                 try {
                     long end = provider.getIconAnimationStartMillis() + provider.getIconAnimationDurationMillis();
-                    wait = Math.max(0L, Math.min(650L, end - System.currentTimeMillis()));
+                    wait = Math.max(0L, Math.min(120L, end - System.currentTimeMillis()));
                 } catch (Throwable ignored) {
                 }
                 final long delay = wait;
                 reveal(delay + 90);
                 if (ic != null) {
-                    ic.animate().setStartDelay(delay).scaleX(1.7f).scaleY(1.7f).alpha(0f).setDuration(Anim.D_MED)
+                    ic.animate().setStartDelay(delay).scaleX(1.12f).scaleY(1.12f).alpha(0f).setDuration(Anim.D_MED)
                             .setInterpolator(Anim.IN).start();
                 }
                 if (sv != null) {

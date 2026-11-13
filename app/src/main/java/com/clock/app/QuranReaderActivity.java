@@ -28,7 +28,6 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.os.SystemClock;
 import android.widget.TextView;
 
@@ -56,20 +55,17 @@ public class QuranReaderActivity extends BaseActivity {
     private RecyclerView pager;
     private LinearLayoutManager lm;
     private LinearLayout main;
-    private View bottomRef;
     private TextView badge;
     private ImageButton selDl;
     private int viewportH;
     private long userScrollAt;
     private TextView title, subtitle, loading;
-    private SeekBar seek;
     private LinearLayout selBar;
     private TextView selText;
     private ImageButton selMark;
     private int selected = -1;
     private int curPos = -1;
     private int startPos = 0;
-    private boolean seeking;
     private int fontSp = 26;
     private Typeface face = Typeface.SERIF;
     private FrameLayout root;
@@ -161,8 +157,6 @@ public class QuranReaderActivity extends BaseActivity {
         });
         main.addView(pager, new LinearLayout.LayoutParams(-1, 0, 1f));
         main.addView(playerPill());
-        bottomRef = bottomBar();
-        main.addView(bottomRef);
 
         loading = Ui.text(this, getString(R.string.quran_loading), 16, R.color.text_secondary);
         loading.setGravity(Gravity.CENTER);
@@ -175,6 +169,18 @@ public class QuranReaderActivity extends BaseActivity {
             androidx.core.graphics.Insets s = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(s.left, s.top, s.right, s.bottom);
             return insets;
+        });
+
+        getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (selected >= 0) {
+                    select(-1);
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
         });
 
         QuranData.load(this, data -> {
@@ -241,40 +247,6 @@ public class QuranReaderActivity extends BaseActivity {
         LinearLayout.LayoutParams mb = new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40));
         mb.setMarginStart(Ui.dp(this, 6));
         bar.addView(more, mb);
-        return bar;
-    }
-
-    private View bottomBar() {
-        LinearLayout bar = new LinearLayout(this);
-        bar.setGravity(Gravity.CENTER_VERTICAL);
-        bar.setPaddingRelative(Ui.dp(this, 18), Ui.dp(this, 2), Ui.dp(this, 18), Ui.dp(this, 8));
-        bar.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        TextView first = Ui.text(this, QuranData.ar(1), 12, R.color.text_secondary);
-        TextView last = Ui.text(this, QuranData.ar(QuranData.PAGES), 12, R.color.text_secondary);
-        seek = new SeekBar(this);
-        seek.setMax(QuranData.PAGES - 1);
-        seek.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar s, int p, boolean fromUser) {
-                if (!fromUser || d == null) return;
-                lm.scrollToPositionWithOffset(p, 0);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar s) {
-                seeking = true;
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar s) {
-                seeking = false;
-                saveProgress();
-            }
-        });
-        bar.addView(first);
-        bar.addView(seek, new LinearLayout.LayoutParams(0, Ui.dp(this, 40), 1f));
-        bar.addView(last);
         return bar;
     }
 
@@ -378,7 +350,7 @@ public class QuranReaderActivity extends BaseActivity {
         selBar.addView(row);
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM);
-        lp.setMargins(Ui.dp(this, 12), 0, Ui.dp(this, 12), Ui.dp(this, 56));
+        lp.setMargins(Ui.dp(this, 12), 0, Ui.dp(this, 12), Ui.dp(this, 12));
         selLp = lp;
         root.addView(selBar, lp);
     }
@@ -561,7 +533,9 @@ public class QuranReaderActivity extends BaseActivity {
                 getString(R.string.quran_share),
                 getString(R.string.quran_bg),
                 getString(R.string.quran_goto),
-                (keepOn() ? "\u2713 " : "") + getString(R.string.quran_keep_on)
+                (keepOn() ? "\u2713 " : "") + getString(R.string.quran_keep_on),
+                getString(R.string.quran_goto_surah),
+                getString(R.string.quran_goto_juz)
         };
         new Dlg(this).setTitle(R.string.quran_more).setItems(items, (dlg, which) -> {
             if (which == 0) showReciters();
@@ -573,11 +547,33 @@ public class QuranReaderActivity extends BaseActivity {
             else if (which == 6) {
                 Store.putRaw(this, "quran_keep_on", keepOn() ? "0" : "1");
                 applyKeepOn();
-            } else {
+            } else if (which == 7) chooseSurah();
+            else if (which == 8) chooseJuz();
+            else {
                 int a = targetAyah();
                 ShareCard.show(this, d.surahShort(d.surahOf[a]), QuranData.num(d.num[a]), d.text[a], ayahShare(a));
             }
         }).show();
+    }
+
+    private void chooseSurah() {
+        String[] labels = new String[QuranData.SURAHS];
+        for (int i = 1; i <= QuranData.SURAHS; i++) labels[i - 1] = QuranData.num(i) + " \u00B7 " + d.surahShort(i);
+        int cur = curPos < 0 ? 0 : d.surahOf[d.pageFirst[curPos + 1]] - 1;
+        Dlg.choose(this, R.string.quran_goto_surah, labels, cur, i -> jumpToPage(d.surahs[i + 1].page));
+    }
+
+    private void chooseJuz() {
+        String[] labels = new String[30];
+        for (int i = 1; i <= 30; i++) labels[i - 1] = getString(R.string.quran_juz_n, QuranData.num(i));
+        int cur = curPos < 0 ? 0 : d.juz[d.pageFirst[curPos + 1]] - 1;
+        Dlg.choose(this, R.string.quran_goto_juz, labels, cur, i -> jumpToPage(d.juzPage[i + 1]));
+    }
+
+    private void jumpToPage(int p) {
+        if (p < 1 || p > QuranData.PAGES || pager == null) return;
+        select(-1);
+        lm.scrollToPositionWithOffset(p - 1, 0);
     }
 
     // ------------------------------------------------------------------ paging
@@ -627,7 +623,7 @@ public class QuranReaderActivity extends BaseActivity {
         float[] y = ayahBounds(ayah);
         if (y == null) return;
         float safeTop = Ui.dp(this, 12);
-        float safeBottom = pager.getHeight() - Ui.dp(this, selBar != null && selBar.getVisibility() == View.VISIBLE ? 156 : 24);
+        float safeBottom = pager.getHeight() - Ui.dp(this, selBar != null && selBar.getVisibility() == View.VISIBLE ? 112 : 24);
         float delta = 0f;
         if (y[1] - y[0] > safeBottom - safeTop || y[0] < safeTop) delta = y[0] - safeTop - Ui.dp(this, 28);
         else if (y[1] > safeBottom) delta = y[1] - safeBottom + Ui.dp(this, 20);
@@ -659,7 +655,6 @@ public class QuranReaderActivity extends BaseActivity {
         title.setText(d.surahTitle(d.surahOf[first]));
         subtitle.setText(getString(R.string.quran_juz_n, QuranData.num(d.juz[first])) + " \u00B7 "
                 + getString(R.string.quran_page, QuranData.num(p)));
-        if (!seeking) seek.setProgress(pos);
     }
 
     private void saveProgress() {
@@ -803,9 +798,13 @@ public class QuranReaderActivity extends BaseActivity {
         java.util.HashSet<Integer> marks = new java.util.HashSet<>(QuranData.marks(this));
 
         LinearLayout strip = new LinearLayout(this);
+        strip.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         TextView juz = Ui.text(this, getString(R.string.quran_juz_n, QuranData.num(d.juz[from])), 12, R.color.text_secondary);
         TextView sur = Ui.text(this, d.surahShort(d.surahOf[from]), 12, R.color.text_secondary);
-        sur.setGravity(Gravity.END);
+        sur.setGravity(Gravity.RIGHT);
+        juz.setGravity(Gravity.LEFT);
+        juz.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
+        sur.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
         juz.setTextColor(pageSub());
         sur.setTextColor(pageSub());
         strip.addView(juz, new LinearLayout.LayoutParams(0, -2, 1f));

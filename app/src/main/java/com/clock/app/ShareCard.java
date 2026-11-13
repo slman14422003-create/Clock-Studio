@@ -2,6 +2,7 @@ package com.clock.app;
 
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,6 +18,9 @@ import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -35,6 +39,7 @@ import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Random;
 
 /**
@@ -645,6 +650,39 @@ final class ShareCard {
         return FileProvider.getUriForFile(a, a.getPackageName() + ".fileprovider", f);
     }
 
+    /** Puts the card in the device gallery (Pictures/Clock Studio). Returns false if it could not be written. */
+    static boolean saveToGallery(Activity a, Bitmap bm) {
+        try {
+            String name = "ayah_" + System.currentTimeMillis() + ".png";
+            if (Build.VERSION.SDK_INT >= 29) {
+                ContentValues v = new ContentValues();
+                v.put(MediaStore.Images.Media.DISPLAY_NAME, name);
+                v.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                v.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Clock Studio");
+                v.put(MediaStore.Images.Media.IS_PENDING, 1);
+                Uri u = a.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
+                if (u == null) return false;
+                try (OutputStream os = a.getContentResolver().openOutputStream(u)) {
+                    if (os == null || !bm.compress(Bitmap.CompressFormat.PNG, 100, os)) return false;
+                }
+                v.clear();
+                v.put(MediaStore.Images.Media.IS_PENDING, 0);
+                a.getContentResolver().update(u, v, null, null);
+                return true;
+            }
+            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Clock Studio");
+            if (!dir.exists() && !dir.mkdirs()) return false;
+            File f = new File(dir, name);
+            try (FileOutputStream os = new FileOutputStream(f)) {
+                bm.compress(Bitmap.CompressFormat.PNG, 100, os);
+            }
+            android.media.MediaScannerConnection.scanFile(a, new String[]{f.getAbsolutePath()}, new String[]{"image/png"}, null);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
     private static boolean installed(Activity a, String pkg) {
         try {
             a.getPackageManager().getPackageInfo(pkg, 0);
@@ -691,6 +729,10 @@ final class ShareCard {
     }
 
     static void show(final Activity a, final String surah, final String ayahNo, final String text, final String plain) {
+        if (Build.VERSION.SDK_INT < 29 && a.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            a.requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 7731);
+        }
         final Typeface face = face(a);
         final String surahName = a.getString(R.string.card_surah, surah);
         final int[] sel = {Math.floorMod(Store.shareTheme(a), THEMES.length), Math.floorMod(Store.shareTpl(a), TPL_LABELS.length)};
@@ -798,14 +840,16 @@ final class ShareCard {
         TextView wa = button(a, R.string.card_whatsapp, R.drawable.btn_primary, R.color.on_accent);
         TextView sh = button(a, R.string.card_share_image, R.drawable.btn_secondary, R.color.text_primary);
         TextView tx = button(a, R.string.card_share_text, R.drawable.btn_secondary, R.color.text_primary);
-        wa.setOnClickListener(x -> export(a, surahName, ayahNo, text, sel, face, true, dlg[0], busy));
-        sh.setOnClickListener(x -> export(a, surahName, ayahNo, text, sel, face, false, dlg[0], busy));
+        TextView sv2 = button(a, R.string.card_save, R.drawable.btn_secondary, R.color.text_primary);
+        sv2.setOnClickListener(x -> export(a, surahName, ayahNo, text, sel, face, false, true, dlg[0], busy));
+        wa.setOnClickListener(x -> export(a, surahName, ayahNo, text, sel, face, true, false, dlg[0], busy));
+        sh.setOnClickListener(x -> export(a, surahName, ayahNo, text, sel, face, false, false, dlg[0], busy));
         tx.setOnClickListener(x -> {
             dlg[0].dismiss();
             Intent i = new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, plain);
             a.startActivity(Intent.createChooser(i, a.getString(R.string.quran_share)));
         });
-        for (TextView b : new TextView[]{wa, sh, tx}) {
+        for (TextView b : new TextView[]{wa, sh, sv2, tx}) {
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, Ui.dp(a, 48));
             lp.topMargin = Ui.dp(a, 10);
             root.addView(b, lp);
@@ -817,27 +861,35 @@ final class ShareCard {
     }
 
     private static void export(final Activity a, final String surahName, final String ayahNo, final String text, final int[] sel,
-                               final Typeface face, final boolean whatsapp, final AlertDialog d, final boolean[] busy) {
+                               final Typeface face, final boolean whatsapp, final boolean saveOnly, final AlertDialog d, final boolean[] busy) {
         if (busy[0]) return;
         busy[0] = true;
         final int th = sel[0], tp = sel[1];
         new Thread(() -> {
             Uri u = null;
+            boolean gal = false;
             try {
                 Bitmap bm = render(surahName, ayahNo, text, th, tp, face, 1f);
-                u = save(a, bm);
+                gal = saveToGallery(a, bm);
+                if (!saveOnly) u = save(a, bm);
                 bm.recycle();
             } catch (Throwable ignored) {
             }
             final Uri fu = u;
+            final boolean saved = gal;
             a.runOnUiThread(() -> {
                 busy[0] = false;
                 if (a.isFinishing() || a.isDestroyed()) return;
+                if (saveOnly) {
+                    Ui.toast(a, a.getString(saved ? R.string.card_saved : R.string.card_failed));
+                    return;
+                }
                 if (fu == null) {
                     Ui.toast(a, a.getString(R.string.card_failed));
                     return;
                 }
                 d.dismiss();
+                if (saved) Ui.toast(a, a.getString(R.string.card_saved));
                 sendImage(a, fu, whatsapp);
             });
         }, "share-card-save").start();
