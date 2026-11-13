@@ -1,0 +1,120 @@
+package com.clock.app;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.text.Layout;
+import android.widget.TextView;
+
+/** Text view that paints a soft translucent bubble with a hairline edge behind chosen character ranges. */
+final class AyahTextView extends TextView {
+    private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint edge = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF rect = new RectF();
+    private int[] ranges = new int[0];
+    private int[] colors = new int[0];
+    private float hlAlpha = 1f;
+    private android.animation.ValueAnimator anim;
+
+    AyahTextView(Context c) {
+        super(c);
+        fill.setStyle(Paint.Style.FILL);
+        edge.setStyle(Paint.Style.STROKE);
+    }
+
+    void setHighlights(int[] r, int[] col) {
+        boolean changed = !java.util.Arrays.equals(r, ranges);
+        ranges = r;
+        colors = col;
+        if (anim != null) anim.cancel();
+        if (changed && col.length > 0) {
+            hlAlpha = 0f;
+            anim = android.animation.ValueAnimator.ofFloat(0f, 1f);
+            anim.setDuration(Anim.D_SHORT + 100);
+            anim.setInterpolator(Anim.OUT);
+            anim.addUpdateListener(a -> {
+                hlAlpha = (float) a.getAnimatedValue();
+                invalidate();
+            });
+            anim.start();
+        } else {
+            hlAlpha = 1f;
+            invalidate();
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if (anim != null) anim.cancel();
+        super.onDetachedFromWindow();
+    }
+
+    @Override
+    protected void onDraw(Canvas cv) {
+        Layout l = getLayout();
+        if (l != null && colors.length > 0 && ranges.length >= colors.length * 2) {
+            float d = getResources().getDisplayMetrics().density;
+            Paint.FontMetrics fm = getPaint().getFontMetrics();
+            float minX = -getTotalPaddingLeft() + 1.5f * d;
+            float maxX = l.getWidth() + getTotalPaddingRight() - 1.5f * d;
+            cv.save();
+            cv.translate(getTotalPaddingLeft(), getTotalPaddingTop());
+            int len = getText().length();
+            for (int k = 0; k < colors.length; k++) {
+                int s = Math.max(0, ranges[k * 2]);
+                int e = Math.min(len, ranges[k * 2 + 1]);
+                if (e <= s) continue;
+                int tint = colors[k] & 0x00FFFFFF;
+                int first = l.getLineForOffset(s), last = l.getLineForOffset(e - 1);
+                for (int line = first; line <= last; line++) {
+                    int ls = Math.max(s, l.getLineStart(line));
+                    int le = Math.min(e, l.getLineVisibleEnd(line));
+                    if (le <= ls) continue;
+                    float x1 = xAt(l, line, ls);
+                    float x2 = xAt(l, line, le);
+                    float base = l.getLineBaseline(line);
+                    float top = Math.max(base + fm.ascent * 1.0f, l.getLineTop(line));
+                    float bottom = Math.min(base + fm.descent * 1.7f, l.getLineBottom(line));
+                    float left = Math.max(minX, Math.min(x1, x2) - 5 * d);
+                    float right = Math.min(maxX, Math.max(x1, x2) + 5 * d);
+                    rect.set(left, top, right, bottom);
+                    drawBubble(cv, rect, tint, d);
+                }
+            }
+            cv.restore();
+        }
+        super.onDraw(cv);
+    }
+
+    /** Glyph position on a line, corrected for inter-word justification (Layout reports the unjustified position). */
+    private float xAt(Layout l, int line, int offset) {
+        float x = l.getPrimaryHorizontal(offset);
+        if (android.os.Build.VERSION.SDK_INT < 26 || getJustificationMode() == Layout.JUSTIFICATION_MODE_NONE) return x;
+        if (line >= l.getLineCount() - 1) return x;
+        int start = l.getLineStart(line), end = l.getLineVisibleEnd(line);
+        CharSequence t = getText();
+        int spaces = 0, before = 0;
+        for (int i = start; i < end; i++) {
+            if (t.charAt(i) == ' ') {
+                spaces++;
+                if (i < offset) before++;
+            }
+        }
+        if (spaces == 0 || end <= start) return x;
+        float natural = Layout.getDesiredWidth(t, start, end, getPaint());
+        float extra = (l.getWidth() - natural) / spaces;
+        if (extra <= 0) return x;
+        return l.getParagraphDirection(line) == Layout.DIR_RIGHT_TO_LEFT ? x - extra * before : x + extra * before;
+    }
+
+    private void drawBubble(Canvas cv, RectF r, int tint, float d) {
+        float radius = Math.min(r.height() / 2f, 14 * d);
+        fill.setColor(tint | (((int) (0x2A * hlAlpha)) << 24));
+        cv.drawRoundRect(r, radius, radius, fill);
+        edge.setStrokeWidth(1f * d);
+        edge.setColor(tint | (((int) (0x4A * hlAlpha)) << 24));
+        r.inset(0.5f * d, 0.5f * d);
+        cv.drawRoundRect(r, radius, radius, edge);
+    }
+}
