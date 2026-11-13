@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/wRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="rtl">
+    <ImageView
+        android:id="@+id/wBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/wb_g2_2" />
+    <ImageView
+        android:id="@+id/wBorder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/wb_bd_adaptive_2"
+        android:visibility="gone" />
+<LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:padding="16dp">
+<LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:orientation="vertical" android:layout_weight="1">
+<TextView android:id="@+id/wS1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="sans-serif" android:includeFontPadding="false" android:singleLine="true" android:textColor="@color/text_secondary" android:textSize="13sp" android:textStyle="bold" />
+<TextView android:id="@+id/wP1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="1dp" android:fontFamily="sans-serif-medium" android:includeFontPadding="false" android:singleLine="true" android:textColor="@color/text_primary" android:textSize="32sp" />
+<TextView android:id="@+id/wA1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:fontFamily="sans-serif" android:includeFontPadding="false" android:singleLine="true" android:textColor="@color/accent" android:textSize="15sp" android:textStyle="bold" />
+</LinearLayout>
+<LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center_horizontal" android:background="@drawable/wb_chip" android:paddingStart="18dp" android:paddingTop="10dp" android:paddingEnd="18dp" android:paddingBottom="10dp">
+<Chronometer android:id="@+id/wP2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="sans-serif-light" android:includeFontPadding="false" android:textColor="@color/text_primary" android:textSize="26sp" />
+<TextClock android:id="@+id/wS2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:fontFamily="sans-serif" android:includeFontPadding="false" android:textColor="@color/text_secondary" android:textSize="12sp" android:format12Hour="h:mm" android:format24Hour="HH:mm"  />
+</LinearLayout>
+</LinearLayout>
+</FrameLayout>

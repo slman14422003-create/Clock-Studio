@@ -1,0 +1,681 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Clock</string>
+    <string name="nav_clock">Clock</string>
+    <string name="nav_alarms">Alarms</string>
+    <string name="nav_timers">Timer</string>
+    <string name="nav_tasks">Tasks</string>
+    <string name="nav_settings">Settings</string>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="undo">Undo</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="none">None</string>
+    <string name="never">Never</string>
+    <string name="am">AM</string>
+    <string name="pm">PM</string>
+    <string name="unit_d">d</string>
+    <string name="unit_h">h</string>
+    <string name="unit_m">min</string>
+    <string name="unit_s">s</string>
+    <string name="in_fmt">in %s</string>
+    <string name="list_sep">,</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="same_time">same time</string>
+    <string name="once">Once</string>
+    <string name="every_day">Every day</string>
+    <string name="sun_thu">Sun–Thu</string>
+    <string name="mon_fri">Mon–Fri</string>
+    <string name="add_city">Add city</string>
+    <string name="city_removed">%s removed</string>
+    <string name="search_city">Search for a city</string>
+    <string name="no_results">No results</string>
+    <string name="alarm">Alarm</string>
+    <string name="new_alarm">New alarm</string>
+    <string name="edit_alarm">Edit alarm</string>
+    <string name="no_alarms">No alarms</string>
+    <string name="no_alarms_sub">Tap + to add an alarm</string>
+    <string name="no_active_alarm">No active alarms</string>
+    <string name="next_alarm">Next alarm %s</string>
+    <string name="alarm_set_in">Alarm rings %s</string>
+    <string name="alarm_deleted">Alarm deleted</string>
+    <string name="delete_alarm">Delete alarm</string>
+    <string name="delete_alarm_msg">This alarm will be deleted.</string>
+    <string name="label">Label</string>
+    <string name="repeat">Repeat</string>
+    <string name="sound">Sound</string>
+    <string name="default_sound">Default</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="snooze">Snooze</string>
+    <string name="ramp">Gradual volume</string>
+    <string name="ramp_sub">Starts quiet and gets louder</string>
+    <string name="challenge">Wake-up challenge</string>
+    <string name="challenge_sub">Solve a sum to stop the alarm</string>
+    <string name="challenge_hint">Pick the right answer to stop the alarm</string>
+    <string name="stop">Stop</string>
+    <string name="plus_one">+1 min</string>
+    <string name="missed_alarm">Missed alarm</string>
+    <string name="timer">Timer</string>
+    <string name="stopwatch">Stopwatch</string>
+    <string name="start">Start</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="paused">Paused</string>
+    <string name="lap">Lap</string>
+    <string name="lap_n">Lap %d</string>
+    <string name="reset">Reset</string>
+    <string name="timer_label_hint">Timer label (optional)</string>
+    <string name="pick_duration">Pick a duration first</string>
+    <string name="running_timers">Running timers</string>
+    <string name="recents">Recents</string>
+    <string name="timer_done">Time\'s up</string>
+    <string name="timer_running">Timer running</string>
+    <string name="focus">Focus</string>
+    <string name="break_label">Break</string>
+    <string name="focus_chip">Focus 25 / 5</string>
+    <string name="new_task">New task</string>
+    <string name="edit_task">Edit task</string>
+    <string name="delete_task">Delete task</string>
+    <string name="task_deleted">Task deleted</string>
+    <string name="task_title_hint">Task title</string>
+    <string name="title_required">Enter a task title</string>
+    <string name="notes">Notes</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="pick_date">Pick a date…</string>
+    <string name="next_week">Next week</string>
+    <string name="priority">Priority</string>
+    <string name="daily">Daily</string>
+    <string name="weekly">Weekly</string>
+    <string name="monthly">Monthly</string>
+    <string name="remind_me">Remind me</string>
+    <string name="remind_sub">Notify at the chosen time</string>
+    <string name="list_today">Today</string>
+    <string name="list_scheduled">Scheduled</string>
+    <string name="list_all">All</string>
+    <string name="list_done">Completed</string>
+    <string name="no_tasks">No tasks here</string>
+    <string name="mark_done">Done</string>
+    <string name="later_10">In 10 min</string>
+    <string name="sec_look">Appearance &amp; language</string>
+    <string name="sec_time">Time</string>
+    <string name="sec_alarms">Alarms</string>
+    <string name="sec_permissions">Permissions</string>
+    <string name="sec_semo">Semo apps</string>
+    <string name="sec_about">About</string>
+    <string name="appearance">Appearance</string>
+    <string name="theme_auto">Automatic</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="language">Language</string>
+    <string name="lang_system">System language</string>
+    <string name="time_format">Time format</string>
+    <string name="fmt_auto">Automatic</string>
+    <string name="fmt_12">12-hour</string>
+    <string name="fmt_24">24-hour</string>
+    <string name="show_seconds">Show seconds</string>
+    <string name="snooze_length">Snooze length</string>
+    <string name="silence_after">Silence after</string>
+    <string name="vibrate_default">Vibrate for new alarms</string>
+    <string name="ramp_default">Gradual volume for new alarms</string>
+    <string name="notifications">Notifications</string>
+    <string name="full_screen">Full-screen alarm</string>
+    <string name="permissions_note">Notifications and full-screen alerts let alarms and timers appear over the lock screen.</string>
+    <string name="ch_ring">Alarm &amp; timer ringing</string>
+    <string name="ch_timer">Running timers</string>
+    <string name="ch_task">Task reminders</string>
+    <string name="ch_missed">Missed alarms</string>
+    <string name="no_alarm">No alarm</string>
+    <string name="widget_desc">Time, date and next alarm</string>
+    <string name="sc_alarm">New alarm</string>
+    <string name="sc_timer">Timer</string>
+    <string name="sc_task">New task</string>
+    <string-array name="day_initials">
+        <item>S</item>
+        <item>M</item>
+        <item>T</item>
+        <item>W</item>
+        <item>T</item>
+        <item>F</item>
+        <item>S</item>
+    </string-array>
+    <string name="standby">StandBy</string>
+    <string name="standby_style">StandBy style</string>
+    <string name="standby_digital">Digital</string>
+    <string name="standby_analog">Analog</string>
+    <string name="standby_night">Night</string>
+    <string name="sec_standby">StandBy</string>
+    <string name="converter">Time converter</string>
+    <string name="conv_from">Convert from</string>
+    <string name="conv_same_day">Same day</string>
+    <string name="bedtime">Bedtime</string>
+    <string name="bedtime_setup_sub">Set a sleep schedule and wake-up alarm</string>
+    <string name="bedtime_line">Sleep %1$s · Wake up %2$s</string>
+    <string name="wake_up">Wake up</string>
+    <string name="go_to_bed">Go to bed</string>
+    <string name="sleep_goal">Sleep goal</string>
+    <string name="bedtime_reminder">Reminder</string>
+    <string name="remind_before">%s before</string>
+    <string name="bedtime_on">Bedtime schedule</string>
+    <string name="bedtime_saved">Bedtime schedule saved</string>
+    <string name="bedtime_remove">Remove Bedtime</string>
+    <string name="bedtime_notif_title">Time to wind down</string>
+    <string name="bedtime_notif_text">Bedtime at %1$s · Wake up at %2$s</string>
+    <string name="ch_bedtime">Bedtime reminders</string>
+    <string name="skip_next">Skip next alarm</string>
+    <string name="skip_cancel">Cancel skip</string>
+    <string name="skipping_next">Skipping next</string>
+    <string name="skip_done">Next alarm will be skipped</string>
+    <string name="haptics">Haptic feedback</string>
+    <string name="prayer_times">Prayer times</string>
+    <string name="next_prayer">Next prayer</string>
+    <string name="prayer_setup_sub">Set your location to see prayer times</string>
+    <string name="sec_location">Location</string>
+    <string name="location">Location</string>
+    <string name="loc_auto">Automatic (my location)</string>
+    <string name="loc_city">Choose a city</string>
+    <string name="loc_locating">Finding your location…</string>
+    <string name="loc_failed">Couldn\'t get your location. Turn on location or choose a city</string>
+    <string name="prayer_method">Calculation method</string>
+    <string name="prayer_hanafi">Hanafi Asr</string>
+    <string name="prayer_notify">Prayer notifications</string>
+    <string name="prayer_updated">Last updated: %s</string>
+    <string name="prayer_source">Times come from Aladhan (aladhan.com), updated online for your region and kept for offline use.</string>
+    <string name="prayer_refresh_fail">Couldn\'t update. Check your internet connection.</string>
+    <string name="prayer_updated_ok">Times updated</string>
+    <string name="prayer_updating">Updating…</string>
+    <string name="prayer_refresh">Refresh</string>
+    <string name="prayer_no_data">No saved times yet. Tap refresh while online.</string>
+    <string name="ch_prayer">Prayer times</string>
+    <string name="prayer_notif_text">It\'s time for %1$s · %2$s</string>
+    <string name="hijri_fmt">%1$s %2$s %3$s AH</string>
+    <string-array name="prayer_names">
+        <item>Fajr</item>
+        <item>Sunrise</item>
+        <item>Dhuhr</item>
+        <item>Asr</item>
+        <item>Maghrib</item>
+        <item>Isha</item>
+    </string-array>
+    <string-array name="prayer_methods">
+        <item>Automatic by region</item>
+        <item>Muslim World League</item>
+        <item>Umm al-Qura (Makkah)</item>
+        <item>Egyptian General Authority</item>
+        <item>ISNA (North America)</item>
+        <item>Karachi (Univ. of Islamic Sciences)</item>
+        <item>Diyanet (Turkey)</item>
+    </string-array>
+
+    <!-- smart assistant, qibla, tasbih, prayer tracker -->
+    <string name="assistant">Smart assistant</string>
+    <string name="close">Close</string>
+    <string name="ai_clear">Clear</string>
+    <string name="ai_offline_note">Runs entirely on your device, no internet needed</string>
+    <string name="ai_hi">Hi! Type or say a normal sentence and I will create a task, alarm or timer, and answer about your day and prayer times.</string>
+    <string name="ai_hi_task">What would you like to add? Write your task naturally and I will pick the time, repeat and priority.</string>
+    <string name="ai_hint">Type or say what you need…</string>
+    <string name="ai_hint_task">e.g. Remind me tomorrow 5pm to call Sam</string>
+    <string name="ai_capture_hint">Add a task in plain words…</string>
+    <string name="ai_send">Send</string>
+    <string name="ai_voice">Voice input</string>
+    <string name="ai_listen">Speak now</string>
+    <string name="ai_voice_fail">Voice input is not available on this device</string>
+    <string name="ai_undone">Undone</string>
+    <string name="ai_chip_plan">Plan my day</string>
+    <string name="ai_chip_today">My tasks today</string>
+    <string name="ai_chip_late">Overdue tasks</string>
+    <string name="ai_chip_prayer">Next prayer</string>
+    <string name="ai_chip_alarm">Next alarm</string>
+    <string name="ai_ex_task">Remind me tomorrow at 5pm to call Sam</string>
+    <string name="ai_ex_alarm">Alarm 6:30am every day</string>
+    <string name="ai_ex_timer">Timer 15 minutes for studying</string>
+    <string name="ai_ex_prayer">Remind me after Asr to read my daily page</string>
+    <string name="ai_task_added">Added task “%1$s”%2$s</string>
+    <string name="ai_alarm_added">Alarm set for %1$s · %2$s%3$s</string>
+    <string name="ai_timer_added">Timer started: %1$s%2$s</string>
+    <string name="ai_need_time">What time should the alarm ring? e.g. Alarm 6:30am</string>
+    <string name="ai_need_duration">How long should the timer run? e.g. Timer 10 minutes</string>
+    <string name="ai_need_title">What should I remind you about?</string>
+    <string name="ai_unknown">I did not quite get that. Try: “Remind me tomorrow at 5pm to call Sam”, “Alarm 6:30am every day” or “Timer 15 minutes”.</string>
+    <string name="ai_no_prayer_cfg">Set your location in Prayer times first so I can work out the time.</string>
+    <string name="ai_open_prayer">Open prayer times</string>
+    <string name="ai_today_head">Today’s tasks (%d):</string>
+    <string name="ai_today_none">No tasks for today.</string>
+    <string name="ai_late_head">Overdue tasks (%d):</string>
+    <string name="ai_late_none">Nothing overdue, well done.</string>
+    <string name="ai_next_prayer">Next prayer: %1$s at %2$s (%3$s)</string>
+    <string name="ai_next_alarm">Next alarm: %1$s (%2$s)</string>
+    <string name="ai_no_alarm">No alarms are on.</string>
+    <string name="ai_cleared">Removed %d completed tasks.</string>
+    <string name="ai_done_ok">Completed “%s”.</string>
+    <string name="ai_done_none">I could not find a matching task.</string>
+    <string name="ai_help">I can:\n• Create a task: “Remind me tomorrow 5pm to call Sam” or “Meeting every Thursday at 10am important”\n• Set an alarm: “Alarm 6:30am every day” or just “Alarm 6”\n• Start a timer: “Timer 1 hour 30 minutes”\n• Remind around prayers: “Remind me after Asr to read”\n• Answer: “Plan my day”, “My tasks today”, “Overdue tasks”, “Next prayer”, “Next alarm”\n• Finish things: “Finished call Sam” or “Clear completed”</string>
+    <string name="ai_item_alarm">Alarm</string>
+    <string name="ai_plan_head">Your day:</string>
+    <string name="ai_plan_anytime">Any time:</string>
+    <string name="ai_tip_late">Tip: start with the overdue task “%s”.</string>
+    <string name="ai_tip_top">Tip: your top task today is “%s”.</string>
+    <string name="ai_tip_bed">Reminder: your suggested bedtime is %s.</string>
+    <string name="ai_insight_late">Overdue: %1$d · Today: %2$d</string>
+    <string name="ai_insight_today">Today: %d</string>
+    <string name="qibla">Qibla</string>
+    <string name="qibla_deg">%1$d° from north</string>
+    <string name="qibla_dist">Distance to the Kaaba: %1$s km</string>
+    <string name="qibla_aligned">You are facing the Qibla</string>
+    <string name="qibla_calibrate">Move the phone in a figure 8 to calibrate the compass</string>
+    <string name="qibla_hold_flat">Hold the phone flat and turn until the arrow points up</string>
+    <string name="qibla_no_sensor">This device has no compass sensor</string>
+    <string name="qibla_need_loc">Set your location first to find the Qibla direction.</string>
+    <string name="tasbih">Tasbih</string>
+    <string name="tasbih_reset">Reset</string>
+    <string name="tasbih_total">Today’s total: %d</string>
+    <string name="tasbih_free">Free</string>
+    <string name="prayer_tools">Tools</string>
+    <string name="prayer_pre">Reminder before prayer</string>
+    <string name="prayer_min">%d min</string>
+    <string name="prayer_each">Prayers to notify</string>
+    <string name="prayer_pre_text">%1$d min until %2$s prayer</string>
+    <string name="prayer_prayed">Prayed</string>
+    <string name="prayer_check_hint">Tap the circle to mark a prayer as prayed.</string>
+    <string name="prayer_log">Prayer tracker</string>
+    <string name="prayer_log_today">Prayed %d of 5 today</string>
+    <string name="prayer_streak">%d days in a row with all prayers</string>
+    <string name="prayer_streak_none">Start your streak today</string>
+    <string name="night_title">Night</string>
+    <string name="night_mid">Islamic midnight</string>
+    <string name="night_third">Last third of the night</string>
+    <string-array name="compass_dirs">
+        <item>N</item>
+        <item>E</item>
+        <item>S</item>
+        <item>W</item>
+    </string-array>
+    <string-array name="tasbih_phrases">
+        <item>سبحان الله</item>
+        <item>الحمد لله</item>
+        <item>الله أكبر</item>
+        <item>لا إله إلا الله</item>
+        <item>أستغفر الله</item>
+        <item>اللهم صلِّ وسلِّم على نبينا محمد</item>
+    </string-array>
+
+    <string name="tasbih_hint">Tap anywhere on the card to count</string>
+    <string name="qibla_dir">Qibla direction</string>
+    <string name="qibla_distance">Distance to the Kaaba</string>
+    <string name="qibla_km">%1$s km</string>
+    <string name="qibla_now">Your phone now</string>
+    <string name="qibla_turn_right">Turn the phone right %d°</string>
+    <string name="qibla_turn_left">Turn the phone left %d°</string>
+    <string name="qibla_true_north">Direction and distance are computed on the WGS-84 ellipsoid from your saved location, and the compass is corrected for the magnetic declination there. Keep away from metal and magnets for best accuracy.</string>
+    <string name="empty_text"></string>
+    <string-array name="compass_names">
+        <item>North</item>
+        <item>North-east</item>
+        <item>East</item>
+        <item>South-east</item>
+        <item>South</item>
+        <item>South-west</item>
+        <item>West</item>
+        <item>North-west</item>
+    </string-array>
+    <string name="widget_digital">Wide digital</string>
+    <string name="widget_digital_desc">Time and date in a slim wide bar</string>
+    <string name="widget_stack">Big digits</string>
+    <string name="widget_stack_desc">Hours and minutes stacked in big digits</string>
+    <string name="widget_analog">Analog clock</string>
+    <string name="widget_analog_desc">A clean analog clock face</string>
+    <string name="widget_date">Today calendar</string>
+    <string name="widget_date_desc">Day and month in a calendar style</string>
+    <string name="widget_prayer">Next prayer</string>
+    <string name="widget_prayer_desc">Next prayer with a live countdown</string>
+    <string name="widget_alarm">Next alarm</string>
+    <string name="widget_alarm_desc">Time of your next alarm</string>
+    <string name="widget_next_prayer">Next prayer</string>
+    <string name="widget_next_alarm">Next alarm</string>
+    <string name="widget_prayer_setup">Set the prayer location in the app</string>
+    <string name="widget_cfg_title">Customize widget</string>
+    <string name="cfg_bg">Background</string>
+    <string name="cfg_opacity">Opacity</string>
+    <string name="cfg_radius">Corners</string>
+    <string name="cfg_text">Text color</string>
+    <string name="cfg_accent">Accent color</string>
+    <string name="cfg_size">Text size</string>
+    <string name="cfg_fmt">Time format</string>
+    <string name="cfg_date">Show date</string>
+    <string name="cfg_face">Clock face</string>
+    <string name="cfg_save">Save</string>
+    <string name="cfg_reset">Default</string>
+    <string name="cfg_r0">Sharp</string>
+    <string name="cfg_r1">Slight</string>
+    <string name="cfg_r2">Medium</string>
+    <string name="cfg_r3">Soft</string>
+    <string name="cfg_s0">Small</string>
+    <string name="cfg_s1">Normal</string>
+    <string name="cfg_s2">Large</string>
+    <string name="cfg_f0">Follow app</string>
+    <string name="cfg_f1">12-hour</string>
+    <string name="cfg_f2">24-hour</string>
+    <string name="cfg_fc0">Auto</string>
+    <string name="cfg_fc1">White</string>
+    <string name="cfg_fc2">Black</string>
+    <string name="widget_prayers">Prayer times</string>
+    <string name="widget_prayers_desc">Today\u2019s five prayer times, next one highlighted</string>
+    <string name="widget_classic">Classic</string>
+    <string name="quran">Holy Quran</string>
+    <string name="quran_sub">The Madinah Mushaf, Hafs narration</string>
+    <string name="quran_surahs">Surahs</string>
+    <string name="quran_juz">Juz</string>
+    <string name="quran_marks">Bookmarks</string>
+    <string name="quran_search_hint">Search a surah, verse or word</string>
+    <string name="quran_continue">Continue reading</string>
+    <string name="quran_page">Page %s</string>
+    <string name="quran_juz_n">Juz %s</string>
+    <string name="quran_ayahs">%s ayahs</string>
+    <string name="quran_meccan">Meccan</string>
+    <string name="quran_medinan">Medinan</string>
+    <string name="quran_starts_at">Starts at %s</string>
+    <string name="quran_no_results">No results</string>
+    <string name="quran_no_marks">No bookmarks yet.\nTap any ayah, then the bookmark icon. Long-press a bookmark to remove it.</string>
+    <string name="quran_download_title">Download the Mushaf</string>
+    <string name="quran_download_sub">The text is downloaded once (about 2 MB) and then works offline.</string>
+    <string name="quran_download_btn">Download Mushaf</string>
+    <string name="quran_downloading">Downloading…</string>
+    <string name="quran_retry">Try again</string>
+    <string name="quran_download_fail">Download failed. Check your connection and try again.</string>
+    <string name="quran_source">Text: Uthmani Quran, Hafs narration, following the Madinah Mushaf (King Fahd Complex), from the Tanzil project via alquran.cloud.</string>
+    <string name="quran_loading">Loading the Mushaf…</string>
+    <string name="quran_copy">Copy</string>
+    <string name="quran_share">Share</string>
+    <string name="quran_copied">Ayah copied</string>
+    <string name="quran_bookmarked">Bookmark added</string>
+    <string name="quran_unbookmarked">Bookmark removed</string>
+    <string name="prayer_quran_start">Start reading the Holy Quran</string>
+    <string name="widget_quran">Verse of the day</string>
+    <string name="widget_quran_desc">A short ayah that changes daily; tap to open the Mushaf</string>
+    <string name="quran_widget_empty">Open the Holy Quran from Prayer and download the Mushaf to see the verse</string>
+    <string name="cfg_grad">Gradients</string>
+    <string name="cfg_solid">Colours</string>
+    <string name="cfg_custom">Custom colour</string>
+    <string name="cfg_hue">Hue</string>
+    <string name="cfg_sat">Saturation</string>
+    <string name="cfg_val">Brightness</string>
+    <string name="cfg_border">Thin border around the widget</string>
+    <string name="cfg_hijri">Show Hijri date</string>
+    <string name="cfg_preview_hint">Tap the preview to switch the backdrop</string>
+    <string name="cfg_look">Look</string>
+    <string name="cfg_content">Content</string>
+    <string name="cfg_auto">Automatic</string>
+    <string name="cfg_r4">Large</string>
+    <string name="cfg_r5">Circular</string>
+    <string name="cfg_preview_failed">Preview unavailable</string>
+    <string name="quran_audio">Recitations</string>
+    <string name="quran_audio_sub">Download surahs and listen offline</string>
+    <string name="quran_reciter">Reciter</string>
+    <string name="quran_audio_dl">Download</string>
+    <string name="quran_audio_done">Ready</string>
+    <string name="quran_audio_play">Listen</string>
+    <string name="quran_audio_delete">Delete download</string>
+    <string name="quran_audio_deleted">Recitation deleted</string>
+    <string name="quran_audio_fail">Download failed. Check your internet connection.</string>
+    <string name="quran_audio_src">Recitations come from everyayah.com and are saved on your device ayah by ayah. Tap a downloading surah to stop it.</string>
+    <string name="quran_audio_need_text">Download the Mushaf first</string>
+    <string name="quran_play">Play recitation</string>
+    <string name="quran_audio_err">Could not play the recitation. Check your connection or download the surah.</string>
+    <string name="quran_tafsir">Tafsir</string>
+    <string name="quran_daily">Verse of the day</string>
+    <string name="quran_read">Read</string>
+    <string name="quran_prev_ayah">Previous verse</string>
+    <string name="quran_next_ayah">Next verse</string>
+    <string name="quran_ayah_n">Verse %s</string>
+    <string name="quran_sect_surahs">Surahs</string>
+    <string name="quran_sect_ayahs">Verses</string>
+    <string name="quran_tafsir_loading">Loading explanation…</string>
+    <string name="quran_tafsir_fail">Could not load the explanation. Check your connection and tap to retry.</string>
+    <string name="quran_tafsir_hint">Explanations come from the classical tafsir books, load live online and are saved once opened. You can also download a surah or the whole book to read offline</string>
+    <string name="quran_need_quran">Download the Mushaf first from the Quran screen</string>
+    <string-array name="tafsir_names">
+        <item>Al-Muyassar</item>
+        <item>As-Sa\'di</item>
+        <item>Ibn Kathir</item>
+        <item>At-Tabari</item>
+        <item>Al-Qurtubi</item>
+        <item>Al-Baghawi</item>
+        <item>Al-Waseet</item>
+        <item>English translation</item>
+    </string-array>
+
+    <string name="quran_suggest">Suggest a verse</string>
+    <string name="quran_suggest_done">Verse of the day changed</string>
+    <string name="quran_listen_here">Listen</string>
+    <string name="quran_more">Options</string>
+    <string name="quran_reciter_now">Reciter: %s</string>
+    <string name="quran_suggest_title">What do you need today?</string>
+    <string name="quran_suggest_write">Write how you feel</string>
+    <string name="quran_suggest_hint">Example: I feel anxious about the future</string>
+    <string name="quran_suggest_busy">Choosing a fitting verse…</string>
+    <string name="quran_suggest_topic">A verse about: %s</string>
+    <string name="quran_suggest_none">No fitting verse found, try other words</string>
+    <string name="sec_updates">Updates &amp; privacy</string>
+    <string name="upd_title">Updates</string>
+    <string name="upd_current">Current version: %s</string>
+    <string name="upd_check">Check for updates</string>
+    <string name="upd_checking">Checking…</string>
+    <string name="upd_latest">You are on the latest version</string>
+    <string name="upd_available">New version available: %s</string>
+    <string name="upd_download">Download &amp; install</string>
+    <string name="upd_downloading">Downloading…</string>
+    <string name="upd_progress">%d%%</string>
+    <string name="upd_size">Update size: %s</string>
+    <string name="upd_cancel">Cancel download</string>
+    <string name="upd_cancelled">Download cancelled</string>
+    <string name="upd_ready">Downloaded and verified</string>
+    <string name="upd_ready_sub">The file is intact; Android also checks the signature when installing</string>
+    <string name="upd_install">Install now</string>
+    <string name="upd_err_net">Could not reach GitHub. Check your connection and try again</string>
+    <string name="upd_err_none">No release has been published yet</string>
+    <string name="upd_err_verify">The file failed its integrity check, please try again</string>
+    <string name="upd_err_install">Could not open the package installer</string>
+    <string name="upd_no_apk">This release has no APK file yet</string>
+    <string name="upd_perm_title">Allow installing</string>
+    <string name="upd_perm_msg">To install the update from inside the app, allow Clock Studio to install apps on the next screen, then come back and tap Install.</string>
+    <string name="upd_perm_open">Open settings</string>
+    <string name="upd_open_page">Releases page on GitHub</string>
+    <string name="upd_notes">What\'s new</string>
+    <string name="upd_source">Source</string>
+    <string name="upd_footnote">Updates are downloaded only from the project\'s official releases page, and the SHA-256 checksum is verified before installing.</string>
+    <string name="upd_auto">Check for updates automatically</string>
+    <string name="upd_auto_sub">Once a day, contacting GitHub only</string>
+    <string name="upd_later">Later</string>
+    <string name="upd_now">Update</string>
+    <string name="upd_new_msg">Version %s is available. Update the app now?</string>
+    <string name="privacy_title">Privacy policy</string>
+    <string name="privacy_updated">Last updated: October 2026</string>
+    <string-array name="privacy_titles">
+        <item>Summary</item>
+        <item>What is stored on your device</item>
+        <item>Location</item>
+        <item>Internet access and third-party services</item>
+        <item>Permissions and why we ask for them</item>
+        <item>The smart assistant</item>
+        <item>Link with other Semo apps</item>
+        <item>Security</item>
+        <item>Deleting your data</item>
+        <item>Changes to this policy</item>
+    </string-array>
+    <string-array name="privacy_bodies">
+        <item>Clock Studio needs no account, shows no ads, uses no analytics or tracking tools, and never sells or shares your data. What you enter in the app stays on your device.</item>
+        <item>Stored locally only: alarms, timers, tasks, chosen cities, app and widget settings, the tasbih counter, Quran bookmarks and the prayer log. No server of ours receives this data, and cloud backup of the app data is disabled.</item>
+        <item>Location permission is optional and approximate only, used for prayer times and the qibla direction. Location is processed on your device; when prayer times are downloaded, coordinates rounded to two decimals (about one kilometre) are sent to the Aladhan service. You can pick your city manually instead, and then location is not used at all. We keep no history of your locations.</item>
+        <item>The app goes online only when needed, and only over HTTPS:\n• api.aladhan.com for prayer times.\n• api.alquran.cloud for the Quran text, tafsir and translation.\n• api.quran.com and cdn.jsdelivr.net for tafsir texts.\n• everyayah.com for audio recitations.\n• api.github.com and github.com to check for and download updates.\nThese services see your IP address and the technical details of the request, like any website, and are bound by their own policies. Your name and your app content are never sent to them.</item>
+        <item>• Notifications: alarm, task and prayer alerts.\n• Exact alarms, full-screen and wake-up: so alarms ring on time, over the lock screen.\n• Approximate location: prayer times and qibla (optional).\n• Display over other apps: for StandBy mode only (optional).\n• Foreground services: alarm sound and StandBy.\n• Run at start-up: to re-schedule alarms after a reboot.\n• Install apps: to install an app update when you choose to.\n• Internet: for the services listed above.</item>
+        <item>The assistant inside the app runs entirely on your device and never sends what you type to any server.</item>
+        <item>If Semo Calendar is installed, this app shows only the time of its next event and the number of today’s events (never titles or places). Semo Calendar can read from this app the time of the next alarm and the name and time of the next prayer, but not alarm labels, tasks or your location. When you choose “Add to Calendar”, the calendar opens a prefilled event that is saved only if you press Save. This exchange stays on your device.</item>
+        <item>All connections use HTTPS. The only component that can be opened from outside the app is its main screen. Updates come only from the project\'s official releases page, their SHA-256 checksum is verified, and Android refuses to install them unless they are signed with the same key as the app.</item>
+        <item>Because your data lives only on your device, clearing the app data in Android settings (Storage → Clear data) or uninstalling the app deletes everything. There is no copy on our side to delete.</item>
+        <item>If the way data is handled ever changes, this text and the “Last updated” line above will change.</item>
+    </string-array>
+    <string name="cfg_prayer">Prayer times display</string>
+    <string name="cfg_pr_hl">Highlight the next prayer</string>
+    <string name="cfg_pr_hl0">Background and colour</string>
+    <string name="cfg_pr_hl1">Colour only</string>
+    <string name="cfg_pr_hl2">No highlight</string>
+    <string name="cfg_pr_sub">Line under the title</string>
+    <string name="cfg_pr_sub0">City and Hijri date</string>
+    <string name="cfg_pr_sub1">Next prayer</string>
+    <string name="cfg_pr_sub2">Hide it</string>
+    <string name="cfg_pr_names">Show prayer names</string>
+    <string name="cfg_pr_dim">Dim prayers that have passed</string>
+    <string name="pw_next_fmt">Next: %1$s %2$s</string>
+    <string name="tasbih_rounds">Rounds: %d</string>
+    <string name="tasbih_undo">Undo</string>
+    <string name="tasbih_opt_haptic">Haptics</string>
+    <string name="tasbih_opt_vol">Volume keys count</string>
+    <string name="tasbih_opt_keep">Keep screen on</string>
+    <string name="quran_bg">Reading background</string>
+    <string name="quran_bg_auto">Automatic (theme)</string>
+    <string name="quran_bg_paper">Warm paper</string>
+    <string name="quran_bg_deep">Deep black</string>
+    <string name="quran_goto">Go to page</string>
+    <string name="quran_keep_on">Keep screen on</string>
+    <string name="card_whatsapp">Share as WhatsApp status</string>
+    <string name="card_share_image">Share as image</string>
+    <string name="card_share_text">Share as text</string>
+    <string name="card_no_whatsapp">WhatsApp is not installed, pick another app</string>
+    <string name="card_failed">Could not create the card</string>
+    <string name="card_brand">Clock Studio</string>
+    <string name="standby_prayer">Prayer</string>
+    <string name="standby_verse">Verse of the day</string>
+    <string name="standby_calendar">Calendar</string>
+    <string name="standby_auto">Start automatically while charging</string>
+    <string name="standby_auto_sub">StandBy appears on the lock screen when the charger is connected</string>
+    <string name="standby_lock">Show over the lock screen</string>
+    <string name="standby_landscape">Landscape only</string>
+    <string name="standby_autonight">Auto night in the dark</string>
+    <string name="standby_color">Clock colour</string>
+    <string name="standby_colors">White,Orange,Blue,Green,Pink,Yellow</string>
+    <string name="standby_overlay_perm">Display over other apps</string>
+    <string name="standby_hint">Swipe sideways to change page, long-press to change colour, swipe down to exit</string>
+    <string name="standby_svc_title">StandBy is ready</string>
+    <string name="standby_svc_text">It will appear automatically when charging</string>
+    <string name="ch_standby">StandBy</string>
+    <string name="standby_no_prayer">Set your location in the Prayer screen</string>
+    <string name="standby_no_verse">Download the Quran text from the Quran screen</string>
+    <string name="standby_next_prayer">Next prayer</string>
+    <string name="card_surah">Surah %s</string>
+    <string name="widget_classic_l">Classic clock · Large</string>
+    <string name="widget_analog_l">Analog clock · Large</string>
+    <string name="widget_digital_l">Digital clock · Large</string>
+    <string name="widget_date_l">Date · Large</string>
+    <string name="widget_quran_l">Verse of the day · Large</string>
+    <string name="widget_prayer_l">Next prayer · Large</string>
+    <string name="widget_stack_l">Stacked clock · Large</string>
+    <string name="widget_prayers_l">Prayer times · Large</string>
+    <string name="widget_alarm_l">Alarm · Large</string>
+
+    <!-- Link with Semo Calendar -->
+    <string name="next_event">Next event in Calendar</string>
+    <string name="events_today_fmt">Events today: %1$d</string>
+    <string name="add_to_calendar">Add to Calendar</string>
+    <string name="calendar_missing">Could not open Semo Calendar</string>
+    <string name="tafsir_mode_auto">Automatic (online when needed)</string>
+    <string name="tafsir_mode_offline">Offline only</string>
+    <string name="tafsir_dl_surah">Download surah</string>
+    <string name="tafsir_dl_book">Download whole book</string>
+    <string name="tafsir_dl_stop">Stop</string>
+    <string name="tafsir_dl_progress">Downloading %1$s of %2$s</string>
+    <string name="tafsir_dl_done">Surah saved for offline reading</string>
+    <string name="tafsir_dl_book_done">Book saved for offline reading</string>
+    <string name="tafsir_dl_fail">Download could not finish. Check your connection and retry.</string>
+    <string name="tafsir_dl_delete">Delete download</string>
+    <string name="tafsir_dl_deleted">Saved copy of this tafsir was deleted</string>
+    <string name="tafsir_dl_saved">Saved: %1$s of %2$s ayahs in this surah</string>
+    <string name="tafsir_offline_missing">This ayah is not saved. Download the surah or switch to automatic.</string>
+    <string name="ayah_dl">Download ayah</string>
+    <string name="ayah_dl_done">Ayah saved for offline listening</string>
+    <string name="ayah_dl_have">Ayah is saved</string>
+    <string name="ayah_dl_fail">Could not download the ayah</string>
+    <string name="card_template">Template</string>
+    <string name="card_color">Colour</string>
+    <string name="tpl_glass">Glass</string>
+    <string name="tpl_frame">Ornate frame</string>
+    <string name="tpl_star">Geometric stars</string>
+    <string name="tpl_mosque">Dome and minaret</string>
+    <string name="tpl_floral">Vines and flowers</string>
+    <string name="tpl_arch">Mihrab</string>
+    <string name="tpl_lantern">Lanterns</string>
+    <string name="tpl_minimal">Minimal</string>
+    <string name="quran_page_badge">%s</string>
+    <string name="app_icon">App icon</string>
+    <string name="app_icon_note">The icon on your home screen changes within a few seconds.</string>
+    <string name="icon_default">Blue</string>
+    <string name="icon_violet">Violet</string>
+    <string name="icon_green">Green</string>
+    <string name="icon_orange">Orange</string>
+    <string name="icon_red">Red</string>
+    <string name="icon_pink">Pink</string>
+    <string name="icon_graphite">Graphite</string>
+    <string name="icon_midnight">Midnight</string>
+    <string name="icon_gold">Gold</string>
+    <string name="al_next_title">Next alarm</string>
+    <string name="al_paused_until">Alarms paused until %1$s</string>
+    <string name="al_resume">Resume</string>
+    <string name="al_options">Alarm options</string>
+    <string name="al_pause">Pause all alarms</string>
+    <string name="al_pause_1d">For 1 day</string>
+    <string name="al_pause_3d">For 3 days</string>
+    <string name="al_pause_1w">For 1 week</string>
+    <string name="al_resume_now">Resume alarms now</string>
+    <string name="al_all_on">Turn all on</string>
+    <string name="al_all_off">Turn all off</string>
+    <string name="al_duplicate">Duplicate</string>
+    <string name="al_duplicated">Alarm duplicated</string>
+    <string name="al_quick_nap">Nap · 20 min</string>
+    <string name="al_quick_tomorrow">Tomorrow · 7:00</string>
+    <string name="al_quick_weekdays">Weekdays · 6:30</string>
+    <string name="al_quick_weekend">Weekend · 9:00</string>
+    <string name="al_nap">Nap</string>
+    <string name="al_added">Alarm added</string>
+    <string name="al_date">Date</string>
+    <string name="al_next_occurrence">Next occurrence</string>
+    <string name="al_past">That time has already passed</string>
+    <string name="al_label_work">Work</string>
+    <string name="al_label_gym">Gym</string>
+    <string name="al_label_prayer">Prayer</string>
+    <string name="al_label_meds">Medication</string>
+    <string name="al_label_school">School</string>
+    <string name="al_label_flight">Flight</string>
+    <string name="al_color">Color</string>
+    <string name="al_volume">Alarm volume</string>
+    <string name="al_snooze_len">Snooze length</string>
+    <string name="al_ramp_time">Ramp-up time</string>
+    <string name="al_auto_stop">Stop automatically after</string>
+    <string name="al_default_fmt">Default (%1$d min)</string>
+    <string name="al_delete_after">Delete after ringing</string>
+    <string name="al_delete_after_sub">One-time alarms only</string>
+    <string name="al_test">Test alarm</string>
+    <string name="al_test_sub">Rings with the saved settings</string>
+    <string name="al_badge_challenge">Challenge</string>
+    <string name="al_badge_ramp">Ramp</string>
+    <string name="al_badge_vibrate">Vibrate</string>
+    <string name="al_badge_snooze">Snooze %1$d</string>
+    <string name="al_none_active">No active alarms</string>
+    <string name="al_rings_at">Rings %1$s · %2$s</string>
+    <string name="al_sound_section">Sound and haptics</string>
+    <string name="al_wake_section">Wake-up</string>
+    <string name="ring_slide">Slide to stop</string>
+    <string name="ring_for">Ringing for %1$s</string>
+    <string name="ring_snooze_fmt">Snooze · %1$d min</string>
+    <string name="ring_solve">Solve to stop the alarm</string>
+    <string name="glass">Liquid Glass</string>
+    <string name="glass_sub">Live blur and transparency on every screen</string>
+    <string name="glass_level">Blur strength</string>
+    <string name="glass_soft">Soft</string>
+    <string name="glass_normal">Medium</string>
+    <string name="glass_strong">Strong</string>
+</resources>

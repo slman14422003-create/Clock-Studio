@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="new_alarm"
+        android:enabled="true"
+        android:icon="@drawable/ic_sc_alarm"
+        android:shortcutShortLabel="@string/sc_alarm">
+        <intent
+            android:action="app.clock.action.NEW_ALARM"
+            android:targetClass="com.clock.app.MainActivity"
+            android:targetPackage="app.clock.studio" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="new_timer"
+        android:enabled="true"
+        android:icon="@drawable/ic_sc_timer"
+        android:shortcutShortLabel="@string/sc_timer">
+        <intent
+            android:action="app.clock.action.NEW_TIMER"
+            android:targetClass="com.clock.app.MainActivity"
+            android:targetPackage="app.clock.studio" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="new_task"
+        android:enabled="true"
+        android:icon="@drawable/ic_sc_task"
+        android:shortcutShortLabel="@string/sc_task">
+        <intent
+            android:action="app.clock.action.NEW_TASK"
+            android:targetClass="com.clock.app.MainActivity"
+            android:targetPackage="app.clock.studio" />
+    </shortcut>
+</shortcuts>

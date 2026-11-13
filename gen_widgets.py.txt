@@ -1,0 +1,121 @@
+OUT='layout'
+NS='xmlns:android="http://schemas.android.com/apk/res/android"'
+
+def tv(id=None, size=14, color='text_primary', font='sans-serif', style=None, w='wrap_content', h='wrap_content',
+       extra='', kind='TextView', lines='singleLine="true"', gravity=None, mt=0, ms=0, me=0, mb=0, weight=None):
+    a=[]
+    if id: a.append(f'android:id="@+id/{id}"')
+    a.append(f'android:layout_width="{w}"'); a.append(f'android:layout_height="{h}"')
+    if weight is not None: a.append(f'android:layout_weight="{weight}"')
+    for k,v in (('Top',mt),('Start',ms),('End',me),('Bottom',mb)):
+        if v: a.append(f'android:layout_margin{k}="{v}dp"')
+    a.append(f'android:fontFamily="{font}"'); a.append('android:includeFontPadding="false"')
+    if lines: a.append('android:'+lines)
+    a.append(f'android:textColor="@color/{color}"'); a.append(f'android:textSize="{size}sp"')
+    if style: a.append(f'android:textStyle="{style}"')
+    if gravity: a.append(f'android:gravity="{gravity}"')
+    if extra: a.append(extra)
+    return f'<{kind} '+' '.join(a)+' />'
+
+def wrap(direction, body, bg='wb_adaptive_1'):
+    return f'''<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout {NS}
+    android:id="@+id/wRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="{direction}">
+    <ImageView
+        android:id="@+id/wBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/{bg}" />
+    <ImageView
+        android:id="@+id/wBorder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/wb_bd_adaptive_2"
+        android:visibility="gone" />
+{body}
+</FrameLayout>
+'''
+
+def lin(orient, inner, w='match_parent', h='match_parent', pad=16, gravity=None, weight=None, bg=None, ps=None, extra='', id=None):
+    a=[]
+    if id: a.append(f'android:id="@+id/{id}"')
+    a+= [f'android:layout_width="{w}"',f'android:layout_height="{h}"',f'android:orientation="{orient}"']
+    if weight is not None: a.append(f'android:layout_weight="{weight}"')
+    if gravity: a.append(f'android:gravity="{gravity}"')
+    if bg: a.append(f'android:background="@drawable/{bg}"')
+    if ps: a.append(f'android:paddingStart="{ps[0]}dp" android:paddingTop="{ps[1]}dp" android:paddingEnd="{ps[2]}dp" android:paddingBottom="{ps[3]}dp"')
+    elif pad: a.append(f'android:padding="{pad}dp"')
+    if extra: a.append(extra)
+    return '<LinearLayout '+' '.join(a)+'>\n'+inner+'\n</LinearLayout>'
+
+def spacer(h='0dp', w=None, weight=None):
+    if w is None: w = '0dp' if weight and h != '0dp' else 'match_parent'
+    return f'<FrameLayout android:layout_width="{w}" android:layout_height="{h}"' + (f' android:layout_weight="{weight}"' if weight else '') + ' />'
+
+def icon(id, res, size, tint='text_secondary'):
+    return f'<ImageView android:id="@+id/{id}" android:layout_width="{size}dp" android:layout_height="{size}dp" android:importantForAccessibility="no" android:src="@drawable/{res}" android:tint="@color/{tint}" />'
+
+def clock(id, f12, f24, size, color='text_primary', font='sans-serif-light', extra='', **k):
+    k.setdefault('lines', None)
+    return tv(id, size, color, font, kind='TextClock', extra=f'android:format12Hour="{f12}" android:format24Hour="{f24}" '+extra, **k)
+
+widgets={}
+
+chip=lin('horizontal', icon('wIcon','ic_alarm',13)+'\n'+tv('wS2',13,'text_secondary',ms=6), w='wrap_content', h='wrap_content', pad=0, gravity='center_vertical', bg='wb_chip', ps=(10,5,12,5))
+widgets['classic']=lin('vertical',
+    clock('wP1','h:mm','HH:mm',50)+'\n'+tv('wA1',14,'accent',style='bold',mt=1)+'\n'+spacer(h='10dp')+'\n'+chip,
+    gravity='center_vertical', pad=16)
+
+left=lin('vertical', clock('wP1','h:mm','HH:mm',46)+'\n'+tv('wA1',15,'accent',style='bold',mt=2), w='wrap_content', h='wrap_content', pad=0)
+right=lin('vertical', tv('wP2',16,'text_primary',font='sans-serif-medium')+'\n'+tv('wS1',14,'text_secondary',mt=3), w='wrap_content', h='wrap_content', pad=0, extra='android:paddingStart="14dp"')
+widgets['digital']=lin('horizontal', left+'\n'+spacer(h='1dp',weight=1)+'\n'+'<FrameLayout android:layout_width="1.5dp" android:layout_height="46dp" android:background="@drawable/wb_line" />'+'\n'+right, gravity='center_vertical', pad=16)
+
+sx='android:autoSizeMaxTextSize="90sp" android:autoSizeMinTextSize="20sp" android:autoSizeTextType="uniform"'
+datechip=lin('horizontal', tv('wS1',13,'text_secondary',style='bold'), w='wrap_content', h='wrap_content', pad=0, gravity='center_vertical', bg='wb_chip', ps=(10,4,10,4))
+widgets['stack']=lin('vertical',
+    clock('wP1','h','HH',40,font='sans-serif-medium',w='match_parent',h='0dp',weight=1,extra=sx,gravity='start|bottom')+'\n'+
+    clock('wP2','mm','mm',40,font='sans-serif-light',w='match_parent',h='0dp',weight=1,extra=sx,gravity='start|top')+'\n'+datechip, pad=16)
+
+widgets['date']=lin('vertical',
+    tv('wA1',15,'accent',style='bold',font='sans-serif-medium',extra='android:letterSpacing="0.06"')+'\n'+
+    tv('wP1',72,'text_primary',font='sans-serif-light')+'\n'+
+    tv('wS1',13,'text_secondary',font='sans-serif-medium'),
+    gravity='center_vertical', pad=16)
+
+head=lin('horizontal', lin('horizontal', icon('wIcon','ic_alarm',20,'accent'), w='40dp', h='40dp', pad=0, gravity='center', bg='wb_circle')+'\n'+tv('wS1',13,'text_secondary',font='sans-serif-medium',ms=10), w='match_parent', h='wrap_content', pad=0, gravity='center_vertical')
+widgets['alarm']=lin('vertical', head+'\n'+spacer(weight=1)+'\n'+tv('wP1',38,'text_primary',font='sans-serif-light')+'\n'+tv('wA1',14,'accent',style='bold',mt=2), pad=16)
+
+ccol=lin('vertical', tv('wS1',13,'text_secondary',style='bold')+'\n'+tv('wP1',32,'text_primary',font='sans-serif-medium',mt=1)+'\n'+tv('wA1',15,'accent',style='bold',mt=2), w='0dp', h='wrap_content', pad=0, weight=1)
+cd=lin('vertical',
+    '<Chronometer android:id="@+id/wP2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="sans-serif-light" android:includeFontPadding="false" android:textColor="@color/text_primary" android:textSize="26sp" />'+'\n'+
+    clock('wS2','h:mm','HH:mm',12,color='text_secondary',font='sans-serif',mt=2),
+    w='wrap_content', h='wrap_content', pad=0, gravity='center_horizontal', bg='wb_chip', ps=(18,10,18,10))
+widgets['prayer']=lin('horizontal', ccol+'\n'+cd, gravity='center_vertical', pad=16)
+
+cells=[]
+for i in range(5):
+    cells.append(lin('vertical', tv(f'wN{i}',12,'text_secondary',font='sans-serif-medium')+'\n'+
+        tv(f'wH{i}',14,'text_primary',style='bold',mt=4,gravity='center',lines='maxLines="2"'),
+        w='0dp', h='wrap_content', pad=0, weight=1, gravity='center', bg='wb_cell_off', ps=(2,8,2,8),
+        extra='android:layout_marginStart="2dp" android:layout_marginEnd="2dp"', id=f'wC{i}'))
+hd=lin('horizontal', tv('wS1',13,'text_secondary',style='bold',w='0dp',weight=1)+'\n'+tv('wS2',12,'text_secondary'), w='match_parent', h='wrap_content', pad=0, gravity='center_vertical')
+widgets['prayers']=lin('vertical', hd+'\n'+'<FrameLayout android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="8dp" android:background="@drawable/wb_line" />'+'\n'+spacer(weight=1)+'\n'+lin('horizontal','\n'.join(cells),w='match_parent',h='wrap_content',pad=0)+'\n'+spacer(weight=1), pad=14)
+
+widgets['quran']=lin('vertical',
+    lin('horizontal', tv('wS1',12,'text_secondary',font='sans-serif-medium'), w='wrap_content', h='wrap_content', pad=0, bg='wb_chip', ps=(12,4,12,4))+'\n'+
+    tv('wP1',18,'text_primary',font='serif',w='match_parent',h='0dp',weight=1,lines='ellipsize="end" android:maxLines="4"',gravity='center',mt=8,extra='android:lineSpacingMultiplier="1.3"')+'\n'+
+    tv('wA1',13,'accent',style='bold',w='match_parent',gravity='center',mt=6),
+    gravity='center_horizontal', pad=16)
+
+bgs={'prayer':'wb_g2_2','prayers':'wb_g2_2','quran':'wb_g2_2'}
+for name,body in widgets.items():
+    for d in ('ltr','rtl'):
+        open(f'{OUT}/wl_{name}_{d}.xml','w',encoding='utf-8').write(wrap(d,body, bgs.get(name,'wb_adaptive_1')))
+print('ok')

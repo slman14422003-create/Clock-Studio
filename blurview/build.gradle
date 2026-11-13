@@ -1,0 +1,26 @@
+plugins {
+    id 'com.android.library'
+}
+
+// BlurView 4.0.0 (Apache-2.0, github.com/Dimezis/BlurView), embedded as a module because the build has no JitPack access.
+android {
+    namespace = 'com.eightbitlab.blurview'
+    compileSdk = 36
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError = false
+    }
+}
+
+dependencies {
+    implementation 'androidx.annotation:annotation:1.9.1'
+}

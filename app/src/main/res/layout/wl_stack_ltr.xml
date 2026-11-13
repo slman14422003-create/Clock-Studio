@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/wRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="ltr">
+    <ImageView
+        android:id="@+id/wBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/wb_adaptive_1" />
+    <ImageView
+        android:id="@+id/wBorder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/wb_bd_adaptive_2"
+        android:visibility="gone" />
+<LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="16dp">
+<TextClock android:id="@+id/wP1" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fontFamily="sans-serif-medium" android:includeFontPadding="false" android:textColor="@color/text_primary" android:textSize="40sp" android:gravity="start|bottom" android:format12Hour="h" android:format24Hour="HH" android:autoSizeMaxTextSize="90sp" android:autoSizeMinTextSize="20sp" android:autoSizeTextType="uniform" />
+<TextClock android:id="@+id/wP2" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fontFamily="sans-serif-light" android:includeFontPadding="false" android:textColor="@color/text_primary" android:textSize="40sp" android:gravity="start|top" android:format12Hour="mm" android:format24Hour="mm" android:autoSizeMaxTextSize="90sp" android:autoSizeMinTextSize="20sp" android:autoSizeTextType="uniform" />
+<LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:background="@drawable/wb_chip" android:paddingStart="10dp" android:paddingTop="4dp" android:paddingEnd="10dp" android:paddingBottom="4dp">
+<TextView android:id="@+id/wS1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="sans-serif" android:includeFontPadding="false" android:singleLine="true" android:textColor="@color/text_secondary" android:textSize="13sp" android:textStyle="bold" />
+</LinearLayout>
+</LinearLayout>
+</FrameLayout>
