@@ -541,10 +541,14 @@
     <string name="quran_bg_auto">تلقائي حسب الثيم</string>
     <string name="quran_bg_paper">ورقي دافئ</string>
     <string name="quran_bg_deep">أسود عميق</string>
+    <string name="quran_goto_surah">الانتقال إلى سورة</string>
+    <string name="quran_goto_juz">الانتقال إلى جزء</string>
     <string name="quran_goto">الانتقال إلى صفحة</string>
     <string name="quran_keep_on">إبقاء الشاشة مضاءة</string>
     <string name="card_whatsapp">مشاركة كحالة واتساب</string>
     <string name="card_share_image">مشاركة كصورة</string>
+    <string name="card_save">حفظ الصورة في الجهاز</string>
+    <string name="card_saved">تم حفظ الصورة في المعرض</string>
     <string name="card_share_text">مشاركة كنص</string>
     <string name="card_no_whatsapp">واتساب غير مثبّت، اختر تطبيقاً آخر</string>
     <string name="card_failed">تعذّر إنشاء البطاقة</string>

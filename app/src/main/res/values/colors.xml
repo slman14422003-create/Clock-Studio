@@ -27,7 +27,7 @@
     <color name="info">#007AFF</color>
     <color name="violet">#AF52DE</color>
     <color name="lime">#65C466</color>
-    <color name="ic_launcher_bg">#F7FAFF</color>
+    <color name="ic_launcher_bg">#FFFFFF</color>
     <color name="indigo">#5856D6</color>
     <!-- Liquid Glass (day) -->
     <color name="glass_surface">#B3FFFFFF</color>

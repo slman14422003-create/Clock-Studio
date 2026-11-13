@@ -541,10 +541,14 @@
     <string name="quran_bg_auto">Automatic (theme)</string>
     <string name="quran_bg_paper">Warm paper</string>
     <string name="quran_bg_deep">Deep black</string>
+    <string name="quran_goto_surah">Go to surah</string>
+    <string name="quran_goto_juz">Go to juz</string>
     <string name="quran_goto">Go to page</string>
     <string name="quran_keep_on">Keep screen on</string>
     <string name="card_whatsapp">Share as WhatsApp status</string>
     <string name="card_share_image">Share as image</string>
+    <string name="card_save">Save image to device</string>
+    <string name="card_saved">Image saved to gallery</string>
     <string name="card_share_text">Share as text</string>
     <string name="card_no_whatsapp">WhatsApp is not installed, pick another app</string>
     <string name="card_failed">Could not create the card</string>
